@@ -1,0 +1,32 @@
+##
+# (c) 2021 - CloudopsWorks OÜ - https://docs.cloudops.works/
+#
+name: Chatops Agent
+on:
+  issue_comment:
+    types:
+      - created
+
+permissions:
+  issues: write
+  contents: write
+  packages: read
+  statuses: write
+  security-events: write
+
+jobs:
+  gitops:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Slash Command Dispatch
+        if: ${{ !github.event.issue.pull_request }}
+        uses: peter-evans/slash-command-dispatch@v2
+        with:
+          token: ${{ secrets.BOT_TOKEN }}
+          commands: |
+            deploy
+            promote
+            rebuild
+          static-args:
+            issue_number=${{ github.event.issue.number }}
+          
