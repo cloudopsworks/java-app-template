@@ -2,7 +2,7 @@
 ##
 # (c) 2021 - CloudopsWorks OÜ - https://docs.cloudops.works/
 #
-name: Forward Streaming Build
+name: Java Maven Build
 on:
   # Run only on branches PUSH except when charts are modified
   push:
