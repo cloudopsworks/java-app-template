@@ -44,7 +44,7 @@ canary:
   host: acme.com
 
 service:
-  name: forward-streaming
+  name: SERVICE_NAME
   type: ClusterIP
   externalPort: 80
   internalPort: 8080

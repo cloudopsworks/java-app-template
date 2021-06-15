@@ -86,7 +86,7 @@ jobs:
           REPOSITORY_OWNER: ${{ steps.getowner.outputs.owner }}
           REPOSITORY_NAME: ${{ steps.getowner.outputs.repo_name }}
         run: |
-          cd charts/forward-streaming
+          cd charts/${REPOSITORY_NAME}
           make tag
       # Push the changes to Git TAG before deploying anything
       - name: Release Version
