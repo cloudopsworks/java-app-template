@@ -1,5 +1,5 @@
-CHART_REPO_URL := finconectaopsclusterprod.azurecr.io
-DOCKER_REGISTRY := finconectaopsclusterprod.azurecr.io
+CHART_REPO_URL := REPO_ADDRESS
+DOCKER_REGISTRY := REPO_ADDRESS
 CHART_REPO := helm/$(REPOSITORY_OWNER)
 CURRENT=$(pwd)
 NAME := $(REPOSITORY_NAME)
