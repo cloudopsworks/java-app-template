@@ -81,6 +81,8 @@ jobs:
       # Proceed with helm chart versioning bump
       - name: Helm Chart Versioning
         env:
+          HELM_REGISTRY_ADDRESS: ${{ secrets.HELM_REGISTRY_ADDRESS }}
+          DOCKER_REGISTRY_ADDRESS: ${{ secrets.DOCKER_REGISTRY_ADDRESS }}
           REPOSITORY_OWNER: ${{ steps.getowner.outputs.owner }}
           REPOSITORY_NAME: ${{ steps.getowner.outputs.repo_name }}
         run: |
@@ -108,7 +110,7 @@ jobs:
       - name: Docker Login
         uses: docker/login-action@v1
         with:
-          registry: finconectaopsclusterprod.azurecr.io
+          registry: ${{ secrets.DOCKER_REGISTRY_ADDRESS }}
           username: ${{ secrets.AZURE_SERVICE_ID }}
           password: ${{ secrets.AZURE_SERVICE_SECRET }}
       - name: Set up Docker Buildx
@@ -119,13 +121,15 @@ jobs:
           push: true
           context: .
           tags: |
-            finconectaopsclusterprod.azurecr.io/${{ steps.getowner.outputs.owner }}/${{ steps.getowner.outputs.repo_name }}:latest
-            finconectaopsclusterprod.azurecr.io/${{ steps.getowner.outputs.owner }}/${{ steps.getowner.outputs.repo_name }}:${{ steps.release.outputs.release_version }}
+            ${{ secrets.DOCKER_REGISTRY_ADDRESS }}/${{ steps.getowner.outputs.owner }}/${{ steps.getowner.outputs.repo_name }}:latest
+            ${{ secrets.DOCKER_REGISTRY_ADDRESS }}/${{ steps.getowner.outputs.owner }}/${{ steps.getowner.outputs.repo_name }}:${{ steps.release.outputs.release_version }}
       #
       # Helm Build and deploy to registry
       #
       - name: Helm Build
         env:
+          HELM_REGISTRY_ADDRESS: ${{ secrets.HELM_REGISTRY_ADDRESS }}
+          DOCKER_REGISTRY_ADDRESS: ${{ secrets.DOCKER_REGISTRY_ADDRESS }}
           HELM_CREDS_USER: ${{ secrets.AZURE_SERVICE_ID }}
           HELM_CREDS_PASSWORD: ${{ secrets.AZURE_SERVICE_SECRET }}
           HELM_EXPERIMENTAL_OCI: "1"
