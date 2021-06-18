@@ -70,6 +70,16 @@ readinessProbe:
   successThreshold: 1
   timeoutSeconds: 1
 
+# Affinity configuration for Pods
+affinity: {}
+
+tolerations: {}
+
+nodeSelector: {}
+
+additionalVolumeMounts: {}
+
+additionalVolumes: {}
 
 # custom ingress annotations on this service
 ingress:
@@ -88,7 +98,7 @@ jxRequirements:
       production: false
 
     # For Kubernetes v1.14+, use 'networking.k8s.io/v1beta1'
-    apiVersion: "apps/v1"
+    apiVersion: "networking.k8s.io/v1beta1"
 
     # shared ingress annotations on all services
     annotations:
