@@ -23,10 +23,19 @@
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 
-# maven project outputs
-**/target
-# IntelliJ Idea
+# .Mac
+**/.DS_Store
+
+# Maven Objects
+dependency-reduced-pom.xml
+target/
+
+# IntelliJ idea
 .idea/
-# EClipse
+*.iml
+
+# Eclipse JDT
 .project
 .settings/
+.classpath
+.factorypath

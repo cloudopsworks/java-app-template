@@ -1,4 +1,3 @@
-
 ##
 # (c) 2021 - CloudopsWorks OÜ - https://docs.cloudops.works/
 #
@@ -41,9 +40,39 @@ jobs:
       - name: Cache Maven packages
         uses: actions/cache@v2
         with:
-          path: ~/.m2
-          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
-          restore-keys: ${{ runner.os }}-m2
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      # Get pipeline conf
+      - name: Get pipeline docker enable
+        id: pipeline_docker
+        uses: mikefarah/yq@master
+        with:
+          cmd: yq eval '.pipeline[]' ./cloudopsworks-ci.yaml | grep docker | wc -l
+
+      # Get pipeline conf
+      - name: Get pipeline helm enable
+        id: pipeline_helm
+        uses: mikefarah/yq@master
+        with:
+          cmd: yq eval '.pipeline[]' ./cloudopsworks-ci.yaml | grep helm | wc -l
+
+      # Get pipeline conf
+      - name: Get pipeline zip packaging
+        id: pipeline_zip
+        uses: mikefarah/yq@master
+        with:
+          cmd: yq eval '.pipeline[]' ./cloudopsworks-ci.yaml | grep zip | wc -l
+
+      # Get pipeline conf
+      - name: Get pipeline zip packaging globs
+        id: zip_globs
+        uses: mikefarah/yq@master
+        with:
+          cmd: yq eval '.zipGlobs[]' ./cloudopsworks-ci.yaml
+
       # Get the owner repo
       - name: Get owner
         id: getowner
@@ -80,6 +109,7 @@ jobs:
         run: mvn --batch-mode --update-snapshots clean package
       # Proceed with helm chart versioning bump
       - name: Helm Chart Versioning
+        if: steps.pipeline_helm.outputs.result == 1
         env:
           HELM_REGISTRY_ADDRESS: ${{ secrets.HELM_REGISTRY_ADDRESS }}
           DOCKER_REGISTRY_ADDRESS: ${{ secrets.DOCKER_REGISTRY_ADDRESS }}
@@ -103,19 +133,22 @@ jobs:
       - name: Deploy to Maven Repo
         run: mvn --batch-mode deploy
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.BOT_TOKEN }}
       #
       # Docker Build and deploy to registry
       #
       - name: Docker Login
+        if: steps.pipeline_docker.outputs.result == 1
         uses: docker/login-action@v1
         with:
           registry: ${{ secrets.DOCKER_REGISTRY_ADDRESS }}
           username: ${{ secrets.AZURE_SERVICE_ID }}
           password: ${{ secrets.AZURE_SERVICE_SECRET }}
       - name: Set up Docker Buildx
+        if: steps.pipeline_docker.outputs.result == 1
         uses: docker/setup-buildx-action@v1
       - name: Docker Push
+        if: steps.pipeline_docker.outputs.result == 1
         uses: docker/build-push-action@v2
         with:
           push: true
@@ -127,6 +160,7 @@ jobs:
       # Helm Build and deploy to registry
       #
       - name: Helm Build
+        if: steps.pipeline_helm.outputs.result == 1
         env:
           HELM_REGISTRY_ADDRESS: ${{ secrets.HELM_REGISTRY_ADDRESS }}
           DOCKER_REGISTRY_ADDRESS: ${{ secrets.DOCKER_REGISTRY_ADDRESS }}
@@ -138,6 +172,29 @@ jobs:
         run: |
           cd charts/$REPOSITORY_NAME
           make release
+
+      #
+      # Perform ZIP packaging of target files & globbed files
+      #
+      - name: ZIP file packaging
+        if: steps.pipeline_zip.outputs.result == 1
+        run: |
+          VERSION=$(cat VERSION)
+          ZIPFILE=target/${{ steps.getowner.outputs.repo_name }}-v${VERSION}.zip
+          mkdir -p target/
+          for glob in '${{ steps.zip_globs.outputs.result }}' ; do
+            zip -u -r ${ZIPFILE} $glob
+          done
+
+      #
+      # Post generated zip into GITHUB artifacts
+      #
+      # - name: Upload artifacts
+      #   if: steps.pipeline_zip.outputs.result == 1
+      #   uses: actions/upload-artifact@v2
+      #   with:
+      #     name: ${{ steps.getowner.outputs.repo_name }}-v${{ steps.release.outputs.release_version }}.zip
+      #     path: target/${{ steps.getowner.outputs.repo_name }}-v${{ steps.release.outputs.release_version }}.zip
 
   static-analysis:
     runs-on: ubuntu-latest
@@ -156,6 +213,16 @@ jobs:
         with:
           java-version: "11"
           distribution: "adopt"
+
+      # Cache all maven packages
+      - name: Cache Maven packages
+        uses: actions/cache@v2
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
       # Build the code!
       - name: Static Test Code
         env:
@@ -172,6 +239,13 @@ jobs:
       - build-release
       - static-analysis
     steps:
+      # Proceed with checkout of source with all the references (depth=0)  
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.BOT_TOKEN }}
+          ref: v${{ needs.build-release.outputs.release_version }}
+
       # Get the owner repo
       - name: Get owner
         id: getowner
@@ -180,6 +254,24 @@ jobs:
           repo_name=`echo "$GITHUB_REPOSITORY" | cut -f 2 -d "/"`
           echo "::set-output name=owner::$repo_owner"
           echo "::set-output name=repo_name::$repo_name"
+
+      # Get pipeline conf
+      - name: Get pipeline target environment
+        id: get_env
+        uses: mikefarah/yq@master
+        with:
+          cmd: yq eval '.cd.env' ./cloudopsworks-ci.yaml
+
+      # Environment Determination
+      - name: Find Target Environment
+        id: target_env
+        run: |
+          ENV="${{ steps.get_env.outputs.result }}"
+          if [[ "$ENV" == "" ]] ; then
+            ENV="staging"
+          fi
+          echo "::set-output name=result::$ENV"
+
       # Build Payload script
       - name: Build Payload params
         id: params
@@ -187,7 +279,7 @@ jobs:
           payload="{\"promote\": {"
           payload="${payload}\"repositoryowner\": \"${{ steps.getowner.outputs.owner }}\""
           payload="${payload}, \"repository\": \"${{ steps.getowner.outputs.repo_name }}\""
-          payload="${payload}, \"environment\": \"staging\""
+          payload="${payload}, \"environment\": \"${{ steps.target_env.outputs.result }}\""
           payload="${payload}, \"version\": \"${{ needs.build-release.outputs.release_version }}\""
           payload="${payload}, \"releasename\": \"${{ steps.getowner.outputs.repo_name }}\""
           payload="${payload} } }"
@@ -200,7 +292,7 @@ jobs:
         uses: peter-evans/repository-dispatch@v1
         with:
           token: "${{ secrets.BOT_TOKEN }}"
-          repository: ${{ steps.getowner.outputs.owner }}/environment-${{ steps.getowner.outputs.owner }}-staging
+          repository: ${{ steps.getowner.outputs.owner }}/environment-${{ steps.getowner.outputs.owner }}-${{ steps.target_env.outputs.result }}
           event-type: promote-environment
           client-payload: '${{ steps.params.outputs.payload }}'
 
