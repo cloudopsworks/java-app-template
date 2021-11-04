@@ -34,9 +34,9 @@ jobs:
           version=${{ github.event.client_payload.slash_command.args.named.version }}
           environment=${{ github.event.client_payload.slash_command.args.named.env }}
           target=${{ github.event.client_payload.slash_command.args.named.release-name }}
-          from_repo=${{ github.event.client_payload.slash_command.args.named.issue_repository }}
-          from_issue=${{ github.event.client_payload.slash_command.args.named.issue_number }}
-          from_author=${{ github.event.client_payload.slash_command.args.named.author }}
+          from_repo=${{ github.event.client_payload.slash_command.args.unnamed.issue_repository }}
+          from_issue=${{ github.event.client_payload.slash_command.args.unnamed.issue_number }}
+          from_author=${{ github.event.client_payload.slash_command.args.unnamed.author }}
 
           failed=0
           if [[ "$version" == "" ]] ; then
@@ -87,7 +87,7 @@ jobs:
         with:
           github-token: ${{secrets.BOT_TOKEN}}
           script: |
-            const issue_number = "${{ github.event.client_payload.slash_command.args.named.issue_number }}"
+            const issue_number = "${{ github.event.client_payload.slash_command.args.unnamed.issue_number }}"
             const body = `Event submitted to repository: ${process.env.EVENT_REPO}
             With Payload:
             \`\`\`
