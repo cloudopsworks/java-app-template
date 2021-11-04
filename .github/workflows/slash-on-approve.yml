@@ -1,0 +1,101 @@
+##
+# (c) 2021 - CloudopsWorks OÜ - https://docs.cloudops.works/
+#
+name: Slash command on Approve/LGTM
+on:
+  repository_dispatch:
+    types:
+      - approved-command
+      - approve-command
+      - lgtm-command
+permissions:
+  issues: write
+  contents: write
+  packages: read
+  statuses: write
+  pull-requests: write
+
+jobs:
+  approve:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/github-script@v4
+        with:
+          github-token: ${{secrets.BOT_TOKEN}}
+          script: |
+            const pull_request = '${{ github.event.client_payload.slash_command.args.named.pull_request }}'
+            const pull_request_number = '${{ github.event.client_payload.slash_command.args.named.pull_request_number }}'
+            const author = '${{ github.event.client_payload.slash_command.args.named.author }}'
+            
+            const {data: thepull} = await github.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: pull_request_number
+            })
+
+            if ( ! thepull.mergeable ) {
+              console.log('NOT Mergeable');
+              return;
+            } 
+
+            const output = `Approval Requested for Pull request.
+            Pull request mergeable?: \`thepull.mergeable\`
+            Approved by: \`${author}\`
+            
+            *Action: \`${{ github.event_name }}\`, Working Directory: \`${{ env.tf_actions_working_dir }}\`, Workflow: \`${{ github.workflow }}\`*`;
+
+            const {data: reviewers} = await github.pulls.listRequestedReviewers({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: pull_request_number
+            });
+
+            var is_approved = false;
+
+            for (const aUser of reviewers.users ) {
+              if( aUser.login == author ) {
+                is_approved = true;
+                break;
+              }
+            }
+
+            if ( is_approved ) {
+              github.issues.createComment({
+                issue_number: pull_request_number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: output
+              });
+
+              var reviewer_names = [];
+              for (const aUser of reviewers.users ) {
+                reviewer_names.push(aUser.login);
+              }
+
+              github.pulls.removeRequestedReviewers({
+                pull_number: pull_request_number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                reviewers: reviewer_names
+              });
+
+              github.issues.removeLabel({
+                issue_number: pull_request_number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                name: 'approval-required',
+              });
+              github.issues.removeLabel({
+                issue_number: pull_request_number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                name: 'review-required'
+              });
+              github.issues.addLabels({
+                issue_number: pull_request_number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                labels: ['approved']
+              });
+
+            }

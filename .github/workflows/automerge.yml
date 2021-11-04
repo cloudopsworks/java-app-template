@@ -1,0 +1,31 @@
+##
+# (c) 2021 - CloudopsWorks OÜ - https://docs.cloudops.works/
+#
+name: Forward Environment Auto Merge on Pull request
+on:
+  pull_request_target:
+    types:
+      - opened
+      - synchronize
+      - labeled
+      - unlabeled
+      - edited
+
+permissions:
+  contents: write
+  packages: read
+  statuses: write
+  pull-requests: write
+  issues: write
+  checks: write
+
+jobs:
+  automerge:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: pascalgn/automerge-action@v0.14.2
+        env:
+          GITHUB_TOKEN: "${{ secrets.BOT_TOKEN }}"
+          MERGE_LABELS: "approved,!do-not-merge"
+          UPDATE_LABELS: "approved"
+          #LOG: "TRACE"

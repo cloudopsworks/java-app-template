@@ -1,0 +1,14 @@
+##
+# (c) 2021 - CloudopsWorks OÜ - https://docs.cloudops.works/
+#
+release:
+- ./*
+
+size-XS:
+- any: [ '*Dockerfile' ]
+
+size-S:
+- any: [ '*pom.xml', 'charts/**/*' ]
+
+size-XL:
+- any: [ '**/*.java', '!*Dockerfile', '!*pom.xml', '!charts/**/*' ]

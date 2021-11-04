@@ -1,0 +1,12 @@
+##
+# (c) 2021 - CloudopsWorks OÜ - https://docs.cloudops.works/
+#
+pipeline:
+  - docker
+  - helm
+#  - zip
+# zipGlobs:
+#   - target/*with-dependencies.jar
+#  - conf/**
+# cd:
+#   env: dev

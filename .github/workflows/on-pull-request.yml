@@ -1,0 +1,97 @@
+##
+# (c) 2021 - CloudopsWorks OÜ - https://docs.cloudops.works/
+#
+name: Check on Pull request
+on:
+  pull_request:
+    
+  pull_request_target:
+    types:
+      - opened
+      - synchronize
+
+permissions:
+  contents: read
+  packages: write
+  statuses: write
+  pull-requests: write
+  issues: write
+  checks: write
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/labeler@v3
+        with:
+          repo-token: ${{ secrets.BOT_TOKEN }}
+
+      # Get the owner repo
+      - name: Get owner
+        id: getowner
+        run: |
+          repo_owner=`echo "$GITHUB_REPOSITORY" | cut -f 1 -d "/"`
+          repo_name=`echo "$GITHUB_REPOSITORY" | cut -f 2 -d "/"`
+          echo "::set-output name=owner::$repo_owner"
+          echo "::set-output name=repo_name::$repo_name"
+
+      - uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.BOT_TOKEN }}
+
+      - name: Install yq
+        run: |
+          sudo wget -O /usr/local/bin/yq https://github.com/mikefarah/yq/releases/download/v4.6.3/yq_linux_amd64
+          sudo chmod +x /usr/local/bin/yq
+
+      - name: Check if automatic
+        id: check_automatic
+        run: |
+          is_auto=$(yq e '.automatic' OWNERS)
+          if [[ "$is_auto" != "true" ]] ; then
+            is_auto=false
+          fi
+          echo "::set-output name=autoapprove::$is_auto"
+
+      - uses: actions/github-script@v4
+        if: ${{ steps.check_automatic.outputs.autoapprove == 'true' }}
+        with:
+          github-token: ${{secrets.BOT_TOKEN}}
+          script: |
+            github.issues.addLabels({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: ['approved', 'automatic-environment']
+            })
+      
+      - name: Read reviewers from file
+        id: reviewers
+        if: ${{ steps.check_automatic.outputs.autoapprove != 'true' }}
+        run: |
+          count=$(yq e '.requiredReviewers' OWNERS)
+          reviewers_as_json=$(yq e -j -I=0 '[.reviewers[] | select(. != "${{ github.event.pull_request.user.login }}") ]' OWNERS)
+          echo "::set-output name=count::$count"
+          echo "::set-output name=as_json::$reviewers_as_json"
+
+      - uses: actions/github-script@v4
+        if: ${{ steps.check_automatic.outputs.autoapprove != 'true' }}
+        with:
+          github-token: ${{secrets.BOT_TOKEN}}
+          script: |
+            const reviewers_json=JSON.parse('${{ steps.reviewers.outputs.as_json }}')
+            const reviewers_count=${{ steps.reviewers.outputs.count }}
+
+            github.pulls.requestReviewers({
+              pull_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              reviewers: reviewers_json
+            })
+
+            github.issues.addLabels({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: ['approval-required','review-required']
+            })

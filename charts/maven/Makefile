@@ -29,10 +29,9 @@ clean:
 release: clean
 	helm dependency build
 	helm lint
-	helm chart save . $(NAME):$(RELEASE_VERSION)
-	helm chart save . $(CHART_REPO_URL)/$(CHART_REPO)/$(NAME):$(RELEASE_VERSION)
+	helm package . --app-version $(RELEASE_VERSION)
 	echo "$(HELM_CREDS_PASSWORD)" | helm registry login $(CHART_REPO_URL) --username $(HELM_CREDS_USER) --password-stdin
-	helm chart push $(CHART_REPO_URL)/$(CHART_REPO)/$(NAME):$(RELEASE_VERSION)
+	helm push $(NAME)-$(RELEASE_VERSION).tgz oci://$(CHART_REPO_URL)/$(CHART_REPO)
 
 tag:
 ifeq ($(OS),Darwin)

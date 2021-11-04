@@ -34,6 +34,9 @@ jobs:
           version=${{ github.event.client_payload.slash_command.args.named.version }}
           environment=${{ github.event.client_payload.slash_command.args.named.env }}
           target=${{ github.event.client_payload.slash_command.args.named.release-name }}
+          from_repo=${{ github.event.client_payload.slash_command.args.named.issue_repository }}
+          from_issue=${{ github.event.client_payload.slash_command.args.named.issue_number }}
+          from_author=${{ github.event.client_payload.slash_command.args.named.author }}
 
           failed=0
           if [[ "$version" == "" ]] ; then
@@ -54,6 +57,8 @@ jobs:
             else
               payload="${payload}, \"releasename\": \"${{ steps.getowner.outputs.repo_name }}\""
             fi
+            payload="${payload}, \"fromissue\": \"${from_repo}#${from_issue}\""
+            payload="${payload}, \"fromauthor\": \"${from_author}\""
             payload="${payload} } }"
 
             echo "::set-output name=payload::$payload"
@@ -103,5 +108,3 @@ jobs:
               issue_number: issue_number,
               state: 'closed'
             })
-
-
