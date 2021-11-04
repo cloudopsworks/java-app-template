@@ -78,8 +78,8 @@ jobs:
           event-type: promote-environment
           client-payload: '${{ steps.params.outputs.payload }}'
 
-      # Close issue that started this event
-      - name: Close the Issue
+      # Comment issue that started this event
+      - name: Comment the Issue
         uses: actions/github-script@v4
         env:
           EVENT_REPO: "${{ steps.getowner.outputs.owner }}/environment-${{ steps.getowner.outputs.owner }}-${{ github.event.client_payload.slash_command.args.named.env }}"
@@ -100,11 +100,4 @@ jobs:
               repo: context.repo.repo,
               issue_number: issue_number,
               body: body
-            })
-
-            github.issues.update({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: issue_number,
-              state: 'closed'
             })
