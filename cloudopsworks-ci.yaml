@@ -5,8 +5,22 @@ pipeline:
   - docker
   - helm
 #  - zip
-# zipGlobs:
-#   - target/*with-dependencies.jar
-#  - conf/**
+zipGlobs:
+  - target/*with-dependencies.jar
+  - conf/**
+excludeGlobs:
+  - Dockerfile
+  - .helmignore
+  - .dockerignore
+  - .git*
+  - .git/
+  - OWNER*
+  - README.md
+  - jenkins*
+  - target/
+  - charts/
+  - cloudopsworks-ci
+  - skafold*
+  - gulpfile*
 # cd:
 #   env: dev

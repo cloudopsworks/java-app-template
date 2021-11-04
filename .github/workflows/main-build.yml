@@ -73,6 +73,13 @@ jobs:
         with:
           cmd: yq eval '.zipGlobs[]' ./cloudopsworks-ci.yaml
 
+      # Get pipeline conf
+      - name: Get pipeline zip packaging exclude globs
+        id: exclude_globs
+        uses: mikefarah/yq@master
+        with:
+          cmd: yq eval '.excludeGlobs[]' ./cloudopsworks-ci.yaml
+
       # Get the owner repo
       - name: Get owner
         id: getowner
@@ -182,9 +189,9 @@ jobs:
           VERSION=$(cat VERSION)
           ZIPFILE=target/${{ steps.getowner.outputs.repo_name }}-v${VERSION}.zip
           mkdir -p target/
-          for glob in '${{ steps.zip_globs.outputs.result }}' ; do
-            zip -u -r ${ZIPFILE} $glob
-          done
+          echo '${{ steps.zip_globs.outputs.result }}' > target/.includelist
+          echo '${{ steps.exclude_globs.outputs.result }}' > target/.excludelist
+          zip -u -r ${ZIPFILE} . -i@target/.includelist -x@target/.excludelist
 
       #
       # Post generated zip into GITHUB artifacts
