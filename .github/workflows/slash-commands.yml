@@ -27,10 +27,10 @@ jobs:
             deploy
             promote
             rebuild
-          static-args:
+          static-args: |
             author=${{ github.actor }}
             issue_number=${{ github.event.issue.number }}
-            issue_repository=${{ github.event.repo.name }}
+            issue_repository=${{ github.repository }}
       - name: Slash Command Dispatch Pull-Request
         if: ${{ github.event.issue.pull_request }}
         uses: peter-evans/slash-command-dispatch@v2
