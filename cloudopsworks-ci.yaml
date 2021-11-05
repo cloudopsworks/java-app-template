@@ -21,6 +21,5 @@ excludeGlobs:
   - charts/
   - cloudopsworks-ci
   - skafold*
-  - gulpfile*
 # cd:
 #   env: dev
