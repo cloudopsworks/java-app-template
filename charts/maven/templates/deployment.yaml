@@ -15,8 +15,16 @@ metadata:
     {{ $pkey }}: {{ quote $pval }}
   {{- end }}
 {{- end }}
+{{- if .Values.tracing.enabled }}
+{{- if eq .Values.tracing.type "jaeger" }}
+    sidecar.jaegertracing.io/inject: {{ .Values.tracing.tracerName }}
+{{- end }}
+{{- end }}
 spec:
   strategy:
+    type: Recreate
+    # maxSurge: 1
+    # maxUnavailable: 0
   selector:
     matchLabels:
       app: {{ template "fullname" . }}
