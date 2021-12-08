@@ -1,0 +1,263 @@
+##
+# (c) 2021 - CloudopsWorks OÜ - https://docs.cloudops.works/
+#
+name: Code Build Workflow Template
+
+on:
+  workflow_call:
+    inputs:
+      isRelease:
+        default: true
+        required: false
+        type: boolean
+      
+    outputs:
+      release_version:
+        value: ${{ jobs.build.outputs.release_version }}
+
+    secrets:
+      DOCKER_REGISTRY_ADDRESS:
+        required: true
+      HELM_REGISTRY_ADDRESS:
+        required: true
+      BOT_USER:
+        required: true
+      BOT_EMAIL:
+        required: true
+      BOT_TOKEN:
+        required: true
+      dockerRegistryUser:
+        required: true
+      dockerRegistryPassword:
+        required: true
+      helmRegistryUser:
+        required: true
+      helmRegistryPassword:
+        required: true
+
+
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    outputs:
+      release_version: ${{ steps.release.outputs.release_version }}
+    steps:
+      # Proceed with checkout of source with all the references (depth=0)  
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.BOT_TOKEN }}
+      # Setup Java JDK for builds
+      - name: Set JDK 8
+        uses: actions/setup-java@v2
+        with:
+          java-version: "11"
+          distribution: "openjdk"
+      # Helm Chart build & deploy Support
+      - uses: azure/setup-helm@v1
+      # Cache all maven packages
+      - name: Cache Maven packages
+        uses: actions/cache@v2
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      # Get pipeline conf
+      - name: Get pipeline docker enable
+        id: pipeline_docker
+        uses: mikefarah/yq@master
+        with:
+          cmd: yq eval '.pipeline[]' ./cloudopsworks-ci.yaml | grep docker | wc -l
+
+      # Get pipeline conf
+      - name: Get pipeline helm enable
+        id: pipeline_helm
+        uses: mikefarah/yq@master
+        with:
+          cmd: yq eval '.pipeline[]' ./cloudopsworks-ci.yaml | grep helm | wc -l
+
+      # Get pipeline conf
+      - name: Get pipeline zip packaging
+        id: pipeline_zip
+        uses: mikefarah/yq@master
+        with:
+          cmd: yq eval '.pipeline[]' ./cloudopsworks-ci.yaml | grep zip | wc -l
+
+      # Get pipeline conf
+      - name: Get pipeline zip packaging globs
+        id: zip_globs
+        uses: mikefarah/yq@master
+        with:
+          cmd: yq eval '.zipGlobs[]' ./cloudopsworks-ci.yaml
+
+      # Get pipeline conf
+      - name: Get pipeline zip packaging exclude globs
+        id: exclude_globs
+        uses: mikefarah/yq@master
+        with:
+          cmd: yq eval '.excludeGlobs[]' ./cloudopsworks-ci.yaml
+
+      # Get the owner repo
+      - name: Get owner
+        id: getowner
+        run: |
+          repo_owner=`echo "$GITHUB_REPOSITORY" | cut -f 1 -d "/"`
+          repo_name=`echo "$GITHUB_REPOSITORY" | cut -f 2 -d "/"`
+          echo "::set-output name=owner::$repo_owner"
+          echo "::set-output name=repo_name::$repo_name"
+
+      # Get previous tags in order to proceed to generate next version
+      - name: Get Previous tag
+        uses: WyriHaximus/github-action-get-previous-tag@v1
+        id: previoustag
+        env:
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+      # Generate next SEMVER number
+      - name: Next Semver
+        uses: WyriHaximus/github-action-next-semvers@v1
+        id: semvers
+        with:
+          version: "${{ steps.previoustag.outputs.tag }}"
+
+      # Create a VERSION file to use through the build
+      - name: Set Version File for a Release
+        if: inputs.isRelease
+        env:
+          NEXT_VERSION: "${{ steps.semvers.outputs.patch }}"
+        run: |
+          echo -n "$NEXT_VERSION" > VERSION
+      # Create a version in case this is not a Release:
+      - name: Set snapshot Version
+        if: inputs.isRelease == false
+        env:
+          NEXT_VERSION: "${{ steps.semvers.outputs.patch }}-SNAPSHOT"
+        run: |
+          echo -n "${NEXT_VERSION}" > VERSION
+      # Collect the version in VERSION File and publish
+      - name: Set Release verision output
+        id: release
+        run: |
+          NEXT_VERSION=$(cat VERSION)
+          echo "::set-output name=release_version::$NEXT_VERSION"
+
+      # Create ChangeLog file into main directory for commit case of Release
+      - name: Create Changelog
+        if: inputs.isRelease
+        uses: heinrichreimer/github-changelog-generator-action@v2.3
+        with:
+          sinceTag: ${{ steps.previoustag.outputs.tag }}
+          futureRelease: ${{ steps.semvers.outputs.patch }}
+          output: CHANGELOG.md
+          token: ${{ secrets.BOT_TOKEN }}
+          stripGeneratorNotice: true
+
+      # Create ChangeLog file into main directory for commit case of PR or branch
+      - name: Create Changelog
+        if: inputs.isRelease == false
+        uses: heinrichreimer/github-changelog-generator-action@v2.3
+        with:
+          output: CHANGELOG.md
+          token: ${{ secrets.BOT_TOKEN }}
+          stripGeneratorNotice: true
+
+      # Maven version set to POM.XML
+      - name: Maven Version
+        run: mvn --batch-mode versions:set -DnewVersion=$(cat VERSION) 
+      # Build the code!
+      - name: Build Code
+        run: mvn --batch-mode --update-snapshots clean package
+      # Proceed with helm chart versioning bump
+      - name: Helm Chart Versioning
+        if: steps.pipeline_helm.outputs.result == 1
+        env:
+          HELM_REGISTRY_ADDRESS: ${{ secrets.HELM_REGISTRY_ADDRESS }}
+          DOCKER_REGISTRY_ADDRESS: ${{ secrets.DOCKER_REGISTRY_ADDRESS }}
+          REPOSITORY_OWNER: ${{ steps.getowner.outputs.owner }}
+          REPOSITORY_NAME: ${{ steps.getowner.outputs.repo_name }}
+        run: |
+          cd charts/${REPOSITORY_NAME}
+          make tag
+      # Push the changes to Git TAG before deploying anything
+      - name: Push TAG
+        if: inputs.isRelease
+        env:
+          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+        run: |
+          VERSION=$(cat VERSION)
+          git config --global user.name "${{ secrets.BOT_USER }}"
+          git config --global user.email "${{ secrets.BOT_EMAIL }}"
+          git commit -a -m "chore: release version v$VERSION"
+          git tag -fa v$VERSION -m "Release Version v$VERSION"
+          git push origin v$VERSION
+      # Deploy release to Maven Repository (defaults to Github repo)
+      - name: Deploy to Maven Repo
+        if: inputs.isRelease
+        run: mvn --batch-mode deploy
+        env:
+          GITHUB_TOKEN: ${{ secrets.BOT_TOKEN }}
+      #
+      # Docker Build and deploy to registry
+      #
+      - name: Docker Login
+        if: steps.pipeline_docker.outputs.result == 1
+        uses: docker/login-action@v1
+        with:
+          registry: ${{ secrets.DOCKER_REGISTRY_ADDRESS }}
+          username: ${{ secrets.dockerRegistryuser }}
+          password: ${{ secrets.dockerRegistryPassword }}
+      - name: Set up Docker Buildx
+        if: steps.pipeline_docker.outputs.result == 1
+        uses: docker/setup-buildx-action@v1
+      - name: Docker Push
+        if: steps.pipeline_docker.outputs.result == 1
+        uses: docker/build-push-action@v2
+        with:
+          push: true
+          context: .
+          tags: |
+            ${{ secrets.DOCKER_REGISTRY_ADDRESS }}/${{ steps.getowner.outputs.owner }}/${{ steps.getowner.outputs.repo_name }}:latest
+            ${{ secrets.DOCKER_REGISTRY_ADDRESS }}/${{ steps.getowner.outputs.owner }}/${{ steps.getowner.outputs.repo_name }}:${{ steps.release.outputs.release_version }}
+      #
+      # Helm Build and deploy to registry
+      #
+      - name: Helm Build
+        if: steps.pipeline_helm.outputs.result == 1
+        env:
+          HELM_REGISTRY_ADDRESS: ${{ secrets.HELM_REGISTRY_ADDRESS }}
+          DOCKER_REGISTRY_ADDRESS: ${{ secrets.DOCKER_REGISTRY_ADDRESS }}
+          HELM_CREDS_USER: ${{ secrets.helmRegistryUser }}
+          HELM_CREDS_PASSWORD: ${{ secrets.helmRegistryPassword }}
+          HELM_EXPERIMENTAL_OCI: "1"
+          REPOSITORY_OWNER: ${{ steps.getowner.outputs.owner }}
+          REPOSITORY_NAME: ${{ steps.getowner.outputs.repo_name }}
+        run: |
+          cd charts/$REPOSITORY_NAME
+          make release
+
+      #
+      # Perform ZIP packaging of target files & globbed files
+      #
+      - name: ZIP file packaging
+        if: steps.pipeline_zip.outputs.result == 1
+        run: |
+          VERSION=$(cat VERSION)
+          ZIPFILE=target/${{ steps.getowner.outputs.repo_name }}-${VERSION}.zip
+          mkdir -p target/
+          echo '${{ steps.zip_globs.outputs.result }}' > target/.includelist
+          echo '${{ steps.exclude_globs.outputs.result }}' > target/.excludelist
+          zip -u -r ${ZIPFILE} . -i@target/.includelist -x@target/.excludelist
+
+      # Perform of upload artfiacts
+      - name: Upload Artifacts to workflow
+        if: inputs.isRelease
+        uses: actions/upload-artifact@v2
+        with:
+          name: all-artifacts
+          path: |
+            target/${{ steps.getowner.outputs.repo_name }}*.zip
+            target/${{ steps.getowner.outputs.repo_name }}*.jar
+            CHANGELOG.md
+          retention-days: 1
