@@ -6,7 +6,7 @@ pipeline:
   - helm
 #  - zip
 zipGlobs:
-  - target/*with-dependencies.jar
+  - target/*.jar
   - conf/**
 excludeGlobs:
   - Dockerfile
@@ -17,9 +17,9 @@ excludeGlobs:
   - OWNER*
   - README.md
   - jenkins*
-  - target/
   - charts/
   - cloudopsworks-ci
   - skafold*
+  - original-*.jar
 # cd:
 #   env: dev
