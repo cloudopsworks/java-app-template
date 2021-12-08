@@ -49,11 +49,11 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.BOT_TOKEN }}
       # Setup Java JDK for builds
-      - name: Set JDK 8
+      - name: Set JDK 11
         uses: actions/setup-java@v2
         with:
           java-version: "11"
-          distribution: "openjdk"
+          distribution: "adopt"
       # Helm Chart build & deploy Support
       - uses: azure/setup-helm@v1
       # Cache all maven packages
