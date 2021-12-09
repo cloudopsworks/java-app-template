@@ -61,7 +61,7 @@ jobs:
       - build
       - static-analysis
       - release
-    uses: cloudopsworks/base-app-template/delivery-push.yml@master
+    uses: cloudopsworks/base-app-template/.github/workflows/delivery-push.yml@master
     with:
       release_version: ${{ needs.build.outputs.release_version }}
       environment: ${{ steps.get_env.outputs.result }}
