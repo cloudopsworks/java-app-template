@@ -39,7 +39,7 @@ jobs:
     uses: cloudopsworks/base-app-template/.github/workflows/create-release.yml@master
     with:
       release-tag: ${{ needs.build.outputs.release_version }}
-      files-glob: |
+      files-globs: |
         target/*.zip
         target/*.jar
     secrets:
