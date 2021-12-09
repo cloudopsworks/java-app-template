@@ -36,9 +36,12 @@ jobs:
   release:
     needs:
       - build
-    uses: cloudopsworks/java-app-template/.github/workflows/create-release.yml@master
+    uses: cloudopsworks/base-app-template/create-release.yml@master
     with:
       release-tag: ${{ needs.build.outputs.release_version }}
+      files-glob: |
+        target/*.zip
+        target/*.jar
     secrets:
       BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
 
@@ -54,66 +57,14 @@ jobs:
       sonarqubeToken: ${{ secrets.SONARQUBE_TOKEN }}
 
   delivery:
-    runs-on: ubuntu-latest
     needs:
       - build
       - static-analysis
       - release
-    steps:
-      # Proceed with checkout of source with all the references (depth=0)  
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-          token: ${{ secrets.BOT_TOKEN }}
-          ref: v${{ needs.build.outputs.release_version }}
-
-      # Get the owner repo
-      - name: Get owner
-        id: getowner
-        run: |
-          repo_owner=`echo "$GITHUB_REPOSITORY" | cut -f 1 -d "/"`
-          repo_name=`echo "$GITHUB_REPOSITORY" | cut -f 2 -d "/"`
-          echo "::set-output name=owner::$repo_owner"
-          echo "::set-output name=repo_name::$repo_name"
-
-      # Get pipeline conf
-      - name: Get pipeline target environment
-        id: get_env
-        uses: mikefarah/yq@master
-        with:
-          cmd: yq eval '.cd.env' ./cloudopsworks-ci.yaml
-
-      # Environment Determination
-      - name: Find Target Environment
-        id: target_env
-        run: |
-          ENV="${{ steps.get_env.outputs.result }}"
-          if [[ "$ENV" == "" ]] ; then
-            ENV="staging"
-          fi
-          echo "::set-output name=result::$ENV"
-
-      # Build Payload script
-      - name: Build Payload params
-        id: params
-        run: |
-          payload="{\"promote\": {"
-          payload="${payload}\"repositoryowner\": \"${{ steps.getowner.outputs.owner }}\""
-          payload="${payload}, \"repository\": \"${{ steps.getowner.outputs.repo_name }}\""
-          payload="${payload}, \"environment\": \"${{ steps.target_env.outputs.result }}\""
-          payload="${payload}, \"version\": \"${{ needs.build.outputs.release_version }}\""
-          payload="${payload}, \"releasename\": \"${{ steps.getowner.outputs.repo_name }}\""
-          payload="${payload} } }"
-
-          echo "::set-output name=payload::$payload"
-
-      # Send event to repository to launch new promotion
-      - name: Send Event to Environment Repository
-        id: send_event
-        uses: peter-evans/repository-dispatch@v1
-        with:
-          token: "${{ secrets.BOT_TOKEN }}"
-          repository: ${{ steps.getowner.outputs.owner }}/environment-${{ steps.getowner.outputs.owner }}-${{ steps.target_env.outputs.result }}
-          event-type: promote-environment
-          client-payload: '${{ steps.params.outputs.payload }}'
+    uses: cloudopsworks/base-app-template/delivery-push.yml@master
+    with:
+      release_version: ${{ needs.build.outputs.release_version }}
+      environment: ${{ steps.get_env.outputs.result }}
+    secrets:
+      token: ${{ secrets.BOT_TOKEN }}
 

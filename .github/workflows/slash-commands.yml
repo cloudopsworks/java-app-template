@@ -17,34 +17,6 @@ permissions:
 
 jobs:
   gitops:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Slash Command Dispatch
-        if: ${{ !github.event.issue.pull_request }}
-        uses: peter-evans/slash-command-dispatch@v2
-        with:
-          token: ${{ secrets.BOT_TOKEN }}
-          commands: |
-            deploy
-            promote
-            rebuild
-          static-args: |
-            author=${{ github.actor }}
-            issue_number=${{ github.event.issue.number }}
-            issue_repository=${{ github.repository }}
-      - name: Slash Command Dispatch Pull-Request
-        if: ${{ github.event.issue.pull_request }}
-        uses: peter-evans/slash-command-dispatch@v2
-        with:
-          token: ${{ secrets.BOT_TOKEN }}
-          commands: |
-            approved
-            approve
-            lgtm
-            cancel
-            retry
-          static-args: |
-            author=${{ github.actor }}
-            pull_request=true
-            pull_request_number=${{ github.event.issue.number }}
-          
+    uses: cloudopsworks/base-app-template/slash-commants.yml@master
+    secrets:
+      token: ${{ secrets.BOT_TOKEN }}
