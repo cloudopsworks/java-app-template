@@ -17,6 +17,6 @@ permissions:
 
 jobs:
   promote:
-    uses: cloudopsworks/base-app-template/slash-on-promote.yml@master
+    uses: cloudopsworks/base-app-template/.github/workflows/slash-on-promote.yml@master
     secrets:
       token: ${{ secrets.BOT_TOKEN }}

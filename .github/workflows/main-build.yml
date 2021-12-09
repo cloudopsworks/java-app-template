@@ -36,7 +36,7 @@ jobs:
   release:
     needs:
       - build
-    uses: cloudopsworks/base-app-template/create-release.yml@master
+    uses: cloudopsworks/base-app-template/.github/workflows/create-release.yml@master
     with:
       release-tag: ${{ needs.build.outputs.release_version }}
       files-glob: |
