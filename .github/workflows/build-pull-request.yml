@@ -1,0 +1,46 @@
+##
+# (c) 2021 - CloudopsWorks OÜ - https://docs.cloudops.works/
+#
+name: Build Pull Request Checks
+on:
+  pull_request_target:
+    types:
+      - opened
+      - synchronize
+      - edited
+
+permissions:
+  contents: read
+  packages: write
+  statuses: write
+  pull-requests: write
+  issues: write
+  checks: write
+
+jobs:
+  build:
+    uses: cloudopsworks/java-app-template/.github/workflows/code-build.yml@master
+    with:
+      isRelease: false
+      ref: ${{ github.head_ref }}
+    secrets:
+      DOCKER_REGISTRY_ADDRESS: ${{ secrets.DOCKER_REGISTRY_ADDRESS }}
+      HELM_REGISTRY_ADDRESS: ${{ secrets.DOCKER_REGISTRY_ADDRESS }}
+      BOT_USER: ${{ secrets.BOT_USER }}
+      BOT_EMAIL: ${{ secrets.BOT_EMAIL }}
+      BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+      dockerRegistryUser: ${{ secrets.AZURE_SERVICE_ID }}
+      dockerRegistryPassword: ${{ secrets.AZURE_SERVICE_SECRET }}
+      helmRegistryUser: ${{ secrets.AZURE_SERVICE_ID }}
+      helmRegistryPassword: ${{ secrets.AZURE_SERVICE_SECRET }}
+
+  static-analysis:
+    needs:
+      - build
+    uses: cloudopsworks/java-app-template/.github/workflows/static-analysis.yml@master
+    with:
+      ref: ${{ github.head_ref }}
+    secrets:
+      BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+      sonarqubeUrl: ${{ secrets.SONARQUBE_URL }}
+      sonarqubeToken: ${{ secrets.SONARQUBE_TOKEN }}
