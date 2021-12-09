@@ -64,7 +64,6 @@ jobs:
     uses: cloudopsworks/base-app-template/.github/workflows/delivery-push.yml@master
     with:
       release_version: ${{ needs.build.outputs.release_version }}
-      environment: ${{ steps.get_env.outputs.result }}
     secrets:
       token: ${{ secrets.BOT_TOKEN }}
 
