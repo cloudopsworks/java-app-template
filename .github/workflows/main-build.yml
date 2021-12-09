@@ -43,7 +43,7 @@ jobs:
         target/*.zip
         target/*.jar
     secrets:
-      BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+      token: ${{ secrets.BOT_TOKEN }}
 
   static-analysis:
     needs:
