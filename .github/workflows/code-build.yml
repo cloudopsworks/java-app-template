@@ -258,7 +258,7 @@ jobs:
           mkdir -p target/
           echo '${{ steps.zip_globs.outputs.result }}' > target/.includelist
           echo '${{ steps.exclude_globs.outputs.result }}' > target/.excludelist
-          zip -u -r ${ZIPFILE} . -i@target/.includelist -x@target/.excludelist
+          zip -q -r -y ${ZIPFILE} . -i@target/.includelist -x@target/.excludelist
 
       # Perform of upload artfiacts
       - name: Upload Artifacts to workflow
