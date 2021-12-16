@@ -158,10 +158,10 @@ jobs:
           tags: |
             ${{ secrets.DOCKER_REGISTRY_ADDRESS }}/${{ steps.getowner.outputs.owner }}/${{ steps.getowner.outputs.repo_name }}:${{ inputs.semver }}
       #
-      # Helm Build and deploy to registry
+      # Helm tag pull request version
       #
       - name: Helm Build
-        if: steps.pipeline_helm.outputs.result == 1
+        if: steps.pipeline_helm.outputs.result == 1 && inputs.isRelease == false
         env:
           HELM_REGISTRY_ADDRESS: ${{ secrets.HELM_REGISTRY_ADDRESS }}
           DOCKER_REGISTRY_ADDRESS: ${{ secrets.DOCKER_REGISTRY_ADDRESS }}
@@ -172,7 +172,22 @@ jobs:
           REPOSITORY_NAME: ${{ steps.getowner.outputs.repo_name }}
         run: |
           cd charts/$REPOSITORY_NAME
-	  make tag
+          make tag
+      #
+      # Helm Build and deploy to registry
+      #
+      - name: Helm Build
+        if: steps.pipeline_helm.outputs.result == 1 && inputs.isRelease == true
+        env:
+          HELM_REGISTRY_ADDRESS: ${{ secrets.HELM_REGISTRY_ADDRESS }}
+          DOCKER_REGISTRY_ADDRESS: ${{ secrets.DOCKER_REGISTRY_ADDRESS }}
+          HELM_CREDS_USER: ${{ secrets.helmRegistryUser }}
+          HELM_CREDS_PASSWORD: ${{ secrets.helmRegistryPassword }}
+          HELM_EXPERIMENTAL_OCI: "1"
+          REPOSITORY_OWNER: ${{ steps.getowner.outputs.owner }}
+          REPOSITORY_NAME: ${{ steps.getowner.outputs.repo_name }}
+        run: |
+          cd charts/$REPOSITORY_NAME
           make release
 
       #
