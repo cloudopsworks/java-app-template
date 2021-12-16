@@ -22,7 +22,7 @@ jobs:
     uses: cloudopsworks/java-app-template/.github/workflows/code-build.yml@master
     with:
       isRelease: false
-      semver: 0.0.1-SNAPSHOT
+      semver: 0.1.0-SNAPSHOT
       ref: ${{ github.head_ref }}
     secrets:
       DOCKER_REGISTRY_ADDRESS: ${{ secrets.DOCKER_REGISTRY_ADDRESS }}

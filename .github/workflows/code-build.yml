@@ -109,6 +109,13 @@ jobs:
           echo "::set-output name=owner::$repo_owner"
           echo "::set-output name=repo_name::$repo_name"
 
+      # Create a VERSION file to use through the build
+      - name: Set Version File for a Release
+        env:
+          NEXT_VERSION: "${{ inputs.semver }}"
+        run: |
+          echo -n "$NEXT_VERSION" > VERSION
+
       # Build the code!
       - name: Build Code
         run: mvn --batch-mode --update-snapshots clean package
@@ -165,6 +172,7 @@ jobs:
           REPOSITORY_NAME: ${{ steps.getowner.outputs.repo_name }}
         run: |
           cd charts/$REPOSITORY_NAME
+	  make tag
           make release
 
       #
