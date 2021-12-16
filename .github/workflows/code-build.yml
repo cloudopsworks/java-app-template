@@ -15,9 +15,9 @@ on:
         required: false
         type: string
 
-    outputs:
-      release_version:
-        value: ${{ jobs.build.outputs.release_version }}
+    # outputs:
+    #   release_version:
+    #     value: ${{ jobs.build.outputs.release_version }}
 
     secrets:
       DOCKER_REGISTRY_ADDRESS:
@@ -42,18 +42,17 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    outputs:
-      release_version: ${{ steps.release.outputs.release_version }}
+    # outputs:
+    #   release_version: ${{ steps.release.outputs.release_version }}
     steps:
+      # # Proceed with checkout of source with all the references (depth=0)  
+      # - uses: actions/checkout@v2
+      #   if: inputs.ref == ''
+      #   with:
+      #     fetch-depth: 0
+      #     token: ${{ secrets.BOT_TOKEN }}
       # Proceed with checkout of source with all the references (depth=0)  
       - uses: actions/checkout@v2
-        if: inputs.ref == ''
-        with:
-          fetch-depth: 0
-          token: ${{ secrets.BOT_TOKEN }}
-      # Proceed with checkout of source with all the references (depth=0)  
-      - uses: actions/checkout@v2
-        if: inputs.ref != ''
         with:
           fetch-depth: 0
           ref: ${{ inputs.ref }}
@@ -119,89 +118,91 @@ jobs:
           echo "::set-output name=owner::$repo_owner"
           echo "::set-output name=repo_name::$repo_name"
 
-      # Get previous tags in order to proceed to generate next version
-      - name: Get Previous tag
-        uses: WyriHaximus/github-action-get-previous-tag@v1
-        id: previoustag
-        env:
-          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
-      # Generate next SEMVER number
-      - name: Next Semver
-        uses: WyriHaximus/github-action-next-semvers@v1
-        id: semvers
-        with:
-          version: "${{ steps.previoustag.outputs.tag }}"
+      # # Get previous tags in order to proceed to generate next version
+      # - name: Get Previous tag
+      #   uses: WyriHaximus/github-action-get-previous-tag@v1
+      #   id: previoustag
+      #   env:
+      #     GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+      #   with:
+      #     fallback: 0.0.0
+      # # Generate next SEMVER number
+      # - name: Next Semver
+      #   uses: WyriHaximus/github-action-next-semvers@v1
+      #   id: semvers
+      #   with:
+      #     version: "${{ steps.previoustag.outputs.tag }}"
 
-      # Create a VERSION file to use through the build
-      - name: Set Version File for a Release
-        if: inputs.isRelease
-        env:
-          NEXT_VERSION: "${{ steps.semvers.outputs.patch }}"
-        run: |
-          echo -n "$NEXT_VERSION" > VERSION
+      # # Create a VERSION file to use through the build
+      # - name: Set Version File for a Release
+      #   if: inputs.isRelease
+      #   env:
+      #     NEXT_VERSION: "${{ steps.semvers.outputs.patch }}"
+      #   run: |
+      #     echo -n "$NEXT_VERSION" > VERSION
       # Create a version in case this is not a Release:
-      - name: Set snapshot Version
-        if: inputs.isRelease == false
-        env:
-          NEXT_VERSION: "${{ steps.semvers.outputs.patch }}-SNAPSHOT"
-        run: |
-          echo -n "${NEXT_VERSION}" > VERSION
-      # Collect the version in VERSION File and publish
-      - name: Set Release verision output
-        id: release
-        run: |
-          NEXT_VERSION=$(cat VERSION)
-          echo "::set-output name=release_version::$NEXT_VERSION"
+      # - name: Set snapshot Version
+      #   if: inputs.isRelease == false
+      #   env:
+      #     NEXT_VERSION: "${{ steps.semvers.outputs.patch }}-SNAPSHOT"
+      #   run: |
+      #     echo -n "${NEXT_VERSION}" > VERSION
+      # # Collect the version in VERSION File and publish
+      # - name: Set Release verision output
+      #   id: release
+      #   run: |
+      #     NEXT_VERSION=$(cat VERSION)
+      #     echo "::set-output name=release_version::$NEXT_VERSION"
 
-      # Create ChangeLog file into main directory for commit case of Release
-      - name: Create Changelog
-        if: inputs.isRelease
-        uses: heinrichreimer/github-changelog-generator-action@v2.3
-        with:
-          sinceTag: ${{ steps.previoustag.outputs.tag }}
-          futureRelease: ${{ steps.semvers.outputs.patch }}
-          output: CHANGELOG.md
-          token: ${{ secrets.BOT_TOKEN }}
-          stripGeneratorNotice: true
+      # # Create ChangeLog file into main directory for commit case of Release
+      # - name: Create Changelog
+      #   if: inputs.isRelease
+      #   uses: heinrichreimer/github-changelog-generator-action@v2.3
+      #   with:
+      #     sinceTag: ${{ steps.previoustag.outputs.tag }}
+      #     futureRelease: ${{ steps.semvers.outputs.patch }}
+      #     output: CHANGELOG.md
+      #     token: ${{ secrets.BOT_TOKEN }}
+      #     stripGeneratorNotice: true
 
-      # Create ChangeLog file into main directory for commit case of PR or branch
-      - name: Create Changelog
-        if: inputs.isRelease == false
-        uses: heinrichreimer/github-changelog-generator-action@v2.3
-        with:
-          output: CHANGELOG.md
-          token: ${{ secrets.BOT_TOKEN }}
-          stripGeneratorNotice: true
+      # # Create ChangeLog file into main directory for commit case of PR or branch
+      # - name: Create Changelog
+      #   if: inputs.isRelease == false
+      #   uses: heinrichreimer/github-changelog-generator-action@v2.3
+      #   with:
+      #     output: CHANGELOG.md
+      #     token: ${{ secrets.BOT_TOKEN }}
+      #     stripGeneratorNotice: true
 
-      # Maven version set to POM.XML
-      - name: Maven Version
-        run: mvn --batch-mode versions:set -DnewVersion=$(cat VERSION) 
+      # # Maven version set to POM.XML
+      # - name: Maven Version
+      #   run: mvn --batch-mode versions:set -DnewVersion=$(cat VERSION) 
       # Build the code!
       - name: Build Code
         run: mvn --batch-mode --update-snapshots clean package
-      # Proceed with helm chart versioning bump
-      - name: Helm Chart Versioning
-        if: steps.pipeline_helm.outputs.result == 1
-        env:
-          HELM_REGISTRY_ADDRESS: ${{ secrets.HELM_REGISTRY_ADDRESS }}
-          DOCKER_REGISTRY_ADDRESS: ${{ secrets.DOCKER_REGISTRY_ADDRESS }}
-          REPOSITORY_OWNER: ${{ steps.getowner.outputs.owner }}
-          REPOSITORY_NAME: ${{ steps.getowner.outputs.repo_name }}
-        run: |
-          cd charts/${REPOSITORY_NAME}
-          make tag
-      # Push the changes to Git TAG before deploying anything
-      - name: Push TAG
-        if: inputs.isRelease
-        env:
-          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
-        run: |
-          VERSION=$(cat VERSION)
-          git config --global user.name "${{ secrets.BOT_USER }}"
-          git config --global user.email "${{ secrets.BOT_EMAIL }}"
-          git commit -a -m "chore: release version v$VERSION"
-          git tag -fa v$VERSION -m "Release Version v$VERSION"
-          git push origin v$VERSION
+      # # Proceed with helm chart versioning bump
+      # - name: Helm Chart Versioning
+      #   if: steps.pipeline_helm.outputs.result == 1
+      #   env:
+      #     HELM_REGISTRY_ADDRESS: ${{ secrets.HELM_REGISTRY_ADDRESS }}
+      #     DOCKER_REGISTRY_ADDRESS: ${{ secrets.DOCKER_REGISTRY_ADDRESS }}
+      #     REPOSITORY_OWNER: ${{ steps.getowner.outputs.owner }}
+      #     REPOSITORY_NAME: ${{ steps.getowner.outputs.repo_name }}
+      #   run: |
+      #     cd charts/${REPOSITORY_NAME}
+      #     make tag
+      # # Push the changes to Git TAG before deploying anything
+      # - name: Push TAG
+      #   if: inputs.isRelease
+      #   env:
+      #     BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+      #   run: |
+      #     VERSION=$(cat VERSION)
+      #     git config --global user.name "${{ secrets.BOT_USER }}"
+      #     git config --global user.email "${{ secrets.BOT_EMAIL }}"
+      #     git commit -a -m "chore: release version v$VERSION"
+      #     git tag -fa v$VERSION -m "Release Version v$VERSION"
+      #     git push origin v$VERSION
       # Deploy release to Maven Repository (defaults to Github repo)
       - name: Deploy to Maven Repo
         if: inputs.isRelease

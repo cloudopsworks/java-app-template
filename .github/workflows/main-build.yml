@@ -20,8 +20,21 @@ permissions:
   statuses: write
 
 jobs:
+  new_version:
+    uses: cloudopsworks/java-app-template/.github/workflows/code-tag.yml@master
+    secrets:
+      DOCKER_REGISTRY_ADDRESS: ${{ secrets.DOCKER_REGISTRY_ADDRESS }}
+      HELM_REGISTRY_ADDRESS: ${{ secrets.DOCKER_REGISTRY_ADDRESS }}
+      BOT_USER: ${{ secrets.BOT_USER }}
+      BOT_EMAIL: ${{ secrets.BOT_EMAIL }}
+      BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+
   build:
+    needs: 
+      - new_version
     uses: cloudopsworks/java-app-template/.github/workflows/code-build.yml@master
+    with:
+      ref: ${{ needs.new_version.outputs.release_tag }}
     secrets:
       DOCKER_REGISTRY_ADDRESS: ${{ secrets.DOCKER_REGISTRY_ADDRESS }}
       HELM_REGISTRY_ADDRESS: ${{ secrets.DOCKER_REGISTRY_ADDRESS }}
