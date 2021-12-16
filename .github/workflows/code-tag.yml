@@ -5,17 +5,12 @@ name: Code Tagging Workflow Template
 
 on:
   workflow_call:
-    inputs:
-      ref:
-        default: ''
-        required: false
-        type: string
 
     outputs:
       release_version:
-        value: ${{ jobs.build.outputs.release_version }}
+        value: ${{ jobs.tag_version.outputs.release_version }}
       release_tag:
-        value: ${{ jobs.build.outputs.release_tag }}
+        value: ${{ jobs.tag_version.outputs.release_tag }}
 
     secrets:
       DOCKER_REGISTRY_ADDRESS:
@@ -39,7 +34,6 @@ jobs:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
-          ref: ${{ inputs.ref }}
           token: ${{ secrets.BOT_TOKEN }}
       # Setup Java JDK for builds
       - name: Set JDK 11
@@ -131,7 +125,8 @@ jobs:
           VERSION=$(cat VERSION)
           git config --global user.name "${{ secrets.BOT_USER }}"
           git config --global user.email "${{ secrets.BOT_EMAIL }}"
-          git commit -a -m "chore: release version v$VERSION"
+          git add .
+          git commit -m "chore: release version v$VERSION"
           git tag -fa v$VERSION -m "Release Version v$VERSION"
           git push origin v$VERSION
           echo "::set-output name=tag_name::v$VERSION"

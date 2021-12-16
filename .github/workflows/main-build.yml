@@ -34,6 +34,7 @@ jobs:
       - new_version
     uses: cloudopsworks/java-app-template/.github/workflows/code-build.yml@master
     with:
+      semver: ${{ needs.new_version.outputs.release_version }} 
       ref: ${{ needs.new_version.outputs.release_tag }}
     secrets:
       DOCKER_REGISTRY_ADDRESS: ${{ secrets.DOCKER_REGISTRY_ADDRESS }}
@@ -49,9 +50,10 @@ jobs:
   release:
     needs:
       - build
+      - new_version
     uses: cloudopsworks/base-app-template/.github/workflows/create-release.yml@master
     with:
-      release-tag: ${{ needs.build.outputs.release_version }}
+      release-tag: ${{ needs.new_version.outputs.release_version }}
       files-globs: |
         target/*.zip
         target/*.jar
@@ -61,9 +63,10 @@ jobs:
   static-analysis:
     needs:
       - build
+      - new_version
     uses: cloudopsworks/java-app-template/.github/workflows/static-analysis.yml@master
     with:
-      ref: v${{ needs.build.outputs.release_version }}
+      ref: ${{ needs.new_version.outputs.release_tag }}
     secrets:
       BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
       sonarqubeUrl: ${{ secrets.SONARQUBE_URL }}
@@ -74,9 +77,10 @@ jobs:
       - build
       - static-analysis
       - release
+      - new_version
     uses: cloudopsworks/base-app-template/.github/workflows/delivery-push.yml@master
     with:
-      release_version: ${{ needs.build.outputs.release_version }}
+      release_version: ${{ needs.new_version.outputs.release_version }}
     secrets:
       token: ${{ secrets.BOT_TOKEN }}
 
