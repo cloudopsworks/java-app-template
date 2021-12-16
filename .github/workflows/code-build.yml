@@ -139,7 +139,7 @@ jobs:
         if: steps.pipeline_docker.outputs.result == 1
         uses: docker/setup-buildx-action@v1
       # Push docker version latest release
-      - name: Docker Push
+      - name: Docker Push Release
         if: steps.pipeline_docker.outputs.result == 1 && inputs.isRelease == true
         uses: docker/build-push-action@v2
         with:
@@ -149,7 +149,7 @@ jobs:
             ${{ secrets.DOCKER_REGISTRY_ADDRESS }}/${{ steps.getowner.outputs.owner }}/${{ steps.getowner.outputs.repo_name }}:latest
             ${{ secrets.DOCKER_REGISTRY_ADDRESS }}/${{ steps.getowner.outputs.owner }}/${{ steps.getowner.outputs.repo_name }}:${{ inputs.semver }}
       # Push docker version but is not latest release
-      - name: Docker Push
+      - name: Docker Push Preview
         if: steps.pipeline_docker.outputs.result == 1 && inputs.isRelease == false
         uses: docker/build-push-action@v2
         with:
@@ -160,7 +160,7 @@ jobs:
       #
       # Helm tag pull request version
       #
-      - name: Helm Build
+      - name: Helm Build Preview
         if: steps.pipeline_helm.outputs.result == 1 && inputs.isRelease == false
         env:
           HELM_REGISTRY_ADDRESS: ${{ secrets.HELM_REGISTRY_ADDRESS }}
@@ -176,7 +176,7 @@ jobs:
       #
       # Helm Build and deploy to registry
       #
-      - name: Helm Build
+      - name: Helm Build Release
         if: steps.pipeline_helm.outputs.result == 1 && inputs.isRelease == true
         env:
           HELM_REGISTRY_ADDRESS: ${{ secrets.HELM_REGISTRY_ADDRESS }}
