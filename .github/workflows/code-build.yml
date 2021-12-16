@@ -18,10 +18,6 @@ on:
         required: true
         type: string
 
-    # outputs:
-    #   release_version:
-    #     value: ${{ jobs.build.outputs.release_version }}
-
     secrets:
       DOCKER_REGISTRY_ADDRESS:
         required: true
@@ -45,8 +41,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    # outputs:
-    #   release_version: ${{ steps.release.outputs.release_version }}
     steps:
       # Proceed with checkout of source with all the references (depth=0)  
       - uses: actions/checkout@v2
