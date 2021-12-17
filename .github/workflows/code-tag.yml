@@ -91,14 +91,17 @@ jobs:
           echo -n "$NEXT_VERSION" > VERSION
 
       # Create ChangeLog file into main directory for commit case of Release
-      - name: Create Changelog
-        uses: heinrichreimer/github-changelog-generator-action@v2.3
+      - name: Generate changelog
+        id: changelog
+        uses: metcalfc/changelog-generator@v3.0.0
         with:
-          sinceTag: ${{ steps.previoustag.outputs.tag }}
-          futureRelease: ${{ steps.semvers.outputs.patch }}
-          output: CHANGELOG.md
-          token: ${{ secrets.BOT_TOKEN }}
-          stripGeneratorNotice: true
+          myToken: ${{ secrets.BOT_TOKEN }}
+          base-ref: '${{ steps.previoustag.outputs.tag }}'
+      - name: Write Changelog
+        run: |
+          cat > CHANGELOG.md <<EOF
+          ${{ steps.changelog.outputs.changelog }}
+          EOF
 
       # Maven version set to POM.XML
       - name: Maven Version
