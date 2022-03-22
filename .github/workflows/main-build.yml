@@ -77,7 +77,6 @@ jobs:
   delivery:
     needs:
       - build
-      - static-analysis
       - release
       - new_version
     uses: cloudopsworks/base-app-template/.github/workflows/delivery-push.yml@master
