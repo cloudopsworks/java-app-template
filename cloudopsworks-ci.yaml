@@ -7,6 +7,7 @@ pipeline:
   - docker
   - helm
 #  - zip
+staticAnalysis: true
 zipGlobs:
   - target/*.jar
   - conf/**

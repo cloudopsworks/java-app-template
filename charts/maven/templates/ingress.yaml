@@ -1,5 +1,5 @@
-{{- if and (.Values.jxRequirements.ingress.domain) (not .Values.knativeDeploy) }}
-apiVersion: {{ .Values.jxRequirements.ingress.apiVersion }}
+{{- if and (.Values.ingress.enabled) (not .Values.knativeDeploy) }}
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   annotations:
@@ -7,26 +7,56 @@ metadata:
 {{- if .Values.ingress.annotations }}
 {{ toYaml .Values.ingress.annotations | indent 4 }}
 {{- end }}
-{{- if .Values.jxRequirements.ingress.annotations }}
-{{ toYaml .Values.jxRequirements.ingress.annotations | indent 4 }}
-{{- end }}
+{{- if .Values.service.name }}
   name: {{ .Values.service.name }}
+{{- else }}
+  name: {{ template "fullname" . }}
+{{- end }}
 spec:
+  ingressClass: {{- .Values.ingress.ingressClass }}
   rules:
-  - host: {{ .Values.service.name }}{{ .Values.jxRequirements.ingress.namespaceSubDomain }}{{ .Values.jxRequirements.ingress.domain }}
+{{- if .Values.ingress.host }}
+  - host: {{ .Values.ingress.host }}
+{{- else }}
+  {{- if .Values.service.name }}
+  - host: {{ .Values.service.name }}
+  {{- else }}
+  - host: {{ template "fullname" . }}
+  {{- end }}
+{{- end }}
     http:
       paths:
       - backend:
-          serviceName: {{ .Values.service.name }}
-          servicePort: 80
-{{- if .Values.jxRequirements.ingress.tls.enabled }}
+          path: {{- .Values.ingress.path }}
+          pathType: {{- .Values.ingress.pathType }}
+          service:
+        {{- if .Values.service.name }}
+            name: {{ .Values.service.name }}
+        {{- else }}
+            name: {{ template "fullname" . }}
+        {{- end }}
+            port: 
+              number: 80
+{{- if .Values.ingress.tls.enabled }}
   tls:
   - hosts:
-    - {{ .Values.service.name }}{{ .Values.jxRequirements.ingress.namespaceSubDomain }}{{ .Values.jxRequirements.ingress.domain }}
-{{- if .Values.jxRequirements.ingress.tls.production }}
-    secretName: "tls-{{ .Values.jxRequirements.ingress.domain | replace "." "-" }}-p"
+{{- if .Values.ingress.host }}
+    - {{ .Values.ingress.host }}
 {{- else }}
+  {{- if .Values.service.name }}
+    - {{ .Values.service.name }}
+  {{- else }}
+    - {{ template "fullname" . }}
+  {{- end }}
+{{- end }}
+{{- if .Values.ingress.tls.secretName }}
+    secretName: "{{ .Values.ingress.tls.secretName }}"
+{{- else }}
+  {{- if .Values.jxRequirements.ingress.domain }}
     secretName: "tls-{{ .Values.jxRequirements.ingress.domain | replace "." "-" }}-s"
+  {{- else }}
+    secretName: "tls-{{ template "fullname" . }}-s"
+  {{- end }}
 {{- end }}
 {{- end }}
 {{- end }}

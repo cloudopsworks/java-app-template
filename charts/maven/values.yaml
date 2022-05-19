@@ -86,8 +86,11 @@ additionalVolumes: {}
 
 # custom ingress annotations on this service
 ingress:
-  annotations:
-#      kubernetes.io/ingress.class: nginx
+  enabled: false
+  path: /
+  pathType: Prefix
+  ingressClass: nginx
+  annotations: {}
 
 # values we use from the `jx-requirements.yml` file if we are using helmfile and helm 3
 jxRequirements:
