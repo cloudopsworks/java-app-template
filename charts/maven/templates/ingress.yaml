@@ -3,7 +3,6 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   annotations:
-    kubernetes.io/ingress.class: nginx
 {{- if .Values.ingress.annotations }}
 {{ toYaml .Values.ingress.annotations | indent 4 }}
 {{- end }}
@@ -13,7 +12,6 @@ metadata:
   name: {{ template "fullname" . }}
 {{- end }}
 spec:
-  ingressClass: {{- .Values.ingress.ingressClass }}
   rules:
 {{- if .Values.ingress.host }}
   - host: {{ .Values.ingress.host }}
@@ -26,9 +24,9 @@ spec:
 {{- end }}
     http:
       paths:
-      - backend:
-          path: {{- .Values.ingress.path }}
-          pathType: {{- .Values.ingress.pathType }}
+      - path: {{ .Values.ingress.path }}
+        pathType: {{ .Values.ingress.pathType }}
+        backend:
           service:
         {{- if .Values.service.name }}
             name: {{ .Values.service.name }}
@@ -59,4 +57,5 @@ spec:
   {{- end }}
 {{- end }}
 {{- end }}
+  ingressClassName: {{ .Values.ingress.ingressClass }}
 {{- end }}
