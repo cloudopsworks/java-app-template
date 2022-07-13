@@ -40,8 +40,17 @@ on:
       helmRegistryPassword:
         required: true
 
+    outputs:
+      has_preview:
+        description: "Has Preview output"
+        value: ${{ jobs.build.outputs.has_preview }}
+
 jobs:
   build:
+    outputs:
+      has_preview: ${{ steps.has_preview.outputs.result == 1 }}
+      pipeline_helm: ${{ steps.pipeline_helm.outputs.result == 1 }}
+      pipeline_docker: ${{ steps.pipeline_docker.ouputs.result == 1 }}
     runs-on: ubuntu-latest
     steps:
       # Proceed with checkout of source with all the references (depth=0)  
@@ -73,6 +82,13 @@ jobs:
         uses: mikefarah/yq@master
         with:
           cmd: yq eval '.pipeline[]' ./cloudopsworks-ci.yaml | grep docker | wc -l
+
+      # Get pipeline conf
+      - name: Get pipeline preview enabled
+        id: has_preview
+        uses: mikefarah/yq@master
+        with:
+          cmd: yq eval '.cd.preview.enable' ./cloudopsworks-ci.yaml | grep true | wc -l
 
       # Get pipeline conf
       - name: Get pipeline helm enable

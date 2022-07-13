@@ -25,4 +25,8 @@ excludeGlobs:
   - skafold*
   - original-*.jar
 # cd:
-#   env: dev
+#   env: staging
+#   preview:
+#     enabled: true
+#     kubernetes: true
+#     domain: example.com

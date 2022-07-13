@@ -1,0 +1,30 @@
+---
+expose:
+  Annotations:
+    helm.sh/hook: post-install,post-upgrade
+    helm.sh/hook-delete-policy: hook-succeeded
+  config:
+    domain: 4wrd.tech
+    urltemplate: "{{.Service}}-prv.{{.Domain}}"
+    exposer: Ingress
+    http: "true"
+    tlsacme: "true"
+    ingressClass: nginx
+
+cleanup:
+  Args:
+    - --cleanup
+  Annotations:
+    helm.sh/hook: pre-delete
+    helm.sh/hook-delete-policy: hook-succeeded
+
+preview:
+  image:
+    repository:
+    tag:
+    pullPolicy: Always
+
+  config:
+    dotenv: |-
+      CONFIG=value
+

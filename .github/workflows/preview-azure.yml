@@ -1,0 +1,176 @@
+##
+# (c) 2022 - Cloud Ops Works LLC - https://cloudops.works/
+#            On GitHub: https://github.com/cloudopsworks
+#            Distributed Under Apache v2.0 License
+#
+name: Preview Deploy Workflow Template
+
+on:
+  workflow_call:
+    inputs:
+      ref:
+        default: ''
+        required: false
+        type: string
+      semver:
+        required: true
+        type: string
+      pr_name:
+        required: true
+        type: string
+
+    secrets:
+      DOCKER_REGISTRY_ADDRESS:
+        required: true
+      HELM_REGISTRY_ADDRESS:
+        required: true
+      BOT_USER:
+        required: true
+      BOT_EMAIL:
+        required: true
+      BOT_TOKEN:
+        required: true
+      dockerRegistryUser:
+        required: true
+      dockerRegistryPassword:
+        required: true
+      helmRegistryUser:
+        required: true
+      helmRegistryPassword:
+        required: true
+      AZ_AKS_RESOURCE_GROUP:
+        required: true
+      AZ_AKS_CLUSTER_NAME:
+        required: true
+      AZ_CREDENTIALS:
+        required: true      
+
+jobs:
+  preview:
+    runs-on: [ self-hosted, azure ]
+    steps:
+      # Proceed with checkout of source with all the references (depth=0)  
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          ref: ${{ inputs.ref }}
+          token: ${{ secrets.BOT_TOKEN }}
+      # Azure login
+      - name: Azure Login
+        run: az login --identity
+      # # Azure login
+      # - uses: azure/login@v1
+      #   with:
+      #     creds: ${{ secrets.AZ_CREDENTIALS }}
+      # AKS context setup
+      - uses: azure/aks-set-context@v3
+        with:
+          resource-group: ${{ secrets.AZ_AKS_RESOURCE_GROUP }}
+          cluster-name: ${{ secrets.AZ_AKS_CLUSTER_NAME }}
+          admin: 'true'
+
+      # Kubernetes cli
+      - uses: azure/setup-kubectl@v3
+      
+      # Helm Chart build & deploy Support
+      - uses: azure/setup-helm@v1
+
+      # Get pipeline conf
+      - name: Get pipeline docker enable
+        id: pipeline_docker
+        uses: mikefarah/yq@master
+        with:
+          cmd: yq eval '.pipeline[]' ./cloudopsworks-ci.yaml | grep docker | wc -l
+
+      # Get pipeline conf
+      - name: Get pipeline preview enabled
+        id: has_preview
+        uses: mikefarah/yq@master
+        with:
+          cmd: yq eval '.cd.preview.enable' ./cloudopsworks-ci.yaml | grep true | wc -l
+
+      # Get pipeline conf
+      - name: Get pipeline preview enabled
+        id: preview_domain
+        uses: mikefarah/yq@master
+        with:
+          cmd: yq eval '.cd.preview.domain' ./cloudopsworks-ci.yaml
+
+      # Get pipeline conf
+      - name: Get pipeline helm enable
+        id: pipeline_helm
+        uses: mikefarah/yq@master
+        with:
+          cmd: yq eval '.pipeline[]' ./cloudopsworks-ci.yaml | grep helm | wc -l
+
+      # Get the owner repo
+      - name: Get owner
+        id: getowner
+        run: |
+          repo_owner=`echo "$GITHUB_REPOSITORY" | cut -f 1 -d "/"`
+          repo_name=`echo "$GITHUB_REPOSITORY" | cut -f 2 -d "/"`
+          echo "::set-output name=owner::$repo_owner"
+          echo "::set-output name=repo_name::$repo_name"
+
+      # Create a VERSION file to use through the build
+      - name: Set Version File for a Release
+        env:
+          NEXT_VERSION: "${{ inputs.semver }}"
+        run: |
+          echo -n "$NEXT_VERSION" > VERSION
+
+      #
+      # Helm tag pull request version
+      #
+      - name: Helm Build Preview
+        if: steps.pipeline_helm.outputs.result == 1
+        env:
+          HELM_REGISTRY_ADDRESS: ${{ secrets.HELM_REGISTRY_ADDRESS }}
+          DOCKER_REGISTRY_ADDRESS: ${{ secrets.DOCKER_REGISTRY_ADDRESS }}
+          HELM_CREDS_USER: ${{ secrets.helmRegistryUser }}
+          HELM_CREDS_PASSWORD: ${{ secrets.helmRegistryPassword }}
+          HELM_EXPERIMENTAL_OCI: "1"
+          REPOSITORY_OWNER: ${{ steps.getowner.outputs.owner }}
+          REPOSITORY_NAME: ${{ steps.getowner.outputs.repo_name }}
+        run: |
+          cd charts/$REPOSITORY_NAME
+          make tag
+
+      - name: Run Preview prepare
+        if: steps.pipeline_helm.outputs.result == 1
+        env:
+          HELM_REGISTRY_ADDRESS: ${{ secrets.HELM_REGISTRY_ADDRESS }}
+          DOCKER_REGISTRY_ADDRESS: ${{ secrets.DOCKER_REGISTRY_ADDRESS }}
+          HELM_CREDS_USER: ${{ secrets.helmRegistryUser }}
+          HELM_CREDS_PASSWORD: ${{ secrets.helmRegistryPassword }}
+          HELM_EXPERIMENTAL_OCI: "1"
+          REPOSITORY_OWNER: ${{ steps.getowner.outputs.owner }}
+          REPOSITORY_NAME: ${{ steps.getowner.outputs.repo_name }}
+          PR_NAME: ${{ inputs.pr_name }}
+          PREVIEW_DOMAIN_NAME: ${{ steps.preview_domain.outputs.result }}
+        run: |
+          cd charts/preview
+          make preview
+
+      - name: Deploy Preview Helm
+        if: steps.pipeline_helm.outputs.result == 1
+        run: |
+          echo "Will run helm install!"
+                  
+      - name: Report Preview deployment and URL
+        if: steps.pipeline_helm.outputs.result == 1
+        uses: actions/github-script@v4
+        with:
+          github-token: ${{ secrets.BOT_TOKEN }}
+          script: |
+            const output = `#### Preview Deployment Completed
+            You can find the deployed instance [here](https://${{ steps.getowner.outputs.repo_name }}-${{ inputs.pr_name }}.${{ steps.preview_domain.outputs.result }})
+            
+            *Action: \`${{ github.event_name }}\`, Workflow: \`${{ github.workflow }}\`*`;
+
+            github.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: output
+            });
