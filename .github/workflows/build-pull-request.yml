@@ -24,7 +24,7 @@ jobs:
     uses: cloudopsworks/java-app-template/.github/workflows/code-build.yml@master
     with:
       isRelease: false
-      semver: 0.1.0-SNAPSHOT-PR${{ github.event.pull_request.number }}
+      semver: 0.1.0-SNAPSHOT-PR${{ github.event.pull_request.number }}-${{ github.run_number }}
       ref: ${{ github.head_ref }}
     secrets:
       DOCKER_REGISTRY_ADDRESS: ${{ secrets.DOCKER_REGISTRY_ADDRESS }}
@@ -42,7 +42,7 @@ jobs:
       - build
     uses: ./.github/workflows/preview-azure.yml
     with:
-      semver: 0.1.0-SNAPSHOT-PR${{ github.event.pull_request.number }}
+      semver: 0.1.0-SNAPSHOT-PR${{ github.event.pull_request.number }}-${{ github.run_number }}
       ref: ${{ github.head_ref }}
       pr_name: pr${{ github.event.pull_request.number }}
     secrets:
