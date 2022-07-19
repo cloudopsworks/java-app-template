@@ -21,6 +21,8 @@ permissions:
 
 jobs:
   build:
+    needs:
+      - target_cloud
     uses: cloudopsworks/java-app-template/.github/workflows/code-build.yml@master
     with:
       isRelease: false
@@ -32,14 +34,17 @@ jobs:
       BOT_USER: ${{ secrets.BOT_USER }}
       BOT_EMAIL: ${{ secrets.BOT_EMAIL }}
       BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
-      dockerRegistryUser: ${{ secrets.AZURE_SERVICE_ID }}
-      dockerRegistryPassword: ${{ secrets.AZURE_SERVICE_SECRET }}
-      helmRegistryUser: ${{ secrets.AZURE_SERVICE_ID }}
-      helmRegistryPassword: ${{ secrets.AZURE_SERVICE_SECRET }}
+      TARGET_CLOUD: ${{ secrets.TARGET_CLOUD }}
+      AWS_REGION: ${{ secrets.BUILD_AWS_REGION }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.BUILD_AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.BUILD_AWS_SECRET_ACCESS_KEY }}
+      AZURE_SERVICE_ID: ${{ secrets.AZURE_SERVICE_ID }}
+      AZURE_SERVICE_SECRET: ${{ secrets.AZURE_SERVICE_SECRET }}
 
   preview:
     needs:
       - build
+    if: ${{ secrets.TARGET_CLOUD == 'AZ' }}
     uses: ./.github/workflows/preview-azure.yml
     with:
       semver: 0.1.0-SNAPSHOT-PR${{ github.event.pull_request.number }}-${{ github.run_number }}
@@ -51,13 +56,32 @@ jobs:
       BOT_USER: ${{ secrets.BOT_USER }}
       BOT_EMAIL: ${{ secrets.BOT_EMAIL }}
       BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
-      dockerRegistryUser: ${{ secrets.AZURE_SERVICE_ID }}
-      dockerRegistryPassword: ${{ secrets.AZURE_SERVICE_SECRET }}
-      helmRegistryUser: ${{ secrets.AZURE_SERVICE_ID }}
-      helmRegistryPassword: ${{ secrets.AZURE_SERVICE_SECRET }}
+      AZURE_SERVICE_ID: ${{ secrets.AZURE_SERVICE_ID }}
+      AZURE_SERVICE_SECRET: ${{ secrets.AZURE_SERVICE_SECRET }}
       AZ_AKS_RESOURCE_GROUP: ${{ secrets.AZURE_RESOURCE_GROUP }}
       AZ_AKS_CLUSTER_NAME: ${{ secrets.AZURE_AKS_CLUSTER_NAME }}
       AZ_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
+
+  preview-aws:
+    needs:
+      - build
+    if: ${{ secrets.TARGET_CLOUD == 'AWS' }}
+    uses: ./.github/workflows/preview-aws.yml
+    with:
+      semver: 0.1.0-SNAPSHOT-PR${{ github.event.pull_request.number }}-${{ github.run_number }}
+      ref: ${{ github.head_ref }}
+      pr_name: pr${{ github.event.pull_request.number }}
+    secrets:
+      DOCKER_REGISTRY_ADDRESS: ${{ secrets.DOCKER_REGISTRY_ADDRESS }}
+      HELM_REGISTRY_ADDRESS: ${{ secrets.DOCKER_REGISTRY_ADDRESS }}
+      BOT_USER: ${{ secrets.BOT_USER }}
+      BOT_EMAIL: ${{ secrets.BOT_EMAIL }}
+      BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+      TARGET_CLOUD: ${{ secrets.TARGET_CLOUD }}
+      AWS_REGION: ${{ secrets.BUILD_AWS_REGION }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.BUILD_AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.BUILD_AWS_SECRET_ACCESS_KEY }}
+      AWS_EKS_CLUSTER_NAME: ${{ secrets.AZURE_AKS_CLUSTER_NAME }}
 
   static-analysis:
     needs:
