@@ -209,10 +209,10 @@ jobs:
           cd charts/$REPOSITORY_NAME
           make tag
       #
-      # Helm Build and deploy to registry
+      # Helm Build and deploy to ACR registry
       #
-      - name: Helm Build Release
-        if: steps.pipeline_helm.outputs.result == 1 && inputs.isRelease == true
+      - name: Helm Build Release Azure ACR
+        if: steps.pipeline_helm.outputs.result == 1 && inputs.isRelease == true && env.TARGET_CLOUD == 'AZ'
         env:
           HELM_REGISTRY_ADDRESS: ${{ secrets.HELM_REGISTRY_ADDRESS }}
           DOCKER_REGISTRY_ADDRESS: ${{ secrets.DOCKER_REGISTRY_ADDRESS }}
@@ -220,22 +220,39 @@ jobs:
           REPOSITORY_OWNER: ${{ steps.getowner.outputs.owner }}
           REPOSITORY_NAME: ${{ steps.getowner.outputs.repo_name }}
           TARGET_CLOUD: ${{ secrets.TARGET_CLOUD }}
-          AWS_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ${{ secrets.AWS_REGION }}
-          AZ_ID: ${{ secrets.AZURE_SERVICE_ID }}
-          AZ_SECRET: ${{ secrets.AZURE_SERVICE_SECRET }}
+          HELM_CREDS_USER: ${{ secrets.AZURE_SERVICE_ID }}
+          HELM_CREDS_PASSWORD: ${{ secrets.AZURE_SERVICE_SECRET }}
         run: |
-          if [[ "$TARGET_CLOUD" == "AWS" ]] ; then
-            export AWS_ACCESS_KEY_ID="$AWS_ID"
-            export AWS_SECRET_ACCESS_KEY="$AWS_SECRET"
-            export HELM_CREDS_USER=AWS
-            export HELM_CREDS_PASSWORD=`aws ecr get-login-password --region $AWS_REGION`
-          elif [[ "$TARGET_CLOUD" == "AZ" ]] ; then
-            export HELM_CREDS_USER="$AZ_ID"
-            export HELM_CREDS_PASSWORD="$AZ_SECRET"
-          if
+          cd charts/$REPOSITORY_NAME
+          make release
 
+      #
+      # Helm Build and deploy to ECR registry
+      #
+      - name: AWS ECR login
+        id: ecr_login
+        if: steps.pipeline_helm.outputs.result == 1 && inputs.isRelease == true && env.TARGET_CLOUD == 'AWS'
+        env:
+          TARGET_CLOUD: ${{ secrets.TARGET_CLOUD }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+        run: |
+          pass=`aws ecr get-login-password --region $AWS_REGION`
+          echo "::set-output name=auth::$pass"
+
+      - name: Helm Build Release AWS ECR
+        if: steps.pipeline_helm.outputs.result == 1 && inputs.isRelease == true && env.TARGET_CLOUD == 'AWS'
+        env:
+          HELM_REGISTRY_ADDRESS: ${{ secrets.HELM_REGISTRY_ADDRESS }}
+          DOCKER_REGISTRY_ADDRESS: ${{ secrets.DOCKER_REGISTRY_ADDRESS }}
+          HELM_EXPERIMENTAL_OCI: "1"
+          REPOSITORY_OWNER: ${{ steps.getowner.outputs.owner }}
+          REPOSITORY_NAME: ${{ steps.getowner.outputs.repo_name }}
+          TARGET_CLOUD: ${{ secrets.TARGET_CLOUD }}
+          HELM_CREDS_USER: AWS
+          HELM_CREDS_PASSWORD: ${{ steps.ecr_login.outputs.auth }}
+        run: |
           cd charts/$REPOSITORY_NAME
           make release
 
