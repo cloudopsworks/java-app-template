@@ -3,7 +3,7 @@
 #            On GitHub: https://github.com/cloudopsworks
 #            Distributed Under Apache v2.0 License
 #
-name: Build Pull Request Checks
+name: Build Pull Request
 on:
   pull_request_target:
     types:

@@ -24,6 +24,14 @@ excludeGlobs:
   - cloudopsworks-ci
   - skafold*
   - original-*.jar
+#
+## Default node version is 14, uncomment to build with different
+# build:
+#   java:
+#     version: 11
+#     dist: adopt
+#
+## CD pipeline configuration uncomment and configure accordingly to enable
 # cd:
 #   env: staging
 #   preview:

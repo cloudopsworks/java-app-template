@@ -63,12 +63,24 @@ jobs:
           fetch-depth: 0
           ref: ${{ inputs.ref }}
           token: ${{ secrets.BOT_TOKEN }}
+      # Get pipeline conf java version
+      - name: Get pipeline node version
+        id: java_version
+        uses: mikefarah/yq@master
+        with:
+          cmd: yq eval '.build.java.version // "11"' ./cloudopsworks-ci.yaml
+      # Get pipeline conf node dist
+      - name: Get pipeline java dist
+        id: java_dist
+        uses: mikefarah/yq@master
+        with:
+          cmd: yq eval '.build.java.dist // "adopt"' ./cloudopsworks-ci.yaml
       # Setup Java JDK for builds
-      - name: Set JDK 11
+      - name: Set JDK
         uses: actions/setup-java@v2
         with:
-          java-version: "11"
-          distribution: "adopt"
+          java-version: "${{ steps.java_version.outputs.result }}"
+          distribution: "${{ steps.java_dist.outputs.result }}"
       # Helm Chart build & deploy Support
       - uses: azure/setup-helm@v1
       # Cache all maven packages
