@@ -21,7 +21,7 @@ excludeGlobs:
   - README.md
   - jenkins*
   - charts/
-  - cloudopsworks-ci
+  - cloudopsworks-ci*
   - skafold*
   - original-*.jar
 #
