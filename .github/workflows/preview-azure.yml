@@ -30,13 +30,9 @@ on:
         required: true
       BOT_TOKEN:
         required: true
-      dockerRegistryUser:
+      AZURE_SERVICE_ID:
         required: true
-      dockerRegistryPassword:
-        required: true
-      helmRegistryUser:
-        required: true
-      helmRegistryPassword:
+      AZURE_SERVICE_SECRET:
         required: true
       AZ_AKS_RESOURCE_GROUP:
         required: true
@@ -127,8 +123,8 @@ jobs:
         env:
           HELM_REGISTRY_ADDRESS: ${{ secrets.HELM_REGISTRY_ADDRESS }}
           DOCKER_REGISTRY_ADDRESS: ${{ secrets.DOCKER_REGISTRY_ADDRESS }}
-          HELM_CREDS_USER: ${{ secrets.helmRegistryUser }}
-          HELM_CREDS_PASSWORD: ${{ secrets.helmRegistryPassword }}
+          HELM_CREDS_USER: ${{ secrets.AZURE_SERVICE_ID }}
+          HELM_CREDS_PASSWORD: ${{ secrets.AZURE_SERVICE_SECRET }}
           HELM_EXPERIMENTAL_OCI: "1"
           REPOSITORY_OWNER: ${{ steps.getowner.outputs.owner }}
           REPOSITORY_NAME: ${{ steps.getowner.outputs.repo_name }}
@@ -141,8 +137,8 @@ jobs:
         env:
           HELM_REGISTRY_ADDRESS: ${{ secrets.HELM_REGISTRY_ADDRESS }}
           DOCKER_REGISTRY_ADDRESS: ${{ secrets.DOCKER_REGISTRY_ADDRESS }}
-          HELM_CREDS_USER: ${{ secrets.helmRegistryUser }}
-          HELM_CREDS_PASSWORD: ${{ secrets.helmRegistryPassword }}
+          HELM_CREDS_USER: ${{ secrets.AZURE_SERVICE_ID }}
+          HELM_CREDS_PASSWORD: ${{ secrets.AZURE_SERVICE_SECRET }}
           HELM_EXPERIMENTAL_OCI: "1"
           REPOSITORY_OWNER: ${{ steps.getowner.outputs.owner }}
           REPOSITORY_NAME: ${{ steps.getowner.outputs.repo_name }}
@@ -152,11 +148,6 @@ jobs:
           cd charts/preview
           make preview
 
-      - name: Deploy Preview Helm
-        if: steps.pipeline_helm.outputs.result == 1
-        run: |
-          echo "Will run helm install!"
-                  
       - name: Report Preview deployment and URL
         if: steps.pipeline_helm.outputs.result == 1
         uses: actions/github-script@v4

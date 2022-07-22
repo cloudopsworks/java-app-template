@@ -100,10 +100,10 @@ jobs:
       BOT_EMAIL: ${{ secrets.BOT_EMAIL }}
       BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
       TARGET_CLOUD: ${{ secrets.TARGET_CLOUD }}
-      AWS_REGION: ${{ secrets.BUILD_AWS_REGION }}
-      AWS_ACCESS_KEY_ID: ${{ secrets.BUILD_AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.BUILD_AWS_SECRET_ACCESS_KEY }}
-      AWS_EKS_CLUSTER_NAME: ${{ secrets.AZURE_AKS_CLUSTER_NAME }}
+      AWS_REGION: ${{ secrets.PREVIEW_AWS_REGION }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.PREVIEW_AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.PREVIEW_AWS_SECRET_ACCESS_KEY }}
+      AWS_EKS_CLUSTER_NAME: ${{ secrets.AWS_EKS_CLUSTER_NAME }}
 
   static-analysis:
     needs:
