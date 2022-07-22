@@ -39,7 +39,7 @@ endif
 	helm dependency build
 	helm lint
 ifeq ($(REL),0)
-	helm install --namespace $(NAME)-$(PREVIEW_NAME) preview . 
+	helm install --namespace $(NAME)-$(PREVIEW_NAME) --set "preview.ingress.host=$(NAME)-$(PREVIEW_NAME).$(PREVIEW_DOMAIN)" preview . 
 else
 	helm upgrade --namespace $(NAME)-$(PREVIEW_NAME) --set "preview.ingress.host=$(NAME)-$(PREVIEW_NAME).$(PREVIEW_DOMAIN)" preview . 
 endif
