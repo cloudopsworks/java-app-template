@@ -30,6 +30,7 @@ excludeGlobs:
 #   java:
 #     version: 11
 #     dist: adopt
+#
 #   # Set Sonarqube processing to false if want to disable, the tool is enabled by default
 #   sonarqube:
 #     enabled: false
