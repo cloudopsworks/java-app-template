@@ -1,0 +1,71 @@
+##
+# (c) 2022 - Cloud Ops Works LLC - https://cloudops.works/
+#            On GitHub: https://github.com/cloudopsworks
+#            Distributed Under Apache v2.0 License
+#
+name: Dependency Track Analysis
+on:
+  workflow_call:
+    inputs:
+      ref:
+        required: true
+        type: string
+
+    secrets:
+      BOT_TOKEN:
+        required: true
+      dependencyTrackUrl:
+        required: true
+      dependencyTrackToken:
+        required: true
+
+jobs:
+  dependency-track:
+    runs-on: ubuntu-latest
+    steps:
+      # Proceed with checkout of source with all the references (depth=0)
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.BOT_TOKEN }}
+          ref: ${{ inputs.ref }}
+      # Get pipeline conf java version
+      - name: Get pipeline node version
+        id: java_version
+        uses: mikefarah/yq@master
+        with:
+          cmd: yq eval '.build.java.version // "11"' ./cloudopsworks-ci.yaml
+      # Get pipeline conf node dist
+      - name: Get pipeline java dist
+        id: java_dist
+        uses: mikefarah/yq@master
+        with:
+          cmd: yq eval '.build.java.dist // "adopt"' ./cloudopsworks-ci.yaml
+      # Setup Java JDK for builds
+      - name: Set JDK
+        uses: actions/setup-java@v2
+        with:
+          java-version: "${{ steps.java_version.outputs.result }}"
+          distribution: "${{ steps.java_dist.outputs.result }}"
+      # Cache all maven packages
+      - name: Cache Maven packages
+        uses: actions/cache@v2
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      # SBOM generation
+      - name: SBOM Generation for Dtrack
+        uses: AppThreat/cdxgen-action@v1
+        with:
+          output: "./reports/bom.xml"
+          serverUrl: ${{ secrets.dependencyTrackUrl }}
+          apiKey: ${{ secrets.dependencyTrackToken }}
+
+      # SBOM generated reports upload
+      - uses: actions/upload-artifact@v1
+        with:
+          name: reports
+          path: reports

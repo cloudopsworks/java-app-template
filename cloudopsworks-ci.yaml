@@ -25,11 +25,17 @@ excludeGlobs:
   - skafold*
   - original-*.jar
 #
-## Default node version is 14, uncomment to build with different
+## Default Java version is 11, uncomment to build with different JDK
 # build:
 #   java:
 #     version: 11
 #     dist: adopt
+#   # Set Sonarqube processing to false if want to disable, the tool is enabled by default
+#   sonarqube:
+#     enabled: false
+#   # Set DependencyTrack processing to false if want to disable, the tool is enabled by default
+#   dependencyTrack:
+#     enabled: false
 #
 ## CD pipeline configuration uncomment and configure accordingly to enable
 # cd:

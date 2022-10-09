@@ -55,6 +55,8 @@ jobs:
       has_preview: ${{ steps.has_preview.outputs.result == 1 }}
       pipeline_helm: ${{ steps.pipeline_helm.outputs.result == 1 }}
       pipeline_docker: ${{ steps.pipeline_docker.ouputs.result == 1 }}
+      pipeline_sonarqube: ${{ steps.disable_sonarqube.ouputs.result == 0 }}
+      pipeline_dtrack: ${{ steps.disable_dtrack.ouputs.result == 0 }}
     runs-on: ubuntu-latest
     steps:
       # Proceed with checkout of source with all the references (depth=0)  
@@ -105,6 +107,20 @@ jobs:
         uses: mikefarah/yq@master
         with:
           cmd: yq eval '.cd.preview.enable' ./cloudopsworks-ci.yaml | grep true | wc -l
+
+      # Get Sonarqube Configuration is disabled
+      - name: Get Pipeline conf Sonarqube is Disabled
+        id: disable_sonarqube
+        uses: mikefarah/yq@master
+        with:
+          cmd: yq eval '.build.sonarqube.enabled' ./cloudopsworks-ci.yaml | grep false | wc -l
+
+      # Get Sonarqube Configuration is disabled
+      - name: Get Pipeline conf DependencyTrack is Disabled
+        id: disable_dtrack
+        uses: mikefarah/yq@master
+        with:
+          cmd: yq eval '.build.dependencyTrack.enabled' ./cloudopsworks-ci.yaml | grep false | wc -l
 
       # Get pipeline conf
       - name: Get pipeline helm enable

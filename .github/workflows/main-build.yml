@@ -68,6 +68,7 @@ jobs:
     needs:
       - build
       - new_version
+    if: ${{ needs.build.pipeline_sonarqube }}
     uses: cloudopsworks/java-app-template/.github/workflows/static-analysis.yml@master
     with:
       ref: ${{ needs.new_version.outputs.release_tag }}
@@ -75,6 +76,19 @@ jobs:
       BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
       sonarqubeUrl: ${{ secrets.SONARQUBE_URL }}
       sonarqubeToken: ${{ secrets.SONARQUBE_TOKEN }}
+
+  dependency-track:
+    needs:
+      - build
+      - new_version
+    if: ${{ needs.build.pipeline_dtrack }}
+    uses: cloudopsworks/java-app-template/.github/workflows/dependency-track.yml@master
+    with:
+      ref: ${{ needs.new_version.outputs.release_tag }}
+    secrets:
+      BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+      dependencyTrackUrl: ${{ secrets.DEPENDENCYTRACK_URL }}
+      dependencyTrackToken: ${{ secrets.DEPENDENCYTRACK_TOKEN }}
 
   delivery:
     needs:
