@@ -99,42 +99,42 @@ jobs:
         id: pipeline_docker
         uses: mikefarah/yq@master
         with:
-          cmd: yq eval '.pipeline[]' ./cloudopsworks-ci.yaml | grep docker | wc -l
+          cmd: yq eval '.pipeline[]' ./cloudopsworks-ci.yaml | grep docker | wc -l | tr -d " "
 
       # Get pipeline conf
       - name: Get pipeline preview enabled
         id: has_preview
         uses: mikefarah/yq@master
         with:
-          cmd: yq eval '.cd.preview.enable' ./cloudopsworks-ci.yaml | grep true | wc -l
+          cmd: yq eval '.cd.preview.enable' ./cloudopsworks-ci.yaml | grep true | wc -l | tr -d " "
 
       # Get Sonarqube Configuration is disabled
       - name: Get Pipeline conf Sonarqube is Disabled
         id: disable_sonarqube
         uses: mikefarah/yq@master
         with:
-          cmd: yq eval '.build.sonarqube.enabled' ./cloudopsworks-ci.yaml | grep false | wc -l
+          cmd: yq eval '.build.sonarqube.enabled' ./cloudopsworks-ci.yaml | grep false | wc -l | tr -d " "
 
       # Get Sonarqube Configuration is disabled
       - name: Get Pipeline conf DependencyTrack is Disabled
         id: disable_dtrack
         uses: mikefarah/yq@master
         with:
-          cmd: yq eval '.build.dependencyTrack.enabled' ./cloudopsworks-ci.yaml | grep false | wc -l
+          cmd: yq eval '.build.dependencyTrack.enabled' ./cloudopsworks-ci.yaml | grep false | wc -l | tr -d " "
 
       # Get pipeline conf
       - name: Get pipeline helm enable
         id: pipeline_helm
         uses: mikefarah/yq@master
         with:
-          cmd: yq eval '.pipeline[]' ./cloudopsworks-ci.yaml | grep helm | wc -l
+          cmd: yq eval '.pipeline[]' ./cloudopsworks-ci.yaml | grep helm | wc -l | tr -d " "
 
       # Get pipeline conf
       - name: Get pipeline zip packaging
         id: pipeline_zip
         uses: mikefarah/yq@master
         with:
-          cmd: yq eval '.pipeline[]' ./cloudopsworks-ci.yaml | grep zip | wc -l
+          cmd: yq eval '.pipeline[]' ./cloudopsworks-ci.yaml | grep zip | wc -l | tr -d " "
 
       # Get pipeline conf
       - name: Get pipeline zip packaging globs
