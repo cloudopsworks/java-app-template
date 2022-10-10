@@ -41,5 +41,6 @@ target/
 
 # Eclipse JDT
 .project
-.classpath
 .settings/
+.classpath
+.factorypath
