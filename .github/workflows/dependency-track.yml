@@ -67,5 +67,5 @@ jobs:
       # SBOM generated reports upload
       - uses: actions/upload-artifact@v1
         with:
-          name: reports
-          path: reports
+          name: sbom
+          path: target/bom.*
