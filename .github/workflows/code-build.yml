@@ -48,6 +48,19 @@ on:
       has_preview:
         description: "Has Preview output"
         value: ${{ jobs.build.outputs.has_preview }}
+      pipeline_helm:
+        description: "Pipeline with Helm Enabled"
+        value: ${{ jobs.build.outputs.pipeline_helm }}
+      pipeline_docker:
+        description: "Pipeline with Docker Enabled"
+        value: ${{ jobs.build.outputs.pipeline_docker }}
+      pipeline_sonarqube:
+        description: "Pipeline with Sonarqube Analysis Enabled"
+        value: ${{ jobs.build.outputs.pipeline_sonarqube }}
+      pipeline_dtrack:
+        description: "Pipeline with DependencyTrack Analysis Enabled"
+        value: ${{ jobs.build.outputs.pipeline_dtrack }}
+
 
 jobs:
   build:

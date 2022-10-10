@@ -5,11 +5,7 @@
 #
 name: Build Pull Request
 on:
-  pull_request_target:
-    types:
-      - opened
-      - synchronize
-      - edited
+  pull_request:
 
 permissions:
   contents: read
@@ -108,7 +104,7 @@ jobs:
   static-analysis:
     needs:
       - build
-    if: ${{ needs.build.outputs.pipeline_sonarqube }}
+    if: needs.build.outputs.pipeline_sonarqube
     uses: cloudopsworks/java-app-template/.github/workflows/static-analysis.yml@master
     with:
       ref: ${{ github.head_ref }}
@@ -120,8 +116,7 @@ jobs:
   dependency-track:
     needs:
       - build
-      - new_version
-    if: ${{ needs.build.outputs.pipeline_dtrack }}
+    if: needs.build.outputs.pipeline_dtrack
     uses: cloudopsworks/java-app-template/.github/workflows/dependency-track.yml@master
     with:
       ref: ${{ github.head_ref }}
