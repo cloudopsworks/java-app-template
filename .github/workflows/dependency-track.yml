@@ -68,4 +68,4 @@ jobs:
       - uses: actions/upload-artifact@v1
         with:
           name: sbom
-          path: target/bom.*
+          path: target/bom.xml
