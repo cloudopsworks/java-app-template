@@ -62,7 +62,7 @@ jobs:
         with:
           output: "./target/bom.xml"
           projectVersion: ${{ inputs.ref }}
-          serverUrl: ${{ secrets.dependencyTrackUrl }}
+          serverUrl: https://${{ secrets.dependencyTrackUrl }}
           apiKey: ${{ secrets.dependencyTrackToken }}
 
       # SBOM generated reports upload
