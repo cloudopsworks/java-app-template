@@ -79,8 +79,8 @@ jobs:
         run: |
           repo_owner=`echo "$GITHUB_REPOSITORY" | cut -f 1 -d "/"`
           repo_name=`echo "$GITHUB_REPOSITORY" | cut -f 2 -d "/"`
-          echo "::set-output name=owner::$repo_owner"
-          echo "::set-output name=repo_name::$repo_name"
+          echo "owner=$repo_owner" >> $GITHUB_OUTPUT
+          echo "repo_name=$repo_name" >> $GITHUB_OUTPUT
 
       # Get previous tags in order to proceed to generate next version
       - name: Get Previous tag
@@ -146,4 +146,4 @@ jobs:
           git commit -m "chore: release version v$VERSION"
           git tag -fa v$VERSION -m "Release Version v$VERSION"
           git push origin v$VERSION
-          echo "::set-output name=tag_name::v$VERSION"
+          echo "tag_name=v$VERSION" >> $GITHUB_OUTPUT

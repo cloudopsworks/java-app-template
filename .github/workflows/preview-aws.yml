@@ -92,8 +92,8 @@ jobs:
         run: |
           repo_owner=`echo "$GITHUB_REPOSITORY" | cut -f 1 -d "/"`
           repo_name=`echo "$GITHUB_REPOSITORY" | cut -f 2 -d "/"`
-          echo "::set-output name=owner::$repo_owner"
-          echo "::set-output name=repo_name::$repo_name"
+          echo "owner=$repo_owner" >> $GITHUB_OUTPUT
+          echo "repo_name=$repo_name" >> $GITHUB_OUTPUT
 
       # Create a VERSION file to use through the build
       - name: Set Version File for a Release
