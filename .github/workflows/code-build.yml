@@ -96,15 +96,15 @@ jobs:
           cmd: yq eval '.build.java.dist // "adopt"' ./cloudopsworks-ci.yaml
       # Setup Java JDK for builds
       - name: Set JDK
-        uses: actions/setup-java@v2
+        uses: actions/setup-java@v3
         with:
           java-version: "${{ steps.java_version.outputs.result }}"
           distribution: "${{ steps.java_dist.outputs.result }}"
       # Helm Chart build & deploy Support
-      - uses: azure/setup-helm@v1
+      - uses: azure/setup-helm@v3
       # Cache all maven packages
       - name: Cache Maven packages
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
@@ -332,7 +332,7 @@ jobs:
       # Perform of upload artfiacts
       - name: Upload Artifacts to workflow
         if: inputs.isRelease
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: all-artifacts
           path: |

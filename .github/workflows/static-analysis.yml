@@ -43,13 +43,13 @@ jobs:
           cmd: yq eval '.build.java.dist // "adopt"' ./cloudopsworks-ci.yaml
       # Setup Java JDK for builds
       - name: Set JDK
-        uses: actions/setup-java@v2
+        uses: actions/setup-java@v3
         with:
           java-version: "${{ steps.java_version.outputs.result }}"
           distribution: "${{ steps.java_dist.outputs.result }}"
       # Cache all maven packages
       - name: Cache Maven packages
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}

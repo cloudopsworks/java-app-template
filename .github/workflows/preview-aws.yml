@@ -56,7 +56,7 @@ jobs:
       - uses: azure/setup-kubectl@v3
       
       # Helm Chart build & deploy Support
-      - uses: azure/setup-helm@v1
+      - uses: azure/setup-helm@v3
 
       # Get pipeline conf
       - name: Get pipeline docker enable
