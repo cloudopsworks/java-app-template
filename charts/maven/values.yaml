@@ -73,6 +73,10 @@ readinessProbe:
   successThreshold: 1
   timeoutSeconds: 1
 
+# Tracing config
+tracing:
+  enabled: false
+
 # Affinity configuration for Pods
 affinity: {}
 

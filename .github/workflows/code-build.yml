@@ -1,5 +1,5 @@
 ##
-# (c) 2021 - Cloud Ops Works LLC - https://cloudops.works/
+# (c) 2022 - Cloud Ops Works LLC - https://cloudops.works/
 #            On GitHub: https://github.com/cloudopsworks
 #            Distributed Under Apache v2.0 License
 #
@@ -60,6 +60,9 @@ on:
       pipeline_dtrack:
         description: "Pipeline with DependencyTrack Analysis Enabled"
         value: ${{ jobs.build.outputs.pipeline_dtrack }}
+      cdenv_enabled:
+        description: "Pipeline has CD environment enabled."
+        value: ${{ jobs.build.outputs.cdenv_enabled }}
 
 
 jobs:
@@ -70,6 +73,7 @@ jobs:
       pipeline_docker: ${{ steps.pipeline_docker.outputs.result == 1 }}
       pipeline_sonarqube: ${{ steps.disable_sonarqube.outputs.result == 0 }}
       pipeline_dtrack: ${{ steps.disable_dtrack.outputs.result == 0 }}
+      cdenv_enabled: ${{ steps.cdenv_enabled.outputs.result }}
     runs-on: ubuntu-latest
     steps:
       # Proceed with checkout of source with all the references (depth=0)  
@@ -162,6 +166,13 @@ jobs:
         uses: mikefarah/yq@master
         with:
           cmd: yq eval '.excludeGlobs[]' ./cloudopsworks-ci.yaml
+
+      # Get pipeline conf target environment
+      - name: Get pipeline target environment
+        id: cdenv_enabled
+        uses: mikefarah/yq@master
+        with:
+          cmd: yq eval '.cd.env != null' ./cloudopsworks-ci.yaml
 
       # Get the owner repo
       - name: Get owner

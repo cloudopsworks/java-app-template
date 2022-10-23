@@ -44,3 +44,10 @@ target/
 .settings/
 .classpath
 .factorypath
+
+### VS Code ###
+.vscode/
+
+### Tronador ###
+.tronador
+tronador/

@@ -10,3 +10,5 @@ LICENSE
 README.md
 jenkins-x*.*
 skaffold.*
+tronador/
+.tronador

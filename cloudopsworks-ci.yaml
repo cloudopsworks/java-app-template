@@ -24,6 +24,7 @@ excludeGlobs:
   - cloudopsworks-ci*
   - skafold*
   - original-*.jar
+
 #
 ## Default Java version is 11, uncomment to build with different JDK
 # build:

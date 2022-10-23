@@ -30,3 +30,5 @@
 target/
 node_modules/
 vendor/
+tronador/
+.tronador
