@@ -68,7 +68,7 @@ jobs:
     needs:
       - build
       - new_version
-    if: ${{ needs.build.outputs.pipeline_sonarqube ='true' }}
+    if: ${{ needs.build.outputs.pipeline_sonarqube == 'true' }}
     uses: cloudopsworks/java-app-template/.github/workflows/static-analysis.yml@master
     with:
       ref: ${{ needs.new_version.outputs.release_tag }}
@@ -81,7 +81,7 @@ jobs:
     needs:
       - build
       - new_version
-    if: ${{ needs.build.outputs.pipeline_dtrack = 'true' }}
+    if: ${{ needs.build.outputs.pipeline_dtrack == 'true' }}
     uses: cloudopsworks/java-app-template/.github/workflows/dependency-track.yml@master
     with:
       ref: ${{ needs.new_version.outputs.release_tag }}
@@ -95,7 +95,7 @@ jobs:
       - build
       - release
       - new_version
-    if: ${{ needs.build.outputs.cdenv_enabled = 'true' }}
+    if: ${{ needs.build.outputs.cdenv_enabled == 'true' }}
     uses: cloudopsworks/base-app-template/.github/workflows/delivery-push.yml@master
     with:
       release_version: ${{ needs.new_version.outputs.release_version }}
