@@ -62,7 +62,7 @@ jobs:
       - target_cloud
       - build
     if: needs.target_cloud.outputs.is_azure == 1
-    uses: ./.github/workflows/preview-azure.yml
+    uses: cloudopsworks/base-app-template/.github/workflows/preview-azure.yml@master
     with:
       semver: 0.1.0-SNAPSHOT-PR${{ github.event.pull_request.number }}-${{ github.run_number }}
       ref: ${{ github.head_ref }}
@@ -84,7 +84,7 @@ jobs:
       - target_cloud
       - build
     if: needs.target_cloud.outputs.is_aws == 1
-    uses: ./.github/workflows/preview-aws.yml
+    uses: cloudopsworks/base-app-template/.github/workflows/preview-aws.yml@master
     with:
       semver: 0.1.0-SNAPSHOT-PR${{ github.event.pull_request.number }}-${{ github.run_number }}
       ref: ${{ github.head_ref }}
