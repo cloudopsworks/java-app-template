@@ -145,5 +145,5 @@ jobs:
           git add .
           git commit -m "chore: release version v$VERSION"
           git tag -fa v$VERSION -m "Release Version v$VERSION"
-          git push origin v$VERSION
+          git push origin --tags -f
           echo "tag_name=v$VERSION" >> $GITHUB_OUTPUT
