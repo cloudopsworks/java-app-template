@@ -33,7 +33,7 @@ jobs:
       release_version: ${{ steps.semvers.outputs.patch }}
       release_tag: ${{ steps.tagged.outputs.tag_name }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 0
           token: ${{ secrets.BOT_TOKEN }}
