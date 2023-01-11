@@ -7,6 +7,12 @@ name: Dependency Track Analysis
 on:
   workflow_call:
     inputs:
+      projectName:
+        required: true
+        type: string
+      projectType:
+        required: true
+        type: string
       ref:
         required: true
         type: string
@@ -56,17 +62,33 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-
 
+      #      # SBOM generation
+      #      - name: SBOM Generation for Dtrack
+      #        uses: AppThreat/cdxgen-action@v1
+      #        with:
+      #          output: "./target/bom.xml"
+      #          projectVersion: ${{ inputs.ref }}
+      #          serverUrl: https://${{ secrets.dependencyTrackUrl }}
+      #          apiKey: ${{ secrets.dependencyTrackToken }}
+
       # SBOM generation
       - name: SBOM Generation for Dtrack
-        uses: AppThreat/cdxgen-action@v1
+        run: mvn org.cyclonedx:cyclonedx-maven-plugin:makeAggregateBom -DprojectType=${{ inputs.projectType }} -DoutputFormat=xml -DoutputName=dtrack-bom
+
+      # SBOM upload
+      - name: SBOM Dtrack Upload
+        uses: DependencyTrack/gh-upload-sbom@v1.0.0
         with:
-          output: "./target/bom.xml"
-          projectVersion: ${{ inputs.ref }}
-          serverUrl: https://${{ secrets.dependencyTrackUrl }}
-          apiKey: ${{ secrets.dependencyTrackToken }}
+          serverhostname: secrets.dependencyTrackUrl
+          protocol: https
+          apikey: ${{ secrets.dependencyTrackToken }}
+          projectname: ${{ inputs.projectName }}
+          projectversion: ${{ inputs.ref }}
+          autocreate: true
+          bomfilename: dtrack-bom.xml
 
       # SBOM generated reports upload
       - uses: actions/upload-artifact@v3
         with:
           name: sbom
-          path: target/bom.xml
+          path: target/dtrack-bom.xml

@@ -60,6 +60,9 @@ on:
       pipeline_dtrack:
         description: "Pipeline with DependencyTrack Analysis Enabled"
         value: ${{ jobs.build.outputs.pipeline_dtrack }}
+      pipeline_dtrack_project_type:
+        description: "Pipeline classification for DependencyTrack Analysis, blank when dtrack is disabled"
+        value: $${{ jobs.build.outputs.pipeline_dtrack_project_type }}
       cdenv_enabled:
         description: "Pipeline has CD environment enabled."
         value: ${{ jobs.build.outputs.cdenv_enabled }}
@@ -73,6 +76,7 @@ jobs:
       pipeline_docker: ${{ steps.pipeline_docker.outputs.result == 1 }}
       pipeline_sonarqube: ${{ steps.disable_sonarqube.outputs.result == 0 }}
       pipeline_dtrack: ${{ steps.disable_dtrack.outputs.result == 0 }}
+      pipeline_dtrack_project_type: ${{ steps.dtrack_project_type.outputs.type }}
       cdenv_enabled: ${{ steps.cdenv_enabled.outputs.result }}
     runs-on: ubuntu-latest
     steps:
@@ -132,12 +136,29 @@ jobs:
         with:
           cmd: yq eval '.build.sonarqube.enabled' ./cloudopsworks-ci.yaml | grep false | wc -l | tr -d " "
 
-      # Get Sonarqube Configuration is disabled
+      # Get DependencyTrack Configuration is disabled
       - name: Get Pipeline conf DependencyTrack is Disabled
         id: disable_dtrack
         uses: mikefarah/yq@master
         with:
           cmd: yq eval '.build.dependencyTrack.enabled' ./cloudopsworks-ci.yaml | grep false | wc -l | tr -d " "
+
+      # Get DependencyTrack project type configuration, default is null
+      - name: Get Pipeline conf DependencyTrack Project type
+        id: dtrack_project_type_eval
+        uses: mikefarah/yq@master
+        with:
+          cmd: yq eval '.build.dependencyTrack.type' ./cloudopsworks-ci.yaml
+
+      # Determine Dependency Track Project Type properly with default
+      - name: Determine Pipeline conf DependencyTrack Project type
+        id: dtrack_project_type
+        run: |
+          type=${{ steps.dtrack_project_type_eval.outputs.result }}
+          if [ "$type" == "null" ] ; then
+            type=Library
+          fi
+          echo "type=$type" >> $GITHUB_OUTPUT
 
       # Get pipeline conf
       - name: Get pipeline helm enable

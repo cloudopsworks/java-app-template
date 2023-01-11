@@ -12,7 +12,7 @@ on:
     paths-ignore:
       - ".github/workflows/**"
   workflow_dispatch:
-    
+
 # Permission Settings for the entire RUN
 permissions:
   actions: write
@@ -36,7 +36,7 @@ jobs:
       - new_version
     uses: cloudopsworks/java-app-template/.github/workflows/code-build.yml@master
     with:
-      semver: ${{ needs.new_version.outputs.release_version }} 
+      semver: ${{ needs.new_version.outputs.release_version }}
       ref: ${{ needs.new_version.outputs.release_tag }}
     secrets:
       DOCKER_REGISTRY_ADDRESS: ${{ secrets.DOCKER_REGISTRY_ADDRESS }}
@@ -84,6 +84,8 @@ jobs:
     if: ${{ needs.build.outputs.pipeline_dtrack == 'true' }}
     uses: cloudopsworks/java-app-template/.github/workflows/dependency-track.yml@master
     with:
+      projectName: ${{ needs.new_version.outputs.project_name }}
+      projectType: ${{ needs.build.outputs.pipeline_dtrack_project_type }}
       ref: ${{ needs.new_version.outputs.release_tag }}
     secrets:
       BOT_TOKEN: ${{ secrets.BOT_TOKEN }}

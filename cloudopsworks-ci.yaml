@@ -36,8 +36,11 @@ excludeGlobs:
 #   sonarqube:
 #     enabled: false
 #   # Set DependencyTrack processing to false if want to disable, the tool is enabled by default
+#   # type: is one of => Library , Application , Container , Framework , Device , Firmware , File , Operating System
+#   #       Default type is Library
 #   dependencyTrack:
 #     enabled: false
+#     type: Library
 #
 ## CD pipeline configuration uncomment and configure accordingly to enable
 # cd:
