@@ -77,7 +77,7 @@ jobs:
 
       # SBOM upload
       - name: SBOM Dtrack Upload
-        uses: DependencyTrack/gh-upload-sbom@v1.0.0
+        uses: DependencyTrack/gh-upload-sbom@master
         with:
           serverhostname: secrets.dependencyTrackUrl
           protocol: https
