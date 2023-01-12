@@ -79,7 +79,7 @@ jobs:
       - name: SBOM Dtrack Upload
         uses: DependencyTrack/gh-upload-sbom@master
         with:
-          serverhostname: secrets.dependencyTrackUrl
+          serverhostname: ${{ secrets.dependencyTrackUrl }}
           protocol: https
           apikey: ${{ secrets.dependencyTrackToken }}
           projectname: ${{ inputs.projectName }}
