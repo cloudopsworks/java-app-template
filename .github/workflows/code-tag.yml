@@ -14,9 +14,9 @@ on:
       release_tag:
         value: ${{ jobs.tag_version.outputs.release_tag }}
       owner:
-        value: ${{ steps.tag_version.outputs.owner }}
+        value: ${{ jobs.tag_version.outputs.owner }}
       project_name:
-        value: ${{ steps.tag_version.outputs.repo_name }}
+        value: ${{ jobs.tag_version.outputs.repo_name }}
 
 
     secrets:
