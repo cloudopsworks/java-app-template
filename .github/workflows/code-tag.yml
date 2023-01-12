@@ -16,7 +16,7 @@ on:
       owner:
         value: ${{ jobs.tag_version.outputs.owner }}
       project_name:
-        value: ${{ jobs.tag_version.outputs.repo_name }}
+        value: ${{ jobs.tag_version.outputs.project_name }}
 
 
     secrets:
