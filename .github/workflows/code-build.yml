@@ -62,7 +62,7 @@ on:
         value: ${{ jobs.build.outputs.pipeline_dtrack }}
       pipeline_dtrack_project_type:
         description: "Pipeline classification for DependencyTrack Analysis, blank when dtrack is disabled"
-        value: $${{ jobs.build.outputs.pipeline_dtrack_project_type }}
+        value: ${{ jobs.build.outputs.pipeline_dtrack_project_type }}
       cdenv_enabled:
         description: "Pipeline has CD environment enabled."
         value: ${{ jobs.build.outputs.cdenv_enabled }}
