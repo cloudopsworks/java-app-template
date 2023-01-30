@@ -73,22 +73,22 @@ jobs:
 
       # SBOM generation
       - name: SBOM Generation for Dtrack
-        run: mvn org.cyclonedx:cyclonedx-maven-plugin:makeAggregateBom -DprojectType=${{ inputs.projectType }} -DoutputFormat=json -DoutputName=dtrack-bom
+        run: mvn org.cyclonedx:cyclonedx-maven-plugin:makeAggregateBom -DprojectType=${{ inputs.projectType }} -DoutputFormat=xml -DoutputName=dtrack-bom
 
       # SBOM generated reports upload
       - uses: actions/upload-artifact@v3
         with:
           name: sbom
-          path: target/dtrack-bom.json
+          path: target/dtrack-bom.xml
+
 
       # SBOM upload
       - name: SBOM Dtrack Upload
-        uses: cloudopsworks/gh-upload-sbom@master
-        with:
-          serverhostname: ${{ secrets.dependencyTrackUrl }}
-          protocol: https
-          apikey: ${{ secrets.dependencyTrackToken }}
-          projectname: ${{ inputs.projectName }}
-          projectversion: ${{ inputs.ref }}
-          autocreate: true
-          bomfilename: target/dtrack-bom.json
+        run: |
+          curl -X "POST" "https://${{ secrets.dependencyTrackUrl }}/api/v1/bom" \
+               -H 'Content-Type: multipart/form-data' \
+               -H 'X-API-Key: ${{ secrets.dependencyTrackToken }}' \
+               -F "autoCreate=true" \
+               -F "projectName=${{ inputs.projectName }}" \
+               -F "projectVersion=${{ inputs.ref }}" \
+               -F "bom=@target/dtrack-bom.xml"
