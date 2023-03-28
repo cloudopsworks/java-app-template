@@ -16,6 +16,20 @@ permissions:
   checks: write
 
 jobs:
+  project_data:
+    runs-on: ubuntu-latest
+    outputs:
+      project_name: ${{ steps.getowner.outputs.repo_name }}
+    steps:
+      # Get the owner repo
+      - name: Get owner
+        id: getowner
+        run: |
+          repo_owner=`echo "$GITHUB_REPOSITORY" | cut -f 1 -d "/"`
+          repo_name=`echo "$GITHUB_REPOSITORY" | cut -f 2 -d "/"`
+          echo "owner=$repo_owner" >> $GITHUB_OUTPUT
+          echo "repo_name=$repo_name" >> $GITHUB_OUTPUT
+
   target_cloud:
     runs-on: ubuntu-latest
     outputs:
@@ -116,9 +130,12 @@ jobs:
   dependency-track:
     needs:
       - build
+      - project_data
     if: needs.build.outputs.pipeline_dtrack
     uses: cloudopsworks/java-app-template/.github/workflows/dependency-track.yml@master
     with:
+      projectName: ${{ needs.project_data.outputs.project_name }}
+      projectType: ${{ needs.build.outputs.pipeline_dtrack_project_type }}
       ref: ${{ github.head_ref }}
     secrets:
       BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
