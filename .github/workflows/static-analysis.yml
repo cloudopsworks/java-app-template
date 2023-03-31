@@ -10,11 +10,11 @@ on:
       ref:
         required: true
         type: string
+      sonarqubeUrl:
+        required: true
 
     secrets:
       BOT_TOKEN:
-        required: true
-      sonarqubeUrl:
         required: true
       sonarqubeToken:
         required: true
@@ -60,7 +60,7 @@ jobs:
       - name: Static Test Code
         env:
           JAVA_OPTIONS: "-XX:+UnlockExperimentalVMOptions -Dsun.zip.disableMemoryMapping=true -XX:+UseParallelGC -XX:MinHeapFreeRatio=5 -XX:MaxHeapFreeRatio=10 -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -Xms128m -Xmx2048m"
-          SONARQUBE_URL: ${{ secrets.sonarqubeUrl }}
+          SONARQUBE_URL: ${{ inputs.sonarqubeUrl }}
           SONARQUBE_TOKEN: ${{ secrets.sonarqubeToken }}
         run: |
           mvn --batch-mode test

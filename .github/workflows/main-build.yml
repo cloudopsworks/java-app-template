@@ -25,10 +25,10 @@ jobs:
   new_version:
     uses: cloudopsworks/java-app-template/.github/workflows/code-tag.yml@master
     secrets:
-      DOCKER_REGISTRY_ADDRESS: ${{ secrets.DOCKER_REGISTRY_ADDRESS }}
-      HELM_REGISTRY_ADDRESS: ${{ secrets.DOCKER_REGISTRY_ADDRESS }}
-      BOT_USER: ${{ secrets.BOT_USER }}
-      BOT_EMAIL: ${{ secrets.BOT_EMAIL }}
+      DOCKER_REGISTRY_ADDRESS: ${{ vars.DOCKER_REGISTRY_ADDRESS }}
+      HELM_REGISTRY_ADDRESS: ${{ vars.DOCKER_REGISTRY_ADDRESS }}
+      BOT_USER: ${{ vars.BOT_USER }}
+      BOT_EMAIL: ${{ vars.BOT_EMAIL }}
       BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
 
   build:
@@ -38,14 +38,14 @@ jobs:
     with:
       semver: ${{ needs.new_version.outputs.release_version }}
       ref: ${{ needs.new_version.outputs.release_tag }}
-    secrets:
-      DOCKER_REGISTRY_ADDRESS: ${{ secrets.DOCKER_REGISTRY_ADDRESS }}
-      HELM_REGISTRY_ADDRESS: ${{ secrets.DOCKER_REGISTRY_ADDRESS }}
-      BOT_USER: ${{ secrets.BOT_USER }}
-      BOT_EMAIL: ${{ secrets.BOT_EMAIL }}
-      BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
-      TARGET_CLOUD: ${{ secrets.TARGET_CLOUD }}
+      DOCKER_REGISTRY_ADDRESS: ${{ vars.DOCKER_REGISTRY_ADDRESS }}
+      HELM_REGISTRY_ADDRESS: ${{ vars.DOCKER_REGISTRY_ADDRESS }}
+      BOT_USER: ${{ vars.BOT_USER }}
+      BOT_EMAIL: ${{ vars.BOT_EMAIL }}
+      TARGET_CLOUD: ${{ vars.TARGET_CLOUD }}
       AWS_REGION: ${{ secrets.BUILD_AWS_REGION }}
+    secrets:
+      BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
       AWS_ACCESS_KEY_ID: ${{ secrets.BUILD_AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.BUILD_AWS_SECRET_ACCESS_KEY }}
       AZURE_SERVICE_ID: ${{ secrets.AZURE_SERVICE_ID }}
@@ -72,9 +72,9 @@ jobs:
     uses: cloudopsworks/java-app-template/.github/workflows/static-analysis.yml@master
     with:
       ref: ${{ needs.new_version.outputs.release_tag }}
+      sonarqubeUrl: ${{ vars.SONARQUBE_URL }}
     secrets:
       BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
-      sonarqubeUrl: ${{ secrets.SONARQUBE_URL }}
       sonarqubeToken: ${{ secrets.SONARQUBE_TOKEN }}
 
   dependency-track:
@@ -87,9 +87,9 @@ jobs:
       projectName: ${{ needs.new_version.outputs.project_name }}
       projectType: ${{ needs.build.outputs.pipeline_dtrack_project_type }}
       ref: ${{ needs.new_version.outputs.release_tag }}
+      dependencyTrackUrl: ${{ vars.DEPENDENCYTRACK_URL }}
     secrets:
       BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
-      dependencyTrackUrl: ${{ secrets.DEPENDENCYTRACK_URL }}
       dependencyTrackToken: ${{ secrets.DEPENDENCYTRACK_TOKEN }}
 
   delivery:

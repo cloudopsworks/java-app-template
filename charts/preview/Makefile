@@ -1,6 +1,6 @@
-# Value comes from Github secrets.HELM_REGISTRY_ADDRESS
+# Value comes from Github vars.HELM_REGISTRY_ADDRESS
 CHART_REPO_URL := $(HELM_REGISTRY_ADDRESS)
-# Value comes from Github secrets.DOCKER_REGISTRY_ADDRESS
+# Value comes from Github vars.DOCKER_REGISTRY_ADDRESS
 DOCKER_REGISTRY := $(DOCKER_REGISTRY_ADDRESS)
 CHART_REPO := $(REPOSITORY_OWNER)
 CURRENT=$(pwd)

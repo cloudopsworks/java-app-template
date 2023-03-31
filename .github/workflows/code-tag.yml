@@ -17,9 +17,6 @@ on:
         value: ${{ jobs.tag_version.outputs.owner }}
       project_name:
         value: ${{ jobs.tag_version.outputs.project_name }}
-
-
-    secrets:
       DOCKER_REGISTRY_ADDRESS:
         required: true
       HELM_REGISTRY_ADDRESS:
@@ -28,6 +25,8 @@ on:
         required: true
       BOT_EMAIL:
         required: true
+
+    secrets:
       BOT_TOKEN:
         required: true
 
@@ -132,8 +131,8 @@ jobs:
       - name: Helm Chart Versioning
         if: steps.pipeline_helm.outputs.result == 1
         env:
-          HELM_REGISTRY_ADDRESS: ${{ secrets.HELM_REGISTRY_ADDRESS }}
-          DOCKER_REGISTRY_ADDRESS: ${{ secrets.DOCKER_REGISTRY_ADDRESS }}
+          HELM_REGISTRY_ADDRESS: ${{ inputs.HELM_REGISTRY_ADDRESS }}
+          DOCKER_REGISTRY_ADDRESS: ${{ inputs.DOCKER_REGISTRY_ADDRESS }}
           REPOSITORY_OWNER: ${{ steps.getowner.outputs.owner }}
           REPOSITORY_NAME: ${{ steps.getowner.outputs.repo_name }}
         run: |
@@ -147,8 +146,8 @@ jobs:
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
         run: |
           VERSION=$(cat VERSION)
-          git config --global user.name "${{ secrets.BOT_USER }}"
-          git config --global user.email "${{ secrets.BOT_EMAIL }}"
+          git config --global user.name "${{ inputs.BOT_USER }}"
+          git config --global user.email "${{ inputs.BOT_EMAIL }}"
           git add .
           git commit -m "chore: release version v$VERSION"
           git tag -fa v$VERSION -m "Release Version v$VERSION"
