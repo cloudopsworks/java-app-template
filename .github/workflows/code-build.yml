@@ -237,7 +237,7 @@ jobs:
         env:
           TARGET: ${{ secrets.TARGET_CLOUD }}
         if: ${{ steps.pipeline_docker.outputs.result == 1 && env.TARGET == 'AWS' }}
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@v2
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
