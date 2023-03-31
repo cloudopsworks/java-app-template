@@ -43,7 +43,7 @@ jobs:
       BOT_USER: ${{ vars.BOT_USER }}
       BOT_EMAIL: ${{ vars.BOT_EMAIL }}
       TARGET_CLOUD: ${{ vars.TARGET_CLOUD }}
-      AWS_REGION: ${{ secrets.BUILD_AWS_REGION }}
+      AWS_REGION: ${{ vars.BUILD_AWS_REGION }}
     secrets:
       BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
       AWS_ACCESS_KEY_ID: ${{ secrets.BUILD_AWS_ACCESS_KEY_ID }}
