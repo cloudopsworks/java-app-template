@@ -21,16 +21,22 @@ on:
         type: string
       DOCKER_REGISTRY_ADDRESS:
         required: true
+        type: string
       HELM_REGISTRY_ADDRESS:
         required: true
+        type: string
       BOT_USER:
         required: true
+        type: string
       BOT_EMAIL:
         required: true
+        type: string
       TARGET_CLOUD:
         required: true
+        type: string
       AWS_REGION:
         required: true
+        type: string
 
     secrets:
       BOT_TOKEN:

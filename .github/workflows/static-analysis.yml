@@ -12,6 +12,7 @@ on:
         type: string
       sonarqubeUrl:
         required: true
+        type: string
 
     secrets:
       BOT_TOKEN:

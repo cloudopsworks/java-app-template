@@ -17,14 +17,20 @@ on:
         value: ${{ jobs.tag_version.outputs.owner }}
       project_name:
         value: ${{ jobs.tag_version.outputs.project_name }}
+
+    inputs:
       DOCKER_REGISTRY_ADDRESS:
         required: true
+        type: string
       HELM_REGISTRY_ADDRESS:
         required: true
+        type: string
       BOT_USER:
         required: true
+        type: string
       BOT_EMAIL:
         required: true
+        type: string
 
     secrets:
       BOT_TOKEN:
