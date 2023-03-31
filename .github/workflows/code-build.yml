@@ -127,7 +127,7 @@ jobs:
         id: has_preview
         uses: mikefarah/yq@master
         with:
-          cmd: yq eval '.cd.preview.enable' ./cloudopsworks-ci.yaml | grep true | wc -l | tr -d " "
+          cmd: yq eval '.cd.preview.enabled' ./cloudopsworks-ci.yaml | grep true | wc -l | tr -d " "
 
       # Get Sonarqube Configuration is disabled
       - name: Get Pipeline conf Sonarqube is Disabled
