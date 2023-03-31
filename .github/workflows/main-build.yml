@@ -24,11 +24,12 @@ permissions:
 jobs:
   new_version:
     uses: cloudopsworks/java-app-template/.github/workflows/code-tag.yml@master
-    secrets:
+    with:
       DOCKER_REGISTRY_ADDRESS: ${{ vars.DOCKER_REGISTRY_ADDRESS }}
       HELM_REGISTRY_ADDRESS: ${{ vars.DOCKER_REGISTRY_ADDRESS }}
       BOT_USER: ${{ vars.BOT_USER }}
       BOT_EMAIL: ${{ vars.BOT_EMAIL }}
+    secrets:
       BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
 
   build:
