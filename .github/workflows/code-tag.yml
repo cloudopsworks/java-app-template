@@ -112,10 +112,19 @@ jobs:
         with:
           version: "${{ steps.previoustag.outputs.tag }}"
 
-      # Create a VERSION file to use through the build
+      # Create a VERSION file to use through the build - Auto Release
       - name: Set Version File for a Release
+        if: inputs.isAuto == true
         env:
           NEXT_VERSION: "${{ steps.semvers.outputs.patch }}"
+        run: |
+          echo -n "$NEXT_VERSION" > VERSION
+
+      # Create a VERSION file to use through the build - Manual Release
+      - name: Set Version File for a Release
+        if: inputs.isAuto == false
+        env:
+          NEXT_VERSION: "${{ inputs.tagRelease }}"
         run: |
           echo -n "$NEXT_VERSION" > VERSION
 
@@ -159,6 +168,7 @@ jobs:
           git config --global user.email "${{ inputs.BOT_EMAIL }}"
           git add .
           git commit -m "chore: release version v$VERSION"
-          git tag -fa v$VERSION -m "Release Version v$VERSION"
-          git push origin --tags -f
+          git tag -a v$VERSION -m "Release Version v$VERSION"
+          git push origin --tags
+          echo "tag_version=$VERSION" >> $GITHUB_OUTPUT
           echo "tag_name=v$VERSION" >> $GITHUB_OUTPUT
