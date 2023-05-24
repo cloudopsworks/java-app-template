@@ -99,7 +99,7 @@ jobs:
 
       # Get previous tags in order to proceed to generate next version
       - name: Get Previous tag
-        uses: WyriHaximus/github-action-get-previous-tag@v1
+        uses: cloudopsworks/github-action-get-previous-tag@v1
         id: previoustag
         env:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
