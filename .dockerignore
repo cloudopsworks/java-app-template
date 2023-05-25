@@ -8,7 +8,11 @@ charts/
 NOTICE
 LICENSE
 README.md
+OWNERS
+OWNERS_ALIASES
 jenkins-x*.*
 skaffold.*
+.helmignore
+.git*
 tronador/
 .tronador

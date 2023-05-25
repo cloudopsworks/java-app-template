@@ -82,7 +82,6 @@ jobs:
           name: sbom
           path: target/dtrack-bom.xml
 
-
       # SBOM upload
       - name: SBOM Dtrack Upload
         run: |
