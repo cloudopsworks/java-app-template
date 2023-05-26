@@ -31,6 +31,13 @@ on:
       BOT_EMAIL:
         required: true
         type: string
+      isAuto:
+        required: false
+        type: boolean
+        default: true
+      tagRelease:
+        required: false
+        type: string
 
     secrets:
       BOT_TOKEN:
@@ -42,7 +49,7 @@ jobs:
     outputs:
       owner: ${{ steps.getowner.outputs.owner }}
       project_name: ${{ steps.getowner.outputs.repo_name }}
-      release_version: ${{ steps.semvers.outputs.patch }}
+      release_version: ${{ steps.tagged.outputs.tag_version }}
       release_tag: ${{ steps.tagged.outputs.tag_name }}
     steps:
       - uses: actions/checkout@v3
