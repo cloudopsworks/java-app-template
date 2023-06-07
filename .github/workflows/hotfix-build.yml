@@ -3,7 +3,7 @@
 #            On GitHub: https://github.com/cloudopsworks
 #            Distributed Under Apache v2.0 License
 #
-name: NodeJS Hotfix Build
+name: Java Hotfix Build
 on:
   # Run only on branches PUSH except when charts are modified
   pull_request:
