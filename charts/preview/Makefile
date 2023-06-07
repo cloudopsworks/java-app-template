@@ -46,6 +46,6 @@ endif
 
 clean-preview: check-release
 ifneq ($(REL),0)
-	helm delete --purge preview
+	helm --namespace $(NAME)-$(PREVIEW_NAME) uninstall preview --wait --timeout 10m0s
 	kubectl delete ns $(NAME)-$(PREVIEW_NAME)
 endif
