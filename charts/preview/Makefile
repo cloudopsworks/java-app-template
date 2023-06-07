@@ -43,3 +43,9 @@ ifeq ($(REL),0)
 else
 	helm upgrade --namespace $(NAME)-$(PREVIEW_NAME) --set "preview.ingress.host=$(NAME)-$(PREVIEW_NAME).$(PREVIEW_DOMAIN)" preview . 
 endif
+
+clean-preview: check-release
+ifneq ($(REL),0)
+	helm delete --purge preview
+	kubectl delete ns $(NAME)-$(PREVIEW_NAME)
+endif
