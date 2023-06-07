@@ -74,6 +74,9 @@ jobs:
     uses: cloudopsworks/base-app-template/.github/workflows/create-release.yml@master
     with:
       release-tag: ${{ needs.new_version.outputs.release_version }}
+      files-globs: |
+        target/*.zip
+        target/*.jar
     secrets:
       token: ${{ secrets.BOT_TOKEN }}
 
