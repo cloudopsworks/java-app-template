@@ -7,9 +7,9 @@ name: Static Analysis Process
 on:
   workflow_call:
     inputs:
-      ref:
-        required: true
-        type: string
+#      ref:
+#        required: true
+#        type: string
       sonarqubeUrl:
         required: true
         type: string
@@ -56,8 +56,11 @@ jobs:
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-maven-
+      # Run versioning to tag the source
+      - name: Run Versioning setup
+        run: make version
 
-      # Build the code!
+      # Test the code!
       - name: Static Test Code
         env:
           JAVA_OPTIONS: "-XX:+UnlockExperimentalVMOptions -Dsun.zip.disableMemoryMapping=true -XX:+UseParallelGC -XX:MinHeapFreeRatio=5 -XX:MaxHeapFreeRatio=10 -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -Xms128m -Xmx2048m"

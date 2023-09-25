@@ -1,0 +1,338 @@
+# (c) 2023 - Cloud Ops Works LLC - https://cloudops.works/
+#            On GitHub: https://github.com/cloudopsworks
+#            Distributed Under Apache v2.0 License
+#
+name: Process OWNERS file for configuration changes
+on:
+  push:
+    # Owners can be changed only on the following branches
+    branches:
+      - master
+      - main
+    paths:
+      - OWNERS
+      - cloudopsworks-ci.yaml
+  workflow_dispatch:
+
+concurrency: owners-terraform-project
+
+jobs:
+  process-owners:
+    runs-on: ubuntu-latest
+    steps:
+      # Get the owner repo
+      - name: Get owner
+        id: getowner
+        run: |
+          repo_owner=`echo "$GITHUB_REPOSITORY" | cut -f 1 -d "/"`
+          repo_name=`echo "$GITHUB_REPOSITORY" | cut -f 2 -d "/"`
+          echo "owner=$repo_owner" >> $GITHUB_OUTPUT
+          echo "repo_name=$repo_name" >> $GITHUB_OUTPUT
+
+      - uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.BOT_TOKEN }}
+          fetch-depth: 0
+
+      - name: Retrieve branch protection rule
+        uses: mikefarah/yq@v4.33.3
+        id: branch_protection_rules
+        with:
+          cmd: yq '.config.branchProtection' cloudopsworks-ci.yaml | grep true | wc -l
+
+#      - name: Retrieve branch protection rule
+#        uses: mikefarah/yq@v4.33.3
+#        id: gitflow_protection
+#        with:
+#          cmd: yq '.config.gitFlow' cloudopsworks-ci.yaml | grep true | wc -l
+
+      - name: Retrieve protected sources
+        uses: mikefarah/yq@v4.33.3
+        id: protected_sources
+        with:
+          cmd: yq -o=json -I=0 '.config.protectedSources' cloudopsworks-ci.yaml
+
+      - name: Check if automatic
+        uses: mikefarah/yq@v4.33.3
+        id: check_automatic
+        with:
+          cmd: yq '.cd.automatic' cloudopsworks-ci.yaml | grep true | wc -l
+
+      - name: Reviewers Count
+        uses: mikefarah/yq@v4.33.3
+        id: reviewers_count
+        if: ${{ steps.check_automatic.outputs.result == 0 || steps.branch_protection_rules.outputs.result == 1 }}
+        with:
+          cmd: yq '.config.requiredReviewers' cloudopsworks-ci.yaml
+
+      - name: Reviewers list as JSON
+        uses: mikefarah/yq@v4.33.3
+        id: reviewers_list
+        if: ${{ steps.check_automatic.outputs.result == 0 || steps.branch_protection_rules.outputs.result == 1 }}
+        with:
+          cmd: yq -o=json -I=0 '.config.reviewers' cloudopsworks-ci.yaml
+
+      - name: Owners list as JSON
+        uses: mikefarah/yq@v4.33.3
+        id: owners_list
+        if: ${{ steps.check_automatic.outputs.result == 0 || steps.branch_protection_rules.outputs.result == 1 }}
+        with:
+          cmd: yq -o=json -I=0 '.config.owners' cloudopsworks-ci.yaml
+
+      - name: Contributors list as JSON
+        uses: mikefarah/yq@v4.33.3
+        id: contrib_list
+        with:
+          cmd: yq -o=json -I=0 '.config.contributors' cloudopsworks-ci.yaml
+
+      - name: Contributor list form JSON
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.BOT_TOKEN }}
+          script: |
+            const contrib_text = ${{ steps.contrib_list.outputs.result }};
+            const contrib_json = contrib_text != null ? JSON.parse('${{ steps.contrib_list.outputs.result }}') : {};
+
+            // Parse the Contributors List and add them to the repository
+            // Users are plain names teams are prefixed by the org name
+            // The role names are case insensitive and match github's permissions.
+            // The role names are: admin, triage, write, read
+            // The default role is read
+            // contrib_json format will be as follows:
+            //    { "admin": ["user1", "user2"], "triage": ["user3", "org1/team1"], "write": ["user5", "org1/team2"], "read": ["user7", "user8"] }
+            for ( const [role, members] of Object.entries(contrib_json) ) {
+              for ( const member of members ) {
+                if ( member.includes("/") ) {
+                  // This is a team
+                  const team = member.split("/");
+                  github.rest.teams.addOrUpdateRepoPermissionsInOrg({
+                    org: team[0],
+                    team_slug: team[1],
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    permission: role
+                  });
+                } else {
+                  // This is a user
+                  github.rest.repos.addCollaborator({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    username: member,
+                    permission: role
+                  });
+                }
+              }
+            }
+
+      - name: Advanced Protection on GitFlow
+        if: ${{ steps.branch_protection_rules.outputs.result == 1 }}
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.BOT_TOKEN }}
+          script: |
+            const branches = ['main', 'master', 'support/*'];
+            const protectedSources = JSON.parse('${{ steps.protected_sources.outputs.result }}');
+            const reviewers_json = JSON.parse('${{ steps.reviewers_list.outputs.result }}');
+            const owners_text = ${{ steps.owners_list.outputs.result }};
+            const owners_json = owners_text != null ? JSON.parse('${{ steps.owners_list.outputs.result }}') : [];
+            const contrib_text = ${{ steps.contrib_list.outputs.result }};
+            const contrib_json = contrib_text != null ? JSON.parse('${{ steps.contrib_list.outputs.result }}') : {};
+            const reviewers_count = ${{ steps.reviewers_count.outputs.result }};
+            const actor = context.actor;
+            
+            // Get reviewers list
+            var reviewers = [];
+            for ( const rev of reviewers_json ) {
+              reviewers.push(rev);
+            }
+            
+            // Get owners list
+            var owners = [];
+            var owner_teams = [];
+            for( const owner of owners_json ) {
+              if ( owner.includes("/") ) {
+                  team = owner.split("/");
+                  owner_teams.push(team[1]);
+                } else {
+                  owners.push(owner);
+                }
+            }
+            
+            teams_query = `
+              query($login: String!) {
+                organization(login: $login) {
+                  teams(first: 100) {
+                    nodes {
+                      id
+                      name
+                      slug
+                    }
+                  }
+                }
+              }
+            `
+            const teams_result = await github.graphql(teams_query, {login: context.repo.owner});
+            
+            members_query = `
+              query($login: String!) {
+                organization(login: $login) {
+                  membersWithRole(first: 100) {
+                    nodes {
+                      login
+                      id
+                    }
+                  }
+                }
+              }
+            `
+            
+            const members_result = await github.graphql(members_query, {login: context.repo.owner});
+            
+            const owners_ids = [];
+            for ( const team_name of owner_teams ) {
+              console.log("team_name: " + team_name)
+              team = teams_result.organization.teams.nodes.find( team => team.slug === team_name );
+              if ( team != null ) {
+                console.log("team_id" + team.id);
+                owners_ids.push(team.id);
+              }
+            }
+            
+            for ( const member_name of owners ) {
+              console.log("member_name: " + member_name)
+              member = members_result.organization.membersWithRole.nodes.find( member => member.login === member_name );
+              if ( member != null ) {
+                console.log("member_id" + member.id);
+                owners_ids.push(member.id);
+              }
+            }
+            
+            const reviewers_ids = [];
+            for ( const reviewer_name of reviewers ) {
+              console.log("reviewer_name: " + reviewer_name);
+              reviewer = members_result.organization.membersWithRole.nodes.find( member => member.login === reviewer_name );
+              if ( reviewer != null ) {
+                console.log("reviewer_id" + reviewer.id);
+                reviewers_ids.push(reviewer.id);
+              }
+            }
+            
+            // Protect the Branches using GraphQL
+            const repo_query = `
+              query($owner: String!, $repo: String!) {
+                repository(owner:$owner, name:$repo) {
+                  id
+                  branchProtectionRules(first: 100) {
+                    nodes {
+                      id
+                      pattern
+                    }
+                  }
+                }
+              }
+            `;
+            const repo_result = await github.graphql(repo_query, {owner: context.repo.owner, repo: context.repo.repo});
+                        
+            // Perform branch protection for each branch (as they are patterns)
+            // this module must cal GraphQL API instead of rest because of lack of support on wildcards
+            // https://github.community/t/graphql-api-for-branch-protection-rules/17230              
+            for ( const branch of branches ) {
+              const rule_exists = repo_result.repository.branchProtectionRules.nodes.find( rule => rule.pattern === branch );
+              var protection_rule = '';
+              
+              if ( rule_exists == null ) {
+                protection_rule = `
+                  mutation($repo_id: ID!, $branch: String!, $reviewers_count: Int!, $actors_ids: [ID!], $reviewers_ids: [ID!], $contexts: [String!]) {
+                    createBranchProtectionRule(input: {
+                      repositoryId: $repo_id,
+                      pattern: $branch,
+                      requiresApprovingReviews: true,
+                      requiredApprovingReviewCount: $reviewers_count,
+                      restrictsPushes: true,
+                      pushActorIds: $actors_ids,
+                      bypassForcePushActorIds: $actors_ids,
+                      bypassPullRequestActorIds: $actors_ids,
+                      restrictsReviewDismissals: true,
+                      reviewDismissalActorIds: $reviewers_ids,
+                      requiredStatusCheckContexts: $contexts,
+                      allowsForcePushes: false,
+                      requiresStrictStatusChecks: true,
+                      requiresStatusChecks: true,
+                      isAdminEnforced: false,
+                      allowsDeletions: false
+                    }) {
+                      clientMutationId
+                    }
+                  }
+                `;
+              } else {
+                protection_rule = `
+                  mutation($rule_id: ID!, $reviewers_count: Int!, $actors_ids: [ID!], $reviewers_ids: [ID!], $contexts: [String!]) {
+                    updateBranchProtectionRule(input: {
+                      branchProtectionRuleId: $rule_id,
+                      requiresApprovingReviews: true,
+                      requiredApprovingReviewCount: $reviewers_count,
+                      restrictsPushes: true,
+                      pushActorIds: $actors_ids,
+                      bypassForcePushActorIds: $actors_ids,
+                      bypassPullRequestActorIds: $actors_ids,
+                      restrictsReviewDismissals: true,
+                      reviewDismissalActorIds: $reviewers_ids,
+                      requiredStatusCheckContexts: $contexts,
+                      allowsForcePushes: false,
+                      requiresStrictStatusChecks: true,
+                      requiresStatusChecks: true,
+                      isAdminEnforced: false,
+                      allowsDeletions: false
+                    }) {
+                      clientMutationId
+                    }
+                  }
+                `;
+              }
+              
+              const vars = {
+                repo_id: repo_result.repository.id,
+                rule_id: rule_exists ? rule_exists.id : null,
+                branch: branch,
+                reviewers_count: reviewers_count,
+                actors_ids: owners_ids,
+                reviewers_ids: reviewers_ids,
+                contexts: [ "plan / plan" ]
+              };
+              await github.graphql(protection_rule, vars);
+            }
+              
+#            github.rest.repos.updateBranchProtection({
+#                owner: context.repo.owner,
+#                repo: context.repo.repo,
+#                branch: branch,
+#                required_status_checks: {
+#                  strict: true,
+#                  checks: [
+#                    { context: "plan / plan" },
+#                  ]
+#                },
+#                enforce_admins: false,
+#                required_pull_request_reviews: {
+#                  dismiss_stale_reviews: false,
+#                  require_code_owner_reviews: false,
+#                  required_approving_review_count: reviewers_count,
+#                  bypass_pull_request_allowances: {
+#                    users: owners,
+#                    teams: owner_teams
+#                  }
+#                },
+#                restrictions: {
+#                  users: owners,
+#                  teams: owner_teams
+#                },
+#                allow_force_pushes: false,
+#                allow_deletions: false,
+#                required_linear_history: true,
+#                allow_squash_merge: true,
+#                allow_merge_commit: true,
+#                allow_rebase_merge: true,
+#                delete_branch_on_merge: false
+#              });
+#            }

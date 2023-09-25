@@ -7,11 +7,17 @@ name: Java Maven Build
 on:
   # Run only on branches PUSH except when charts are modified
   push:
+    tags:
+      - v*
     branches:
-      - master
+      - develop
+      - support/**
+      - release/**
     paths-ignore:
       - ".github/workflows/**"
   workflow_dispatch:
+
+concurrency: build-${{ github.repository }}-${{ github.ref }}
 
 # Permission Settings for the entire RUN
 permissions:
@@ -22,23 +28,16 @@ permissions:
   statuses: write
 
 jobs:
-  new_version:
-    uses: cloudopsworks/java-app-template/.github/workflows/code-tag.yml@master
-    with:
-      DOCKER_REGISTRY_ADDRESS: ${{ vars.DOCKER_REGISTRY_ADDRESS }}
-      HELM_REGISTRY_ADDRESS: ${{ vars.DOCKER_REGISTRY_ADDRESS }}
-      BOT_USER: ${{ vars.BOT_USER }}
-      BOT_EMAIL: ${{ vars.BOT_EMAIL }}
+  data:
+    uses: cloudopsworks/base-app-template/.github/workflows/cd-data.yml@master
     secrets:
       BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
 
   build:
     needs:
-      - new_version
+      - data
     uses: cloudopsworks/java-app-template/.github/workflows/code-build.yml@master
     with:
-      semver: ${{ needs.new_version.outputs.release_version }}
-      ref: ${{ needs.new_version.outputs.release_tag }}
       DOCKER_REGISTRY_ADDRESS: ${{ vars.DOCKER_REGISTRY_ADDRESS }}
       HELM_REGISTRY_ADDRESS: ${{ vars.DOCKER_REGISTRY_ADDRESS }}
       BOT_USER: ${{ vars.BOT_USER }}
@@ -54,11 +53,12 @@ jobs:
 
   release:
     needs:
+      - data
       - build
-      - new_version
     uses: cloudopsworks/base-app-template/.github/workflows/create-release.yml@master
+    if: ${{ needs.data.outputs.isRelease == 'true' || needs.data.outputs.isPreRelease == 'true' }}
     with:
-      release-tag: ${{ needs.new_version.outputs.release_version }}
+      release-tag: v${{ needs.build.outputs.semver }}
       files-globs: |
         target/*.zip
         target/*.jar
@@ -67,12 +67,12 @@ jobs:
 
   static-analysis:
     needs:
+      - data
       - build
-      - new_version
     if: ${{ needs.build.outputs.pipeline_sonarqube == 'true' }}
     uses: cloudopsworks/java-app-template/.github/workflows/static-analysis.yml@master
     with:
-      ref: ${{ needs.new_version.outputs.release_tag }}
+      semver: ${{ needs.build.outputs.semver }}
       sonarqubeUrl: ${{ vars.SONARQUBE_URL }}
     secrets:
       BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
@@ -80,14 +80,14 @@ jobs:
 
   dependency-track:
     needs:
+      - data
       - build
-      - new_version
     if: ${{ needs.build.outputs.pipeline_dtrack == 'true' }}
     uses: cloudopsworks/java-app-template/.github/workflows/dependency-track.yml@master
     with:
       projectName: ${{ needs.new_version.outputs.project_name }}
       projectType: ${{ needs.build.outputs.pipeline_dtrack_project_type }}
-      ref: ${{ needs.new_version.outputs.release_tag }}
+      semver: ${{ needs.build.outputs.semver }}
       dependencyTrackUrl: ${{ vars.DEPENDENCYTRACK_URL }}
     secrets:
       BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
@@ -95,13 +95,13 @@ jobs:
 
   delivery:
     needs:
+      - data
       - build
       - release
-      - new_version
-    if: ${{ needs.build.outputs.cdenv_enabled == 'true' }}
     uses: cloudopsworks/base-app-template/.github/workflows/delivery-push.yml@master
     with:
-      release_version: ${{ needs.new_version.outputs.release_version }}
+      release_version: ${{ needs.build.outputs.semver }}
+      release_name: ${{ needs.data.outputs.targetName }}
     secrets:
       token: ${{ secrets.BOT_TOKEN }}
 

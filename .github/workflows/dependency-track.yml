@@ -13,9 +13,9 @@ on:
       projectType:
         required: true
         type: string
-      ref:
-        required: true
-        type: string
+#      ref:
+#        required: true
+#        type: string
       dependencyTrackUrl:
         required: true
         type: string
@@ -62,6 +62,9 @@ jobs:
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-maven-
+      # Run versioning to tag the source
+      - name: Run Versioning setup
+        run: make version
 
       #      # SBOM generation
       #      - name: SBOM Generation for Dtrack

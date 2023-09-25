@@ -16,13 +16,13 @@ on:
         default: false
         required: false
         type: boolean
-      ref:
-        default: ''
-        required: false
-        type: string
-      semver:
-        required: true
-        type: string
+#      ref:
+#        default: ''
+#        required: false
+#        type: string
+#      semver:
+#        required: true
+#        type: string
       DOCKER_REGISTRY_ADDRESS:
         required: true
         type: string
@@ -73,9 +73,9 @@ on:
       pipeline_dtrack_project_type:
         description: "Pipeline classification for DependencyTrack Analysis, blank when dtrack is disabled"
         value: ${{ jobs.build.outputs.pipeline_dtrack_project_type }}
-      cdenv_enabled:
-        description: "Pipeline has CD environment enabled."
-        value: ${{ jobs.build.outputs.cdenv_enabled }}
+      semver:
+        description: "Semver Output calculated on Build"
+        value: ${{ jobs.build.outputs.semver }}
 
 
 jobs:
@@ -87,14 +87,14 @@ jobs:
       pipeline_sonarqube: ${{ steps.disable_sonarqube.outputs.result == 0 }}
       pipeline_dtrack: ${{ steps.disable_dtrack.outputs.result == 0 }}
       pipeline_dtrack_project_type: ${{ steps.dtrack_project_type.outputs.type }}
-      cdenv_enabled: ${{ steps.cdenv_enabled.outputs.result }}
+      semver: ${{ steps.semver.outputs.version }}
     runs-on: ubuntu-latest
     steps:
       # Proceed with checkout of source with all the references (depth=0)  
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
-          ref: ${{ inputs.ref }}
+          #ref: ${{ inputs.ref }}
           token: ${{ secrets.BOT_TOKEN }}
       # Get pipeline conf java version
       - name: Get pipeline node version
@@ -201,13 +201,6 @@ jobs:
         with:
           cmd: yq eval '.excludeGlobs[]' ./cloudopsworks-ci.yaml
 
-      # Get pipeline conf target environment
-      - name: Get pipeline target environment
-        id: cdenv_enabled
-        uses: mikefarah/yq@master
-        with:
-          cmd: yq eval '.cd.env != null' ./cloudopsworks-ci.yaml
-
       # Get the owner repo
       - name: Get owner
         id: getowner
@@ -217,12 +210,24 @@ jobs:
           echo "owner=$repo_owner" >> $GITHUB_OUTPUT
           echo "repo_name=$repo_name" >> $GITHUB_OUTPUT
 
-      # Create a VERSION file to use through the build
-      - name: Set Version File for a Release
-        env:
-          NEXT_VERSION: "${{ inputs.semver }}"
+      # Versioning SET
+      - name: Version SET
+        run: make version
+
+      - name: Version Capture
+        id: semver
         run: |
-          echo -n "$NEXT_VERSION" > VERSION
+          echo "version=$(cat VERSION)" >> $GITHUB_OUTPUT
+
+      # Proceed with helm chart versioning bump
+      - name: Helm Chart Versioning
+        if: steps.pipeline_helm.outputs.result == 1
+        env:
+          HELM_REGISTRY_ADDRESS: ${{ inputs.HELM_REGISTRY_ADDRESS }}
+          DOCKER_REGISTRY_ADDRESS: ${{ inputs.DOCKER_REGISTRY_ADDRESS }}
+          REPOSITORY_OWNER: ${{ steps.getowner.outputs.owner }}
+          REPOSITORY_NAME: ${{ steps.getowner.outputs.repo_name }}
+        run: make version/helm
 
       # Build the code!
       - name: Build Code
@@ -277,7 +282,7 @@ jobs:
           context: .
           tags: |
             ${{ inputs.DOCKER_REGISTRY_ADDRESS }}/${{ steps.getowner.outputs.owner }}/${{ steps.getowner.outputs.repo_name }}:latest
-            ${{ inputs.DOCKER_REGISTRY_ADDRESS }}/${{ steps.getowner.outputs.owner }}/${{ steps.getowner.outputs.repo_name }}:${{ inputs.semver }}
+            ${{ inputs.DOCKER_REGISTRY_ADDRESS }}/${{ steps.getowner.outputs.owner }}/${{ steps.getowner.outputs.repo_name }}:${{ steps.semver.outputs.version }}
       # Push docker version but is not latest release
       - name: Docker Push Preview
         if: steps.pipeline_docker.outputs.result == 1 && inputs.isRelease == false
@@ -286,7 +291,7 @@ jobs:
           push: true
           context: .
           tags: |
-            ${{ inputs.DOCKER_REGISTRY_ADDRESS }}/${{ steps.getowner.outputs.owner }}/${{ steps.getowner.outputs.repo_name }}:${{ inputs.semver }}
+            ${{ inputs.DOCKER_REGISTRY_ADDRESS }}/${{ steps.getowner.outputs.owner }}/${{ steps.getowner.outputs.repo_name }}:${{ steps.semver.outputs.version }}
       #
       # Helm tag pull request version
       #
@@ -372,5 +377,4 @@ jobs:
           path: |
             target/${{ steps.getowner.outputs.repo_name }}*.zip
             target/${{ steps.getowner.outputs.repo_name }}*.jar
-            CHANGELOG.md
           retention-days: 1
