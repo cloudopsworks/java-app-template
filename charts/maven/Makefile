@@ -6,7 +6,7 @@ CHART_REPO := helm/$(REPOSITORY_OWNER)
 CURRENT=$(pwd)
 NAME := $(REPOSITORY_NAME)
 OS := $(shell uname)
-RELEASE_VERSION := $(shell cat ../../VERSION)
+RELEASE_VERSION ?= $(shell cat ../../VERSION)
 
 build: clean
 	rm -rf requirements.lock

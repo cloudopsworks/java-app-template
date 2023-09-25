@@ -14,7 +14,7 @@ version: packages/install/gitversion
 
 ## Charts initialization for Node Project
 charts/init:
-	@cp -r charts/node charts/$(PROJECT)
+	@cp -r charts/maven charts/$(PROJECT)
 ifeq ($(OS),darwin)
 	@sed -i '' -e "s/^name: .*$$/name: $(PROJECT)/g" charts/$(PROJECT)/Chart.yaml
 else ifeq ($(OS),linux)
