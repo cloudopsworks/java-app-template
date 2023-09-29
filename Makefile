@@ -27,7 +27,18 @@ endif
 charts/init:
 	@cp -r charts/maven charts/$(PROJECT)
 ifeq ($(OS),darwin)
+	@sed -i '' -e "s|  repository: .*$$|  repository: file://../$(PROJECT)|g" charts/preview/requirements.yaml
 	@sed -i '' -e "s/^name: .*$$/name: $(PROJECT)/g" charts/$(PROJECT)/Chart.yaml
 else ifeq ($(OS),linux)
+	@sed -i -e "s|  repository: .*$$|  repository: file://../$(PROJECT)|g" charts/preview/requirements.yaml
 	@sed -i -e "s/^name: .*$$/name: $(PROJECT)/g" charts/$(PROJECT)/Chart.yaml
+endif
+
+# Modify pom.xml to change the project name with the $(PROJECT) variable
+## Code Initialization for Node Project
+code/init: charts/init
+ifeq ($(OS),darwin)
+	@sed -i '' -e "s/<artifactId>.*<\/artifactId>/<artifactId>$(PROJECT)<\/artifactId>/g" pom.xml
+else ifeq ($(OS),linux)
+	@sed -i -e "s/<artifactId>.*<\/artifactId>/<artifactId>$(PROJECT)<\/artifactId>/g" pom.xml
 endif
