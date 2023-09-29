@@ -40,8 +40,8 @@ code/init: charts/init packages/install/gitversion
 	$(call assert-set,GITVERSION)
 ifeq ($(OS),darwin)
 	@sed -i '' -e "s/<artifactId>.*<\/artifactId>/<artifactId>$(PROJECT)<\/artifactId>/g" pom.xml
-	@sed -i '' -e "s/<version>.*<\/version>/<version>$(shell $(GITVERSION) -output json -showvariable SemVer | tr '+' '-')<\/version>/g" pom.xml
+	@sed -i '' -e "s/<version>.*<\/version>/<version>$(shell $(GITVERSION) -output json -showvariable SemVer | tr '+' '-')-SNAPSHOT<\/version>/g" pom.xml
 else ifeq ($(OS),linux)
 	@sed -i -e "s/<artifactId>.*<\/artifactId>/<artifactId>$(PROJECT)<\/artifactId>/g" pom.xml
-	@sed -i -e "s/<version>.*<\/version>/<version>$(shell $(GITVERSION) -output json -showvariable SemVer | tr '+' '-')<\/version>/g" pom.xml
+	@sed -i -e "s/<version>.*<\/version>/<version>$(shell $(GITVERSION) -output json -showvariable SemVer | tr '+' '-')-SNAPSHOT<\/version>/g" pom.xml
 endif
