@@ -26,7 +26,7 @@ permissions:
 
 jobs:
   data:
-    uses: cloudopsworks/base-app-template/.github/workflows/cd-data.yml@develop
+    uses: cloudopsworks/base-app-template/.github/workflows/cd-data.yml@v2
     secrets:
       token: ${{ secrets.BOT_TOKEN }}
 
@@ -53,7 +53,7 @@ jobs:
     needs:
       - data
       - build
-    uses: cloudopsworks/base-app-template/.github/workflows/create-release.yml@develop
+    uses: cloudopsworks/base-app-template/.github/workflows/create-release.yml@v2
     with:
       ref_name: v${{ needs.build.outputs.semver }}
       release-tag: v${{ needs.build.outputs.semver }}
@@ -97,7 +97,7 @@ jobs:
       - data
       - build
       - release
-    uses: cloudopsworks/base-app-template/.github/workflows/delivery-push.yml@develop
+    uses: cloudopsworks/base-app-template/.github/workflows/delivery-push.yml@v2
     with:
       release_version: ${{ needs.build.outputs.semver }}
       release_name: ${{ needs.data.outputs.targetName }}

@@ -30,7 +30,7 @@ jobs:
   # Runs only if the created branch is a release/** branch
   data:
     if: ${{ startsWith(github.ref,'refs/heads/release/') || startsWith(github.ref,'refs/heads/develop') || startsWith(github.ref,'refs/heads/support/') }}
-    uses: cloudopsworks/base-app-template/.github/workflows/cd-data.yml@develop
+    uses: cloudopsworks/base-app-template/.github/workflows/cd-data.yml@v2
     secrets:
       token: ${{ secrets.BOT_TOKEN }}
 
@@ -85,7 +85,7 @@ jobs:
     needs:
       - data
       - build
-    uses: cloudopsworks/base-app-template/.github/workflows/delivery-push.yml@develop
+    uses: cloudopsworks/base-app-template/.github/workflows/delivery-push.yml@v2
     with:
       release_version: ${{ needs.build.outputs.semver }}
       release_name: ${{ needs.data.outputs.targetName }}
