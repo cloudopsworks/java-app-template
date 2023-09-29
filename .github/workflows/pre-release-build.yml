@@ -3,18 +3,20 @@
 #            On GitHub: https://github.com/cloudopsworks
 #            Distributed Under Apache v2.0 License
 #
-name: Release Build
+name: Pre-Release Build
 on:
-  # Run only on branches PUSH except when charts are modified
+  create:
+
   push:
-    tags:
-      - 'v[0-9]+.[0-9]+.[0-9]+'
-      - 'v[0-9]+.[0-9]+.[0-9]+-**'
+    branches:
+      - develop
+      - support/**
+      - release/**
     paths-ignore:
       - ".github/workflows/**"
   workflow_dispatch:
 
-concurrency: build-${{ github.repository }}-${{ github.ref }}
+concurrency: build-pre-${{ github.repository }}-${{ github.ref }}
 
 # Permission Settings for the entire RUN
 permissions:
@@ -25,7 +27,9 @@ permissions:
   statuses: write
 
 jobs:
+  # Runs only if the created branch is a release/** branch
   data:
+    if: ${{ startsWith(github.ref,'refs/heads/release/') || startsWith(github.ref,'refs/heads/develop') || startsWith(github.ref,'refs/heads/support/') }}
     uses: cloudopsworks/base-app-template/.github/workflows/cd-data.yml@develop
     secrets:
       token: ${{ secrets.BOT_TOKEN }}
@@ -35,7 +39,7 @@ jobs:
       - data
     uses: ./.github/workflows/code-build.yml
     with:
-      isRelease: true
+      isRelease: false
       DOCKER_REGISTRY_ADDRESS: ${{ vars.DOCKER_REGISTRY_ADDRESS }}
       HELM_REGISTRY_ADDRESS: ${{ vars.DOCKER_REGISTRY_ADDRESS }}
       BOT_USER: ${{ vars.BOT_USER }}
@@ -48,21 +52,6 @@ jobs:
       AWS_SECRET_ACCESS_KEY: ${{ secrets.BUILD_AWS_SECRET_ACCESS_KEY }}
       AZURE_SERVICE_ID: ${{ secrets.AZURE_SERVICE_ID }}
       AZURE_SERVICE_SECRET: ${{ secrets.AZURE_SERVICE_SECRET }}
-
-  release:
-    needs:
-      - data
-      - build
-    uses: cloudopsworks/base-app-template/.github/workflows/create-release.yml@develop
-    with:
-      ref_name: v${{ needs.build.outputs.semver }}
-      release-tag: v${{ needs.build.outputs.semver }}
-      pre-release: ${{ needs.data.outputs.isPreRelease == 'true' }}
-      files-globs: |
-        target/*.zip
-        target/*.jar
-    secrets:
-      token: ${{ secrets.BOT_TOKEN }}
 
   static-analysis:
     needs:
@@ -96,7 +85,6 @@ jobs:
     needs:
       - data
       - build
-      - release
     uses: cloudopsworks/base-app-template/.github/workflows/delivery-push.yml@develop
     with:
       release_version: ${{ needs.build.outputs.semver }}

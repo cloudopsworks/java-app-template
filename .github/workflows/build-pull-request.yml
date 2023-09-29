@@ -1,11 +1,16 @@
 ##
-# (c) 2021 - Cloud Ops Works LLC - https://cloudops.works/
+# (c) 2023 - Cloud Ops Works LLC - https://cloudops.works/
 #            On GitHub: https://github.com/cloudopsworks
 #            Distributed Under Apache v2.0 License
 #
 name: Build Pull Request
 on:
   pull_request:
+    branches:
+      - hotfix/**
+      - feature/**
+
+concurrency: build-pull-${{ github.repository }}-${{ github.ref }}
 
 permissions:
   contents: read
@@ -53,11 +58,9 @@ jobs:
           echo "is_aws=$is_aws" >>$GITHUB_OUTPUT
 
   build:
-    uses: cloudopsworks/java-app-template/.github/workflows/code-build.yml@master
+    uses: ./.github/workflows/code-build.yml
     with:
       isRelease: false
-      semver: 0.1.0-SNAPSHOT-PR${{ github.event.pull_request.number }}-${{ github.run_number }}
-      ref: ${{ github.head_ref }}
       DOCKER_REGISTRY_ADDRESS: ${{ vars.DOCKER_REGISTRY_ADDRESS }}
       HELM_REGISTRY_ADDRESS: ${{ vars.DOCKER_REGISTRY_ADDRESS }}
       BOT_USER: ${{ vars.BOT_USER }}
@@ -119,9 +122,9 @@ jobs:
     needs:
       - build
     if: needs.build.outputs.pipeline_sonarqube
-    uses: cloudopsworks/java-app-template/.github/workflows/static-analysis.yml@master
+    uses: ./.github/workflows/static-analysis.yml
     with:
-      ref: ${{ github.head_ref }}
+      #ref: ${{ github.head_ref }}
       sonarqubeUrl: ${{ vars.SONARQUBE_URL }}
     secrets:
       BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
@@ -132,11 +135,11 @@ jobs:
       - build
       - project_data
     if: needs.build.outputs.pipeline_dtrack
-    uses: cloudopsworks/java-app-template/.github/workflows/dependency-track.yml@master
+    uses: ./.github/workflows/dependency-track.yml
     with:
       projectName: ${{ needs.project_data.outputs.project_name }}
       projectType: ${{ needs.build.outputs.pipeline_dtrack_project_type }}
-      ref: ${{ github.head_ref }}
+      #ref: ${{ github.head_ref }}
       dependencyTrackUrl: ${{ vars.DEPENDENCYTRACK_URL }}
     secrets:
       BOT_TOKEN: ${{ secrets.BOT_TOKEN }}

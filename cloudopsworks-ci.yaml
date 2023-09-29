@@ -1,5 +1,5 @@
 ##
-# (c) 2021 - Cloud Ops Works LLC - https://cloudops.works/
+# (c) 2023 - Cloud Ops Works LLC - https://cloudops.works/
 #            On GitHub: https://github.com/cloudopsworks
 #            Distributed Under Apache v2.0 License
 #
@@ -44,30 +44,31 @@ config:
     - Makefile
     - .github
 
-  # Optional only needed if not automatic or protection is true
-  requiredReviewers: 1
+  # Optional only needed if not automatic or protection is true & Further review is needed for merging on Master/Main
+  requiredReviewers: 0
 
   # Optional only needed if not automatic or protection is true
-  #  reviewers:
-  #      - elasticguru-bot
-  #      - cloudopsworks-dev
-  #      - cloudopsworks/engineering
+#  reviewers:
+#      - elasticguru-bot
+#      - cloudopsworks-dev
+#      - cloudopsworks/engineering
 
   # Optional Only needed for permit owners to perform commits under protected branches.
   # Teams are specified as org/team-name
-  #  owners:
-  #    - elasticguru-bot
-  #    - cloudopsworks-dev
-  #    - cloudopsworks/admin
+#  owners:
+#    - elasticguru-bot
+#    - cloudopsworks-dev
+#    - cloudopsworks/admin
 
   # Optional configure the repository members
   contributors:
     admin:
-      - finconecta-team/dev-ops
+      - cloudopsworks/admin
+      - cloudopsworks-bot
     triage: []
     pull: []
     push:
-      - finconecta-team/core-devs
+      - cloudopsworks/engineering
     maintain: []
 
 #
@@ -92,24 +93,43 @@ cd:
   # Indicate that the environment makes automatic merges and deploys
   automatic: false
 
+  # These deployment environments are fixed by the GitFlow workflow
+  # targetName are optional for most deployments but are required for support branches.
+  #
+  # The criteria for each deployment are as follow:
+  #   Pushes to 'develop'       -> develop
+  #   Pushes to 'release/**'    -> test
+  #   Push TAG on 'release/**'  -> prerelease    - Tags are in the form v*.*.*-[alpha|beta].*
+  #   Push TAG on 'main|master' -> release       - Tags are in the strict form v*.*.*
+  #   Push TAG on 'support/**'  -> support x.y.*
+  #
+  # Previews are run on pull requests from hotfix/** or feature/** branches into any of the development / main branches
   deployments:
     develop:
       env: dev
-    main:
-      env: production
+      #targetName: dev-target
     release:
+      env: production
+      #targetName: prod-target
+    test:
       env: uat
+      #targetName: uat-target
+    prerelease:
+      env: demo
+      #targetName: demo-target
     hotfix:
       env: hotfix
+      #targetName: hotfix-target
     pull_request:
       env: pull_request
+      #targetName: pr-target
     support:
       - match: 1.5.*
         env: demo
-        terraformPrefix: demo
+        targetName: demo
       - match: 1.3.*
         env: demo2
-        terraformPrefix: demo2
+        targetName: demo2
   preview:
     enabled: false
     kubernetes: true

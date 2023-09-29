@@ -14,7 +14,7 @@ on:
       - cloudopsworks-ci.yaml
   workflow_dispatch:
 
-concurrency: owners-terraform-project
+concurrency: owners-${{ github.repository }}-${{ github.ref }}
 
 jobs:
   process-owners:
@@ -29,7 +29,7 @@ jobs:
           echo "owner=$repo_owner" >> $GITHUB_OUTPUT
           echo "repo_name=$repo_name" >> $GITHUB_OUTPUT
 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           token: ${{ secrets.BOT_TOKEN }}
           fetch-depth: 0
@@ -38,13 +38,13 @@ jobs:
         uses: mikefarah/yq@v4.33.3
         id: branch_protection_rules
         with:
-          cmd: yq '.config.branchProtection' cloudopsworks-ci.yaml | grep true | wc -l
+          cmd: yq e '.config.branchProtection' cloudopsworks-ci.yaml | grep true | wc -l
 
 #      - name: Retrieve branch protection rule
 #        uses: mikefarah/yq@v4.33.3
 #        id: gitflow_protection
 #        with:
-#          cmd: yq '.config.gitFlow' cloudopsworks-ci.yaml | grep true | wc -l
+#          cmd: yq e '.config.gitFlow' cloudopsworks-ci.yaml | grep true | wc -l
 
       - name: Retrieve protected sources
         uses: mikefarah/yq@v4.33.3
@@ -56,14 +56,14 @@ jobs:
         uses: mikefarah/yq@v4.33.3
         id: check_automatic
         with:
-          cmd: yq '.cd.automatic' cloudopsworks-ci.yaml | grep true | wc -l
+          cmd: yq e '.cd.automatic' cloudopsworks-ci.yaml | grep true | wc -l
 
       - name: Reviewers Count
         uses: mikefarah/yq@v4.33.3
         id: reviewers_count
         if: ${{ steps.check_automatic.outputs.result == 0 || steps.branch_protection_rules.outputs.result == 1 }}
         with:
-          cmd: yq '.config.requiredReviewers' cloudopsworks-ci.yaml
+          cmd: yq e '.config.requiredReviewers' cloudopsworks-ci.yaml
 
       - name: Reviewers list as JSON
         uses: mikefarah/yq@v4.33.3
@@ -130,7 +130,8 @@ jobs:
         with:
           github-token: ${{ secrets.BOT_TOKEN }}
           script: |
-            const branches = ['main', 'master', 'support/*'];
+            const branchesStrict = ['main', 'master', 'support/*'];
+            const branchesRelax = ['release/*', 'hotfix/*', 'feature/*', 'develop']
             const protectedSources = JSON.parse('${{ steps.protected_sources.outputs.result }}');
             const reviewers_json = JSON.parse('${{ steps.reviewers_list.outputs.result }}');
             const owners_text = ${{ steps.owners_list.outputs.result }};
@@ -236,17 +237,19 @@ jobs:
             // Perform branch protection for each branch (as they are patterns)
             // this module must cal GraphQL API instead of rest because of lack of support on wildcards
             // https://github.community/t/graphql-api-for-branch-protection-rules/17230              
-            for ( const branch of branches ) {
+            for ( const branch of branchesStrict ) {
               const rule_exists = repo_result.repository.branchProtectionRules.nodes.find( rule => rule.pattern === branch );
               var protection_rule = '';
+            
+              var required_approve = reviewers_count > 0;
               
               if ( rule_exists == null ) {
                 protection_rule = `
-                  mutation($repo_id: ID!, $branch: String!, $reviewers_count: Int!, $actors_ids: [ID!], $reviewers_ids: [ID!], $contexts: [String!]) {
+                  mutation($repo_id: ID!, $branch: String!, $required_approve: Boolean!, $reviewers_count: Int!, $actors_ids: [ID!], $reviewers_ids: [ID!], $contexts: [String!]) {
                     createBranchProtectionRule(input: {
                       repositoryId: $repo_id,
                       pattern: $branch,
-                      requiresApprovingReviews: true,
+                      requiresApprovingReviews: $required_approve,
                       requiredApprovingReviewCount: $reviewers_count,
                       restrictsPushes: true,
                       pushActorIds: $actors_ids,
@@ -267,10 +270,10 @@ jobs:
                 `;
               } else {
                 protection_rule = `
-                  mutation($rule_id: ID!, $reviewers_count: Int!, $actors_ids: [ID!], $reviewers_ids: [ID!], $contexts: [String!]) {
+                  mutation($rule_id: ID!, $required_approve: Boolean!, $reviewers_count: Int!, $actors_ids: [ID!], $reviewers_ids: [ID!], $contexts: [String!]) {
                     updateBranchProtectionRule(input: {
                       branchProtectionRuleId: $rule_id,
-                      requiresApprovingReviews: true,
+                      requiresApprovingReviews: $required_approve,
                       requiredApprovingReviewCount: $reviewers_count,
                       restrictsPushes: true,
                       pushActorIds: $actors_ids,
@@ -295,44 +298,11 @@ jobs:
                 repo_id: repo_result.repository.id,
                 rule_id: rule_exists ? rule_exists.id : null,
                 branch: branch,
+                required_approve: required_approve,
                 reviewers_count: reviewers_count,
                 actors_ids: owners_ids,
                 reviewers_ids: reviewers_ids,
-                contexts: [ "plan / plan" ]
+                contexts: [ "plan / on-pr" ]
               };
               await github.graphql(protection_rule, vars);
             }
-              
-#            github.rest.repos.updateBranchProtection({
-#                owner: context.repo.owner,
-#                repo: context.repo.repo,
-#                branch: branch,
-#                required_status_checks: {
-#                  strict: true,
-#                  checks: [
-#                    { context: "plan / plan" },
-#                  ]
-#                },
-#                enforce_admins: false,
-#                required_pull_request_reviews: {
-#                  dismiss_stale_reviews: false,
-#                  require_code_owner_reviews: false,
-#                  required_approving_review_count: reviewers_count,
-#                  bypass_pull_request_allowances: {
-#                    users: owners,
-#                    teams: owner_teams
-#                  }
-#                },
-#                restrictions: {
-#                  users: owners,
-#                  teams: owner_teams
-#                },
-#                allow_force_pushes: false,
-#                allow_deletions: false,
-#                required_linear_history: true,
-#                allow_squash_merge: true,
-#                allow_merge_commit: true,
-#                allow_rebase_merge: true,
-#                delete_branch_on_merge: false
-#              });
-#            }
