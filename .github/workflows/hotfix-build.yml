@@ -35,7 +35,7 @@ jobs:
   new_version:
     needs:
       - check_hotfix
-    uses: cloudopsworks/java-app-template/.github/workflows/code-tag.yml@master
+    uses: cloudopsworks/java-app-template/.github/workflows/code-tag.yml@v1
     with:
       DOCKER_REGISTRY_ADDRESS: ${{ vars.DOCKER_REGISTRY_ADDRESS }}
       HELM_REGISTRY_ADDRESS: ${{ vars.DOCKER_REGISTRY_ADDRESS }}
@@ -49,7 +49,7 @@ jobs:
   build:
     needs:
       - new_version
-    uses: cloudopsworks/java-app-template/.github/workflows/code-build.yml@master
+    uses: cloudopsworks/java-app-template/.github/workflows/code-build.yml@v1
     with:
       isHotfix: true
       semver: ${{ needs.new_version.outputs.release_version }}
@@ -71,7 +71,7 @@ jobs:
     needs:
       - build
       - new_version
-    uses: cloudopsworks/base-app-template/.github/workflows/create-release.yml@master
+    uses: cloudopsworks/base-app-template/.github/workflows/create-release.yml@v1
     with:
       release-tag: ${{ needs.new_version.outputs.release_version }}
       files-globs: |
@@ -85,7 +85,7 @@ jobs:
       - build
       - new_version
     if: ${{ needs.build.outputs.pipeline_sonarqube == 'true' }}
-    uses: cloudopsworks/java-app-template/.github/workflows/static-analysis.yml@master
+    uses: cloudopsworks/java-app-template/.github/workflows/static-analysis.yml@v1
     with:
       ref: ${{ needs.new_version.outputs.release_tag }}
       sonarqubeUrl: ${{ vars.SONARQUBE_URL }}
@@ -98,7 +98,7 @@ jobs:
       - build
       - new_version
     if: ${{ needs.build.outputs.pipeline_dtrack == 'true' }}
-    uses: cloudopsworks/java-app-template/.github/workflows/dependency-track.yml@master
+    uses: cloudopsworks/java-app-template/.github/workflows/dependency-track.yml@v1
     with:
       projectName: ${{ needs.new_version.outputs.project_name }}
       projectType: ${{ needs.build.outputs.pipeline_dtrack_project_type }}

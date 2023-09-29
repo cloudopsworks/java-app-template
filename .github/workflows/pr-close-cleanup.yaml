@@ -171,7 +171,7 @@ jobs:
       - target_cloud
       - build-data
     if: needs.target_cloud.outputs.is_azure == 1 && needs.build-data.outputs.has_preview
-    uses: cloudopsworks/base-app-template/.github/workflows/cleanup-preview-azure.yml@master
+    uses: cloudopsworks/base-app-template/.github/workflows/cleanup-preview-azure.yml@v1
     with:
       semver: 0.1.0-SNAPSHOT-PR${{ github.event.pull_request.number }}-${{ github.run_number }}
       ref: ${{ github.head_ref }}
@@ -193,7 +193,7 @@ jobs:
       - target_cloud
       - build-data
     if: needs.target_cloud.outputs.is_aws == 1 && needs.build-data.outputs.has_preview
-    uses: cloudopsworks/base-app-template/.github/workflows/cleanup-preview-aws.yml@master
+    uses: cloudopsworks/base-app-template/.github/workflows/cleanup-preview-aws.yml@v1
     with:
       semver: 0.1.0-SNAPSHOT-PR${{ github.event.pull_request.number }}-${{ github.run_number }}
       ref: ${{ github.head_ref }}
