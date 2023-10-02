@@ -144,7 +144,7 @@ jobs:
     needs:
       - build
       - project_data
-    if: needs.build.outputs.pipeline_dtrack
+    if: needs.build.outputs.pipeline_dtrack == 1
     uses: ./.github/workflows/dependency-track.yml
     with:
       projectName: ${{ needs.project_data.outputs.project_name }}
