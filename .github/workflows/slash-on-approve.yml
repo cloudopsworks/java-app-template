@@ -19,6 +19,6 @@ permissions:
 
 jobs:
   approve:
-    uses: cloudopsworks/base-app-template/.github/workflows/slash-on-approve.yml@master
+    uses: cloudopsworks/base-app-template/.github/workflows/slash-on-approve.yml@v2
     secrets:
       token: ${{ secrets.BOT_TOKEN }}
