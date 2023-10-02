@@ -25,7 +25,7 @@ endif
 
 ## Charts initialization for Node Project
 charts/init:
- 	@cp -r charts/maven/ charts/$(PROJECT)
+	@cp -r charts/maven/ charts/$(PROJECT)
 ifeq ($(OS),darwin)
 	@sed -i '' -e "s|  repository: file.*$$|  repository: file://../$(PROJECT)|g" charts/preview/requirements.yaml
 	@sed -i '' -e "s/^name: .*$$/name: $(PROJECT)/g" charts/$(PROJECT)/Chart.yaml
