@@ -61,6 +61,17 @@ jobs:
           fetch-depth: 0
           fetch-tags: true
 
-      - name: Delete local & remote
+      - name: Delete local & remote Release
+        if: ${{ github.event.pull_request.merged == true && startsWith(github.head_ref, 'release/') }}
         run:
           make gitflow/release/purge
+
+      - name: Delete local & remote Hotfix
+        if: ${{ github.event.pull_request.merged == true && startsWith(github.head_ref, 'hotfix/') }}
+        run:
+          make gitflow/hotfix/purge
+
+      - name: Delete local & remote Feature
+        if: ${{ github.event.pull_request.merged == true && startsWith(github.head_ref, 'feature/') }}
+        run:
+          make gitflow/feature/purge
