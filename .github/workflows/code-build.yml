@@ -64,7 +64,9 @@ on:
       semver:
         description: "Semver Output calculated on Build"
         value: ${{ jobs.build.outputs.semver }}
-
+      package_name:
+        description: "Package name calculated on Build"
+        value: ${{ jobs.build.outputs.package_name }}
 
 jobs:
   build:
@@ -76,6 +78,7 @@ jobs:
       pipeline_dtrack: ${{ steps.disable_dtrack.outputs.result == 0 }}
       pipeline_dtrack_project_type: ${{ steps.dtrack_project_type.outputs.type }}
       semver: ${{ steps.semver.outputs.version }}
+      package_name: ${{ steps.package_name.outputs.result }}
     runs-on: ubuntu-latest
     steps:
       # Proceed with checkout of source with all the references (depth=0)  
@@ -197,6 +200,13 @@ jobs:
           repo_name=`echo "$GITHUB_REPOSITORY" | cut -f 2 -d "/"`
           echo "owner=$repo_owner" >> $GITHUB_OUTPUT
           echo "repo_name=$repo_name" >> $GITHUB_OUTPUT
+
+      # Get the Package name from pom.xml
+      - name: Get Package name
+        id: package_name
+        uses: mikefarah/yq@master
+        with:
+          cmd: yq e -oy '.project.groupId + "." + .project.artifactId' pom.xml
 
       # Versioning SET
       - name: Version SET
