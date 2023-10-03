@@ -90,7 +90,7 @@ jobs:
       release_version: ${{ needs.build.outputs.semver }}
       release_name: ${{ needs.data.outputs.targetName }}
       environment: ${{ needs.data.outputs.environment }}
-      package_name: ${{ needs.build.outputs.package }}
+      package_name: ${{ needs.build.outputs.package_name }}
       package_type: MAVEN
     secrets:
       token: ${{ secrets.BOT_TOKEN }}
