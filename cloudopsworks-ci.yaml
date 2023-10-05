@@ -46,18 +46,18 @@ config:
   # Optional only needed if not automatic or protection is true & Further review is needed for merging on Master/Main
   requiredReviewers: 0
 
-  # Optional only needed if not automatic or protection is true
-#  reviewers:
-#      - elasticguru-bot
-#      - cloudopsworks-dev
-#      - cloudopsworks/engineering
+  # Required: needed if not automatic or protection is true
+  reviewers: []
+  #  - elasticguru-bot
+  #  - cloudopsworks-dev
+  #  - cloudopsworks/engineering
 
-  # Optional Only needed for permit owners to perform commits under protected branches.
+  # Required: needed for permit owners to perform commits under protected branches.
   # Teams are specified as org/team-name
-#  owners:
-#    - elasticguru-bot
-#    - cloudopsworks-dev
-#    - cloudopsworks/admin
+  owners: []
+  #  - elasticguru-bot
+  #  - cloudopsworks-dev
+  #  - cloudopsworks/admin
 
   # Optional configure the repository members
   contributors:
