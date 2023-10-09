@@ -59,8 +59,8 @@ jobs:
       release-tag: v${{ needs.build.outputs.semver }}
       pre-release: ${{ needs.data.outputs.isPreRelease == 'true' }}
       files-globs: |
-        target/*.zip
-        target/*.jar
+        *.zip
+        *.jar
     secrets:
       token: ${{ secrets.BOT_TOKEN }}
 
