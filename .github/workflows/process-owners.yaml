@@ -242,6 +242,9 @@ jobs:
               var protection_rule = '';
             
               var required_approve = reviewers_count > 0;
+            
+              const default_approved = false;
+              const default_count = 0;
               
               if ( rule_exists == null ) {
                 protection_rule = `
@@ -298,8 +301,8 @@ jobs:
                 repo_id: repo_result.repository.id,
                 rule_id: rule_exists ? rule_exists.id : null,
                 branch: branch,
-                required_approve: required_approve,
-                reviewers_count: reviewers_count,
+                required_approve: default_approved,
+                reviewers_count: default_count,
                 actors_ids: owners_ids,
                 reviewers_ids: reviewers_ids,
                 contexts: [ "plan / on-pr" ]
