@@ -1,0 +1,24 @@
+##
+# (c) 2023 - Cloud Ops Works LLC - https://cloudops.works/
+#            On GitHub: https://github.com/cloudopsworks
+#            Distributed Under Apache v2.0 License
+#
+name: Do Retry command
+on:
+  repository_dispatch:
+    types:
+      - retry-command
+
+permissions:
+  issues: write
+  checks: read
+  deployments: write
+  contents: read
+  packages: read
+  statuses: write
+
+jobs:
+  promote:
+    uses: cloudopsworks/base-app-template/.github/workflows/slash-on-retry-automerge.yml@v2
+    secrets:
+      token: ${{ secrets.BOT_TOKEN }}
