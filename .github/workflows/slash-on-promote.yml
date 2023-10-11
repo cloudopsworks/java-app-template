@@ -40,7 +40,8 @@ jobs:
     needs:
       - check-from-code
     uses: cloudopsworks/base-app-template/.github/workflows/slash-on-promote.yml@v2
-    secrets:
+    with:
       package_name: ${{ needs.check-from-code.outputs.package_name }}
       package_type: MAVEN
+    secrets:
       token: ${{ secrets.BOT_TOKEN }}
