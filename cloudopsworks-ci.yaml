@@ -44,7 +44,7 @@ config:
     - .github
 
   # Optional only needed if not automatic or protection is true & Further review is needed for merging on Master/Main
-  requiredReviewers: 0
+  requiredReviewers: 1
 
   # Required: needed if not automatic or protection is true
   reviewers: []
