@@ -18,7 +18,29 @@ permissions:
   statuses: write
 
 jobs:
+  check-from-code:
+    runs-on: ubuntu-latest
+    outputs:
+      package_name: ${{ steps.package_name.outputs.result }}
+    steps:
+      # Proceed with checkout of source with all the references (depth=0)
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          token: ${{ secrets.BOT_TOKEN }}
+
+      # Get the Package name from pom.xml
+      - name: Get Package name
+        id: package_name
+        uses: mikefarah/yq@master
+        with:
+          cmd: yq e -oy '.project.groupId + "." + .project.artifactId' pom.xml
+
   promote:
+    needs:
+      - check-from-code
     uses: cloudopsworks/base-app-template/.github/workflows/slash-on-promote.yml@v2
     secrets:
+      package_name: ${{ needs.check-from-code.outputs.package_name }}
+      package_type: MAVEN
       token: ${{ secrets.BOT_TOKEN }}
