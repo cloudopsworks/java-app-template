@@ -88,7 +88,7 @@ jobs:
     needs:
       - target_cloud
       - build
-    if: needs.target_cloud.outputs.is_azure == 1 && needs.build.outputs.has_preview == 1
+    if: needs.target_cloud.outputs.is_azure == 1 && needs.build.outputs.has_preview == 'true'
     uses: cloudopsworks/base-app-template/.github/workflows/preview-azure.yml@v2
     with:
       semver: ${{ needs.build.outputs.semver }}
@@ -110,7 +110,7 @@ jobs:
     needs:
       - target_cloud
       - build
-    if: needs.target_cloud.outputs.is_aws == 1 && needs.build.outputs.has_preview == 1
+    if: needs.target_cloud.outputs.is_aws == 1 && needs.build.outputs.has_preview == 'true'
     uses: cloudopsworks/base-app-template/.github/workflows/preview-aws.yml@v2
     with:
       semver: ${{ needs.build.outputs.semver }}
@@ -131,7 +131,7 @@ jobs:
   static-analysis:
     needs:
       - build
-    if: needs.build.outputs.pipeline_sonarqube == 1
+    if: needs.build.outputs.pipeline_sonarqube == 'true'
     uses: ./.github/workflows/static-analysis.yml
     with:
       #ref: ${{ github.head_ref }}
@@ -144,7 +144,7 @@ jobs:
     needs:
       - build
       - project_data
-    if: needs.build.outputs.pipeline_dtrack == 1
+    if: needs.build.outputs.pipeline_dtrack == 'true'
     uses: ./.github/workflows/dependency-track.yml
     with:
       projectName: ${{ needs.project_data.outputs.project_name }}
