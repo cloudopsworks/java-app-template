@@ -8,9 +8,6 @@ on:
   pull_request:
     types:
       - closed
-    branches:
-      - hotfix/**
-      - feature/**
 
 concurrency: pr-close-${{ github.repository }}-${{ github.ref }}
 
@@ -60,6 +57,7 @@ jobs:
           echo "is_aws=$is_aws" >>$GITHUB_OUTPUT
 
   build-data:
+    if: ${{ startsWith(github.head_ref, 'hotfix/') || startsWith(github.head_ref, 'feature/') }}
     needs:
       - project_data
       - target_cloud
