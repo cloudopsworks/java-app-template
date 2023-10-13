@@ -50,6 +50,7 @@ jobs:
       commit_email: ${{ vars.BOT_EMAIL }}
 
   branch_deletion:
+    if: always()
     needs:
       - push_tag
     runs-on: ubuntu-latest
