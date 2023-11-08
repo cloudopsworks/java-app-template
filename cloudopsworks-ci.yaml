@@ -96,11 +96,12 @@ cd:
   # These deployment environments are fixed by the GitFlow workflow
   # targetName are optional for most deployments but are required for support branches.
   #
-  # The criteria for each deployment are as follow:
   #   Pushes to 'develop'       -> develop
   #   Pushes to 'release/**'    -> test
   #   Push TAG on 'release/**'  -> prerelease    - Tags are in the form v*.*.*-[alpha|beta].*
+  #                                   /targets   - Tags are in the form v*.*.*-[alpha|beta].*+deploy-.*
   #   Push TAG on 'main|master' -> release       - Tags are in the strict form v*.*.*
+  #                                   /targets   - Tags are in the form v*.*.*+deploy-.*
   #   Push TAG on 'support/**'  -> support x.y.*
   #
   # Previews are run on pull requests from hotfix/** or feature/** branches into any of the development / main branches
@@ -111,12 +112,20 @@ cd:
     release:
       env: production
       #targetName: prod-target
+      targets:
+        my-target:
+          env: prod-my-target
+          targetName: prod-my-target
     test:
       env: uat
       #targetName: uat-target
     prerelease:
       env: demo
       #targetName: demo-target
+      targets:
+        my-target:
+          env: demo-my-target
+          targetName: demo-my-target
     hotfix:
       env: hotfix
       #targetName: hotfix-target

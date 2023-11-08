@@ -9,7 +9,7 @@ on:
   push:
     tags:
       - 'v[0-9]+.[0-9]+.[0-9]+'
-      - 'v[0-9]+.[0-9]+.[0-9]+-**'
+      - 'v[0-9]+.[0-9]+.[0-9]+**'
     paths-ignore:
       - ".github/workflows/**"
   workflow_dispatch:
@@ -98,6 +98,7 @@ jobs:
       - build
       - release
     uses: cloudopsworks/base-app-template/.github/workflows/delivery-push.yml@v2
+    if: ${{ needs.data.outputs.isEnabled == 'true' }}
     with:
       release_version: ${{ needs.build.outputs.semver }}
       release_name: ${{ needs.data.outputs.targetName }}
