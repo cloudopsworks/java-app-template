@@ -100,12 +100,35 @@ jobs:
       - build
       - release
     uses: cloudopsworks/base-app-template/.github/workflows/delivery-push.yml@v2
-    if: ${{ needs.data.outputs.isEnabled == 'true' }}
+    if: ${{ needs.data.outputs.isEnabled == 'true' && needs.data.outputs.hasQualifier != 'true' }}
     with:
       release_version: ${{ needs.build.outputs.semver }}
       release_name: ${{ needs.data.outputs.targetName }}
       environment: ${{ needs.data.outputs.environment }}
       package_name: ${{ needs.build.outputs.package_name }}
+      package_type: MAVEN
+    secrets:
+      token: ${{ secrets.BOT_TOKEN }}
+
+  version-delivery:
+    needs:
+      - data
+    if: ${{ needs.data.outputs.isEnabled == 'true' && needs.data.outputs.hasQualifier == 'true' }}
+    uses: ./.github/workflows/code-version.yml
+    secrets:
+      token: ${{ secrets.BOT_TOKEN }}
+
+  delivery-only:
+    needs:
+      - data
+      - version-delivery
+    if: ${{ needs.data.outputs.isEnabled == 'true' && needs.data.outputs.hasQualifier == 'true' }}
+    uses: cloudopsworks/base-app-template/.github/workflows/delivery-push.yml@v2
+    with:
+      release_version: ${{ needs.version-delivery.outputs.semver }}
+      release_name: ${{ needs.data.outputs.targetName }}
+      environment: ${{ needs.data.outputs.environment }}
+      package_name: ${{ needs.version-delivery.outputs.package_name }}
       package_type: MAVEN
     secrets:
       token: ${{ secrets.BOT_TOKEN }}
