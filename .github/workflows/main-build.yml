@@ -34,6 +34,7 @@ jobs:
     needs:
       - data
     uses: ./.github/workflows/code-build.yml
+    if: ${{ needs.data.outputs.hasQualifier != 'true' }}
     with:
       isRelease: true
       DOCKER_REGISTRY_ADDRESS: ${{ vars.DOCKER_REGISTRY_ADDRESS }}
@@ -54,6 +55,7 @@ jobs:
       - data
       - build
     uses: cloudopsworks/base-app-template/.github/workflows/create-release.yml@v2
+    if: ${{ needs.data.outputs.hasQualifier != 'true' }}
     with:
       ref_name: v${{ needs.build.outputs.semver }}
       release-tag: v${{ needs.build.outputs.semver }}
@@ -68,7 +70,7 @@ jobs:
     needs:
       - data
       - build
-    if: ${{ needs.build.outputs.pipeline_sonarqube == 'true' }}
+    if: ${{ needs.build.outputs.pipeline_sonarqube == 'true' && needs.data.outputs.hasQualifier != 'true' }}
     uses: ./.github/workflows/static-analysis.yml
     with:
       semver: ${{ needs.build.outputs.semver }}
@@ -81,7 +83,7 @@ jobs:
     needs:
       - data
       - build
-    if: ${{ needs.build.outputs.pipeline_dtrack == 'true' }}
+    if: ${{ needs.build.outputs.pipeline_dtrack == 'true' && needs.data.outputs.hasQualifier != 'true' }}
     uses: ./.github/workflows/dependency-track.yml
     with:
       projectName: ${{ needs.new_version.outputs.project_name }}
