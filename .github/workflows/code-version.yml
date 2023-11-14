@@ -7,6 +7,10 @@ name: Code Version Extraction
 
 on:
   workflow_call:
+    inputs:
+      deployment_name:
+        required: true
+        type: string
     secrets:
       token:
         required: true
@@ -20,7 +24,9 @@ on:
         value: ${{ jobs.build.outputs.package_name }}
 
 jobs:
-  build:
+  versioning:
+    environment:
+      name: ${{ inputs.deployment_name }}
     outputs:
       semver: ${{ steps.semver.outputs.version }}
       package_name: ${{ steps.package_name.outputs.result }}

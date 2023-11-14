@@ -107,6 +107,7 @@ jobs:
       environment: ${{ needs.data.outputs.environment }}
       package_name: ${{ needs.build.outputs.package_name }}
       package_type: MAVEN
+      deployment_name: ${{ needs.data.outputs.deploymentName }}
     secrets:
       token: ${{ secrets.BOT_TOKEN }}
 
@@ -115,6 +116,8 @@ jobs:
       - data
     if: ${{ needs.data.outputs.isEnabled == 'true' && needs.data.outputs.hasQualifier == 'true' }}
     uses: ./.github/workflows/code-version.yml
+    with:
+      deployment_name: ${{ needs.data.outputs.deploymentName }}
     secrets:
       token: ${{ secrets.BOT_TOKEN }}
 
@@ -130,6 +133,7 @@ jobs:
       environment: ${{ needs.data.outputs.environment }}
       package_name: ${{ needs.version-delivery.outputs.package_name }}
       package_type: MAVEN
+      deployment_name: ${{ needs.data.outputs.deploymentName }}
     secrets:
       token: ${{ secrets.BOT_TOKEN }}
 

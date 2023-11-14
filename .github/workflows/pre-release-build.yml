@@ -92,6 +92,7 @@ jobs:
       environment: ${{ needs.data.outputs.environment }}
       package_name: ${{ needs.build.outputs.package_name }}
       package_type: MAVEN
+      deployment_name: ${{ needs.data.outputs.deploymentName }}
     secrets:
       token: ${{ secrets.BOT_TOKEN }}
 
