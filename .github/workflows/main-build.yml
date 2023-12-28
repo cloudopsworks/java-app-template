@@ -9,7 +9,7 @@ on:
   push:
     tags:
       - 'v[0-9]+.[0-9]+.[0-9]+'
-      - 'v[0-9]+.[0-9]+.[0-9]+-**'
+      - 'v[0-9]+.[0-9]+.[0-9]+**'
     paths-ignore:
       - ".github/workflows/**"
   workflow_dispatch:
@@ -26,7 +26,7 @@ permissions:
 
 jobs:
   data:
-    uses: cloudopsworks/base-app-template/.github/workflows/cd-data.yml@develop
+    uses: cloudopsworks/base-app-template/.github/workflows/cd-data.yml@v2
     secrets:
       token: ${{ secrets.BOT_TOKEN }}
 
@@ -34,6 +34,7 @@ jobs:
     needs:
       - data
     uses: ./.github/workflows/code-build.yml
+    if: ${{ needs.data.outputs.hasQualifier != 'true' }}
     with:
       isRelease: true
       DOCKER_REGISTRY_ADDRESS: ${{ vars.DOCKER_REGISTRY_ADDRESS }}
@@ -53,14 +54,15 @@ jobs:
     needs:
       - data
       - build
-    uses: cloudopsworks/base-app-template/.github/workflows/create-release.yml@develop
+    uses: cloudopsworks/base-app-template/.github/workflows/create-release.yml@v2
+    if: ${{ needs.data.outputs.hasQualifier != 'true' }}
     with:
       ref_name: v${{ needs.build.outputs.semver }}
       release-tag: v${{ needs.build.outputs.semver }}
       pre-release: ${{ needs.data.outputs.isPreRelease == 'true' }}
       files-globs: |
-        target/*.zip
-        target/*.jar
+        *.zip
+        *.jar
     secrets:
       token: ${{ secrets.BOT_TOKEN }}
 
@@ -68,7 +70,7 @@ jobs:
     needs:
       - data
       - build
-    if: ${{ needs.build.outputs.pipeline_sonarqube == 'true' }}
+    if: ${{ needs.build.outputs.pipeline_sonarqube == 'true' && needs.data.outputs.hasQualifier != 'true' }}
     uses: ./.github/workflows/static-analysis.yml
     with:
       semver: ${{ needs.build.outputs.semver }}
@@ -81,7 +83,7 @@ jobs:
     needs:
       - data
       - build
-    if: ${{ needs.build.outputs.pipeline_dtrack == 'true' }}
+    if: ${{ needs.build.outputs.pipeline_dtrack == 'true' && needs.data.outputs.hasQualifier != 'true' }}
     uses: ./.github/workflows/dependency-track.yml
     with:
       projectName: ${{ needs.new_version.outputs.project_name }}
@@ -97,11 +99,41 @@ jobs:
       - data
       - build
       - release
-    uses: cloudopsworks/base-app-template/.github/workflows/delivery-push.yml@develop
+    uses: cloudopsworks/base-app-template/.github/workflows/delivery-push.yml@v2
+    if: ${{ needs.data.outputs.isEnabled == 'true' && needs.data.outputs.hasQualifier != 'true' }}
     with:
       release_version: ${{ needs.build.outputs.semver }}
       release_name: ${{ needs.data.outputs.targetName }}
       environment: ${{ needs.data.outputs.environment }}
+      package_name: ${{ needs.build.outputs.package_name }}
+      package_type: MAVEN
+      deployment_name: ${{ needs.data.outputs.deploymentName }}
+    secrets:
+      token: ${{ secrets.BOT_TOKEN }}
+
+  version-delivery:
+    needs:
+      - data
+    if: ${{ needs.data.outputs.isEnabled == 'true' && needs.data.outputs.hasQualifier == 'true' }}
+    uses: ./.github/workflows/code-version.yml
+    with:
+      deployment_name: ${{ needs.data.outputs.deploymentName }}
+    secrets:
+      token: ${{ secrets.BOT_TOKEN }}
+
+  delivery-only:
+    needs:
+      - data
+      - version-delivery
+    if: ${{ needs.data.outputs.isEnabled == 'true' && needs.data.outputs.hasQualifier == 'true' }}
+    uses: cloudopsworks/base-app-template/.github/workflows/delivery-push.yml@v2
+    with:
+      release_version: ${{ needs.version-delivery.outputs.semver }}
+      release_name: ${{ needs.data.outputs.targetName }}
+      environment: ${{ needs.data.outputs.environment }}
+      package_name: ${{ needs.version-delivery.outputs.package_name }}
+      package_type: MAVEN
+      deployment_name: ${{ needs.data.outputs.deploymentName }}
     secrets:
       token: ${{ secrets.BOT_TOKEN }}
 

@@ -7,7 +7,6 @@ pipeline:
   - docker
   - helm
 #  - zip
-staticAnalysis: true
 zipGlobs:
   - target/*.jar
   - conf/**
@@ -20,7 +19,7 @@ excludeGlobs:
   - OWNER*
   - README.md
   - jenkins*
-  - charts/
+  - charts/*
   - cloudopsworks-ci*
   - skafold*
   - original-*.jar
@@ -45,20 +44,20 @@ config:
     - .github
 
   # Optional only needed if not automatic or protection is true & Further review is needed for merging on Master/Main
-  requiredReviewers: 0
+  requiredReviewers: 1
 
-  # Optional only needed if not automatic or protection is true
-#  reviewers:
-#      - elasticguru-bot
-#      - cloudopsworks-dev
-#      - cloudopsworks/engineering
+  # Required: needed if not automatic or protection is true
+  reviewers: []
+  #  - elasticguru-bot
+  #  - cloudopsworks-dev
+  #  - cloudopsworks/engineering
 
-  # Optional Only needed for permit owners to perform commits under protected branches.
+  # Required: needed for permit owners to perform commits under protected branches.
   # Teams are specified as org/team-name
-#  owners:
-#    - elasticguru-bot
-#    - cloudopsworks-dev
-#    - cloudopsworks/admin
+  owners: []
+  #  - elasticguru-bot
+  #  - cloudopsworks-dev
+  #  - cloudopsworks/admin
 
   # Optional configure the repository members
   contributors:
@@ -88,6 +87,7 @@ config:
 #     enabled: false
 #     type: Library
 #
+
 ## CD pipeline configuration uncomment and configure accordingly to enable
 cd:
   # Indicate that the environment makes automatic merges and deploys
@@ -96,27 +96,39 @@ cd:
   # These deployment environments are fixed by the GitFlow workflow
   # targetName are optional for most deployments but are required for support branches.
   #
-  # The criteria for each deployment are as follow:
   #   Pushes to 'develop'       -> develop
   #   Pushes to 'release/**'    -> test
   #   Push TAG on 'release/**'  -> prerelease    - Tags are in the form v*.*.*-[alpha|beta].*
+  #                                   /targets   - Tags are in the form v*.*.*-[alpha|beta].*+deploy-.*
   #   Push TAG on 'main|master' -> release       - Tags are in the strict form v*.*.*
+  #                                   /targets   - Tags are in the form v*.*.*+deploy-.*
   #   Push TAG on 'support/**'  -> support x.y.*
   #
   # Previews are run on pull requests from hotfix/** or feature/** branches into any of the development / main branches
   deployments:
     develop:
+      #enabled: false
       env: dev
       #targetName: dev-target
     release:
       env: production
       #targetName: prod-target
+      targets:
+        my-target:
+          env: prod-my-target
+          targetName: prod-my-target
     test:
+      #enabled: false
       env: uat
       #targetName: uat-target
     prerelease:
+      #enabled: false
       env: demo
       #targetName: demo-target
+      targets:
+        my-target:
+          env: demo-my-target
+          targetName: demo-my-target
     hotfix:
       env: hotfix
       #targetName: hotfix-target

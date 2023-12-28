@@ -35,13 +35,13 @@ jobs:
           echo "repo_name=$repo_name" >> $GITHUB_OUTPUT
 
   data:
-    uses: cloudopsworks/base-app-template/.github/workflows/cd-data.yml@develop
+    uses: cloudopsworks/base-app-template/.github/workflows/cd-data.yml@v2
     secrets:
       token: ${{ secrets.BOT_TOKEN }}
 
   push_tag:
     if: ${{ github.event.pull_request.merged == true && ( github.base_ref == 'master' || github.base_ref == 'main' || startsWith(github.base_ref,'support/') ) }}
-    uses: cloudopsworks/base-app-template/.github/workflows/gitflow-push-tag.yml@develop
+    uses: cloudopsworks/base-app-template/.github/workflows/gitflow-push-tag.yml@v2
     secrets:
       token: ${{ secrets.BOT_TOKEN }}
     with:
@@ -50,6 +50,7 @@ jobs:
       commit_email: ${{ vars.BOT_EMAIL }}
 
   branch_deletion:
+    if: always()
     needs:
       - push_tag
     runs-on: ubuntu-latest
@@ -61,6 +62,16 @@ jobs:
           fetch-depth: 0
           fetch-tags: true
 
-      - name: Delete local & remote
-        run:
-          make gitflow/release/purge
+      - name: Delete local & remote Release
+        if: ${{ github.event.pull_request.merged == true && startsWith(github.head_ref, 'release/') && ( github.base_ref == 'master' || github.base_ref == 'main' || startsWith(github.base_ref,'support/') ) }}
+        run: make gitflow/release/purge
+
+      - name: Delete local & remote Hotfix
+        if: ${{ github.event.pull_request.merged == true && startsWith(github.head_ref, 'hotfix/') && ( github.base_ref == 'master' || github.base_ref == 'main' || startsWith(github.base_ref,'support/') ) }}
+        run: make gitflow/hotfix/purge
+
+      - name: Delete local & remote Feature
+        if: ${{ github.event.pull_request.merged == true && startsWith(github.head_ref, 'feature/') }}
+        run: |
+          FEATURE=$(echo "${{ github.head_ref }}" | sed -e 's/feature\///g')
+          make gitflow/feature/purge $FEATURE

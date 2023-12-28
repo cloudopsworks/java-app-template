@@ -14,5 +14,6 @@ jenkins-x*.*
 skaffold.*
 .helmignore
 .git*
+# CloudOpsWorks Tronador
 tronador/
 .tronador

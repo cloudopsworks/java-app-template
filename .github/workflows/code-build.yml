@@ -64,7 +64,9 @@ on:
       semver:
         description: "Semver Output calculated on Build"
         value: ${{ jobs.build.outputs.semver }}
-
+      package_name:
+        description: "Package name calculated on Build"
+        value: ${{ jobs.build.outputs.package_name }}
 
 jobs:
   build:
@@ -76,6 +78,7 @@ jobs:
       pipeline_dtrack: ${{ steps.disable_dtrack.outputs.result == 0 }}
       pipeline_dtrack_project_type: ${{ steps.dtrack_project_type.outputs.type }}
       semver: ${{ steps.semver.outputs.version }}
+      package_name: ${{ steps.package_name.outputs.result }}
     runs-on: ubuntu-latest
     steps:
       # Proceed with checkout of source with all the references (depth=0)  
@@ -198,6 +201,13 @@ jobs:
           echo "owner=$repo_owner" >> $GITHUB_OUTPUT
           echo "repo_name=$repo_name" >> $GITHUB_OUTPUT
 
+      # Get the Package name from pom.xml
+      - name: Get Package name
+        id: package_name
+        uses: mikefarah/yq@master
+        with:
+          cmd: yq e -oy '.project.groupId + "." + .project.artifactId' pom.xml
+
       # Versioning SET
       - name: Version SET
         run: make version
@@ -239,19 +249,15 @@ jobs:
       #
       # Docker Build login AWS
       - name: Configure AWS Credentials
-        env:
-          TARGET: ${{ inputs.TARGET_CLOUD }}
-        if: ${{ steps.pipeline_docker.outputs.result == 1 && env.TARGET == 'AWS' }}
-        uses: aws-actions/configure-aws-credentials@v2
+        if: ${{ steps.pipeline_docker.outputs.result == 1 && inputs.TARGET_CLOUD == 'AWS' }}
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ inputs.AWS_REGION }}
 
       - name: Docker Login AWS
-        env:
-          TARGET: ${{ inputs.TARGET_CLOUD }}
-        if: ${{ steps.pipeline_docker.outputs.result == 1 && env.TARGET == 'AWS' }}
+        if: ${{ steps.pipeline_docker.outputs.result == 1 && inputs.TARGET_CLOUD == 'AWS' }}
         uses: docker/login-action@v2
         with:
           registry: ${{ inputs.DOCKER_REGISTRY_ADDRESS }}
@@ -300,7 +306,7 @@ jobs:
       #
       - name: AWS ECR login
         id: ecr_login
-        if: steps.pipeline_helm.outputs.result == 1 && env.TARGET_CLOUD == 'AWS'
+        if: steps.pipeline_helm.outputs.result == 1 && inputs.TARGET_CLOUD == 'AWS'
         env:
           TARGET_CLOUD: ${{ inputs.TARGET_CLOUD }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -311,7 +317,7 @@ jobs:
           echo "auth=$pass" >> $GITHUB_OUTPUT
 
       - name: Helm Build Release AWS ECR
-        if: steps.pipeline_helm.outputs.result == 1 && env.TARGET_CLOUD == 'AWS'
+        if: steps.pipeline_helm.outputs.result == 1 && inputs.TARGET_CLOUD == 'AWS'
         env:
           HELM_REGISTRY_ADDRESS: ${{ inputs.HELM_REGISTRY_ADDRESS }}
           DOCKER_REGISTRY_ADDRESS: ${{ inputs.DOCKER_REGISTRY_ADDRESS }}
