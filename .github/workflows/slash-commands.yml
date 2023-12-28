@@ -19,6 +19,6 @@ permissions:
 
 jobs:
   gitops:
-    uses: cloudopsworks/base-app-template/.github/workflows/slash-commands.yml@v1
+    uses: cloudopsworks/base-app-template/.github/workflows/slash-commands.yml@v2
     secrets:
       token: ${{ secrets.BOT_TOKEN }}

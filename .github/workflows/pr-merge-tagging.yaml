@@ -1,0 +1,77 @@
+##
+# (c) 2023 - Cloud Ops Works LLC - https://cloudops.works/
+#            On GitHub: https://github.com/cloudopsworks
+#            Distributed Under Apache v2.0 License
+#
+name: Pull Request Merge Tagging
+on:
+  pull_request:
+    types:
+      - closed
+
+concurrency: merge-pr-${{ github.repository }}-${{ github.ref }}
+
+permissions:
+  contents: read
+  packages: write
+  statuses: write
+  pull-requests: write
+  issues: write
+  checks: write
+
+jobs:
+  project_data:
+    runs-on: ubuntu-latest
+    outputs:
+      project_name: ${{ steps.getowner.outputs.repo_name }}
+    steps:
+      # Get the owner repo
+      - name: Get owner
+        id: getowner
+        run: |
+          repo_owner=`echo "$GITHUB_REPOSITORY" | cut -f 1 -d "/"`
+          repo_name=`echo "$GITHUB_REPOSITORY" | cut -f 2 -d "/"`
+          echo "owner=$repo_owner" >> $GITHUB_OUTPUT
+          echo "repo_name=$repo_name" >> $GITHUB_OUTPUT
+
+  data:
+    uses: cloudopsworks/base-app-template/.github/workflows/cd-data.yml@v2
+    secrets:
+      token: ${{ secrets.BOT_TOKEN }}
+
+  push_tag:
+    if: ${{ github.event.pull_request.merged == true && ( github.base_ref == 'master' || github.base_ref == 'main' || startsWith(github.base_ref,'support/') ) }}
+    uses: cloudopsworks/base-app-template/.github/workflows/gitflow-push-tag.yml@v2
+    secrets:
+      token: ${{ secrets.BOT_TOKEN }}
+    with:
+      ref: ${{ github.base_ref }}
+      commit_user: ${{ vars.BOT_USER }}
+      commit_email: ${{ vars.BOT_EMAIL }}
+
+  branch_deletion:
+    if: always()
+    needs:
+      - push_tag
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.BOT_TOKEN }}
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Delete local & remote Release
+        if: ${{ github.event.pull_request.merged == true && startsWith(github.head_ref, 'release/') && ( github.base_ref == 'master' || github.base_ref == 'main' || startsWith(github.base_ref,'support/') ) }}
+        run: make gitflow/release/purge
+
+      - name: Delete local & remote Hotfix
+        if: ${{ github.event.pull_request.merged == true && startsWith(github.head_ref, 'hotfix/') && ( github.base_ref == 'master' || github.base_ref == 'main' || startsWith(github.base_ref,'support/') ) }}
+        run: make gitflow/hotfix/purge
+
+      - name: Delete local & remote Feature
+        if: ${{ github.event.pull_request.merged == true && startsWith(github.head_ref, 'feature/') }}
+        run: |
+          FEATURE=$(echo "${{ github.head_ref }}" | sed -e 's/feature\///g')
+          make gitflow/feature/purge $FEATURE

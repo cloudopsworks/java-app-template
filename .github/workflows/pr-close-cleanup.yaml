@@ -9,6 +9,8 @@ on:
     types:
       - closed
 
+concurrency: pr-close-${{ github.repository }}-${{ github.ref }}
+
 permissions:
   contents: read
   packages: write
@@ -55,6 +57,7 @@ jobs:
           echo "is_aws=$is_aws" >>$GITHUB_OUTPUT
 
   build-data:
+    if: ${{ startsWith(github.head_ref, 'hotfix/') || startsWith(github.head_ref, 'feature/') }}
     needs:
       - project_data
       - target_cloud
@@ -66,10 +69,9 @@ jobs:
       pipeline_sonarqube: ${{ steps.disable_sonarqube.outputs.result == 0 }}
       pipeline_dtrack: ${{ steps.disable_dtrack.outputs.result == 0 }}
       pipeline_dtrack_project_type: ${{ steps.dtrack_project_type.outputs.type }}
-      cdenv_enabled: ${{ steps.cdenv_enabled.outputs.result }}
     steps:
       # Proceed with checkout of source with all the references (depth=0)
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
           ref: ${{ inputs.ref }}
@@ -79,47 +81,47 @@ jobs:
         id: java_version
         uses: mikefarah/yq@master
         with:
-          cmd: yq eval '.build.java.version // "11"' ./cloudopsworks-ci.yaml
+          cmd: yq e '.build.java.version // "11"' ./cloudopsworks-ci.yaml
       # Get pipeline conf node dist
       - name: Get pipeline java dist
         id: java_dist
         uses: mikefarah/yq@master
         with:
-          cmd: yq eval '.build.java.dist // "adopt"' ./cloudopsworks-ci.yaml
+          cmd: yq e '.build.java.dist // "adopt"' ./cloudopsworks-ci.yaml
       # Get pipeline conf
       - name: Get pipeline docker enable
         id: pipeline_docker
         uses: mikefarah/yq@master
         with:
-          cmd: yq eval '.pipeline[]' ./cloudopsworks-ci.yaml | grep docker | wc -l | tr -d " "
+          cmd: yq e '.pipeline[]' ./cloudopsworks-ci.yaml | grep docker | wc -l | tr -d " "
 
       # Get pipeline conf
       - name: Get pipeline preview enabled
         id: has_preview
         uses: mikefarah/yq@master
         with:
-          cmd: yq eval '.cd.preview.enabled' ./cloudopsworks-ci.yaml | grep true | wc -l | tr -d " "
+          cmd: yq e '.cd.preview.enabled' ./cloudopsworks-ci.yaml | grep true | wc -l | tr -d " "
 
       # Get Sonarqube Configuration is disabled
       - name: Get Pipeline conf Sonarqube is Disabled
         id: disable_sonarqube
         uses: mikefarah/yq@master
         with:
-          cmd: yq eval '.build.sonarqube.enabled' ./cloudopsworks-ci.yaml | grep false | wc -l | tr -d " "
+          cmd: yq e '.build.sonarqube.enabled' ./cloudopsworks-ci.yaml | grep false | wc -l | tr -d " "
 
       # Get DependencyTrack Configuration is disabled
       - name: Get Pipeline conf DependencyTrack is Disabled
         id: disable_dtrack
         uses: mikefarah/yq@master
         with:
-          cmd: yq eval '.build.dependencyTrack.enabled' ./cloudopsworks-ci.yaml | grep false | wc -l | tr -d " "
+          cmd: yq e '.build.dependencyTrack.enabled' ./cloudopsworks-ci.yaml | grep false | wc -l | tr -d " "
 
       # Get DependencyTrack project type configuration, default is null
       - name: Get Pipeline conf DependencyTrack Project type
         id: dtrack_project_type_eval
         uses: mikefarah/yq@master
         with:
-          cmd: yq eval '.build.dependencyTrack.type' ./cloudopsworks-ci.yaml
+          cmd: yq e '.build.dependencyTrack.type' ./cloudopsworks-ci.yaml
 
       # Determine Dependency Track Project Type properly with default
       - name: Determine Pipeline conf DependencyTrack Project type
@@ -136,42 +138,35 @@ jobs:
         id: pipeline_helm
         uses: mikefarah/yq@master
         with:
-          cmd: yq eval '.pipeline[]' ./cloudopsworks-ci.yaml | grep helm | wc -l | tr -d " "
+          cmd: yq e '.pipeline[]' ./cloudopsworks-ci.yaml | grep helm | wc -l | tr -d " "
 
       # Get pipeline conf
       - name: Get pipeline zip packaging
         id: pipeline_zip
         uses: mikefarah/yq@master
         with:
-          cmd: yq eval '.pipeline[]' ./cloudopsworks-ci.yaml | grep zip | wc -l | tr -d " "
+          cmd: yq e '.pipeline[]' ./cloudopsworks-ci.yaml | grep zip | wc -l | tr -d " "
 
       # Get pipeline conf
       - name: Get pipeline zip packaging globs
         id: zip_globs
         uses: mikefarah/yq@master
         with:
-          cmd: yq eval '.zipGlobs[]' ./cloudopsworks-ci.yaml
+          cmd: yq e '.zipGlobs[]' ./cloudopsworks-ci.yaml
 
       # Get pipeline conf
       - name: Get pipeline zip packaging exclude globs
         id: exclude_globs
         uses: mikefarah/yq@master
         with:
-          cmd: yq eval '.excludeGlobs[]' ./cloudopsworks-ci.yaml
-
-      # Get pipeline conf target environment
-      - name: Get pipeline target environment
-        id: cdenv_enabled
-        uses: mikefarah/yq@master
-        with:
-          cmd: yq eval '.cd.env != null' ./cloudopsworks-ci.yaml
+          cmd: yq e '.excludeGlobs[]' ./cloudopsworks-ci.yaml
 
   preview-azure:
     needs:
       - target_cloud
       - build-data
     if: needs.target_cloud.outputs.is_azure == 1 && needs.build-data.outputs.has_preview
-    uses: cloudopsworks/base-app-template/.github/workflows/cleanup-preview-azure.yml@v1
+    uses: cloudopsworks/base-app-template/.github/workflows/cleanup-preview-azure.yml@v2
     with:
       semver: 0.1.0-SNAPSHOT-PR${{ github.event.pull_request.number }}-${{ github.run_number }}
       ref: ${{ github.head_ref }}
@@ -193,7 +188,7 @@ jobs:
       - target_cloud
       - build-data
     if: needs.target_cloud.outputs.is_aws == 1 && needs.build-data.outputs.has_preview
-    uses: cloudopsworks/base-app-template/.github/workflows/cleanup-preview-aws.yml@v1
+    uses: cloudopsworks/base-app-template/.github/workflows/cleanup-preview-aws.yml@v2
     with:
       semver: 0.1.0-SNAPSHOT-PR${{ github.event.pull_request.number }}-${{ github.run_number }}
       ref: ${{ github.head_ref }}

@@ -30,5 +30,7 @@
 target/
 node_modules/
 vendor/
+
+# CloudOpsWorks Tronador
 tronador/
 .tronador

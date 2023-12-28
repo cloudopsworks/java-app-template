@@ -9,20 +9,8 @@ on:
   workflow_call:
     inputs:
       isRelease:
-        default: true
-        required: false
-        type: boolean
-      isHotfix:
-        default: false
-        required: false
-        type: boolean
-      ref:
-        default: ''
-        required: false
-        type: string
-      semver:
         required: true
-        type: string
+        type: boolean
       DOCKER_REGISTRY_ADDRESS:
         required: true
         type: string
@@ -73,10 +61,12 @@ on:
       pipeline_dtrack_project_type:
         description: "Pipeline classification for DependencyTrack Analysis, blank when dtrack is disabled"
         value: ${{ jobs.build.outputs.pipeline_dtrack_project_type }}
-      cdenv_enabled:
-        description: "Pipeline has CD environment enabled."
-        value: ${{ jobs.build.outputs.cdenv_enabled }}
-
+      semver:
+        description: "Semver Output calculated on Build"
+        value: ${{ jobs.build.outputs.semver }}
+      package_name:
+        description: "Package name calculated on Build"
+        value: ${{ jobs.build.outputs.package_name }}
 
 jobs:
   build:
@@ -87,27 +77,28 @@ jobs:
       pipeline_sonarqube: ${{ steps.disable_sonarqube.outputs.result == 0 }}
       pipeline_dtrack: ${{ steps.disable_dtrack.outputs.result == 0 }}
       pipeline_dtrack_project_type: ${{ steps.dtrack_project_type.outputs.type }}
-      cdenv_enabled: ${{ steps.cdenv_enabled.outputs.result }}
+      semver: ${{ steps.semver.outputs.version }}
+      package_name: ${{ steps.package_name.outputs.result }}
     runs-on: ubuntu-latest
     steps:
       # Proceed with checkout of source with all the references (depth=0)  
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          ref: ${{ inputs.ref }}
+          #ref: ${{ inputs.ref }}
           token: ${{ secrets.BOT_TOKEN }}
       # Get pipeline conf java version
-      - name: Get pipeline node version
+      - name: Get pipeline Java version
         id: java_version
         uses: mikefarah/yq@master
         with:
-          cmd: yq eval '.build.java.version // "11"' ./cloudopsworks-ci.yaml
-      # Get pipeline conf node dist
-      - name: Get pipeline java dist
+          cmd: yq e '.build.java.version // "11"' ./cloudopsworks-ci.yaml
+      # Get pipeline conf java dist
+      - name: Get pipeline Java dist
         id: java_dist
         uses: mikefarah/yq@master
         with:
-          cmd: yq eval '.build.java.dist // "adopt"' ./cloudopsworks-ci.yaml
+          cmd: yq e '.build.java.dist // "adopt"' ./cloudopsworks-ci.yaml
       # Setup Java JDK for builds
       - name: Set JDK
         uses: actions/setup-java@v3
@@ -133,35 +124,35 @@ jobs:
         id: pipeline_docker
         uses: mikefarah/yq@master
         with:
-          cmd: yq eval '.pipeline[]' ./cloudopsworks-ci.yaml | grep docker | wc -l | tr -d " "
+          cmd: yq e '.pipeline[]' ./cloudopsworks-ci.yaml | grep docker | wc -l | tr -d " "
 
       # Get pipeline conf
       - name: Get pipeline preview enabled
         id: has_preview
         uses: mikefarah/yq@master
         with:
-          cmd: yq eval '.cd.preview.enabled' ./cloudopsworks-ci.yaml | grep true | wc -l | tr -d " "
+          cmd: yq e '.cd.preview.enabled' ./cloudopsworks-ci.yaml | grep true | wc -l | tr -d " "
 
       # Get Sonarqube Configuration is disabled
       - name: Get Pipeline conf Sonarqube is Disabled
         id: disable_sonarqube
         uses: mikefarah/yq@master
         with:
-          cmd: yq eval '.build.sonarqube.enabled' ./cloudopsworks-ci.yaml | grep false | wc -l | tr -d " "
+          cmd: yq e '.build.sonarqube.enabled' ./cloudopsworks-ci.yaml | grep false | wc -l | tr -d " "
 
       # Get DependencyTrack Configuration is disabled
       - name: Get Pipeline conf DependencyTrack is Disabled
         id: disable_dtrack
         uses: mikefarah/yq@master
         with:
-          cmd: yq eval '.build.dependencyTrack.enabled' ./cloudopsworks-ci.yaml | grep false | wc -l | tr -d " "
+          cmd: yq e '.build.dependencyTrack.enabled' ./cloudopsworks-ci.yaml | grep false | wc -l | tr -d " "
 
       # Get DependencyTrack project type configuration, default is null
       - name: Get Pipeline conf DependencyTrack Project type
         id: dtrack_project_type_eval
         uses: mikefarah/yq@master
         with:
-          cmd: yq eval '.build.dependencyTrack.type' ./cloudopsworks-ci.yaml
+          cmd: yq e '.build.dependencyTrack.type' ./cloudopsworks-ci.yaml
 
       # Determine Dependency Track Project Type properly with default
       - name: Determine Pipeline conf DependencyTrack Project type
@@ -178,35 +169,28 @@ jobs:
         id: pipeline_helm
         uses: mikefarah/yq@master
         with:
-          cmd: yq eval '.pipeline[]' ./cloudopsworks-ci.yaml | grep helm | wc -l | tr -d " "
+          cmd: yq e '.pipeline[]' ./cloudopsworks-ci.yaml | grep helm | wc -l | tr -d " "
 
       # Get pipeline conf
       - name: Get pipeline zip packaging
         id: pipeline_zip
         uses: mikefarah/yq@master
         with:
-          cmd: yq eval '.pipeline[]' ./cloudopsworks-ci.yaml | grep zip | wc -l | tr -d " "
+          cmd: yq e '.pipeline[]' ./cloudopsworks-ci.yaml | grep zip | wc -l | tr -d " "
 
       # Get pipeline conf
       - name: Get pipeline zip packaging globs
         id: zip_globs
         uses: mikefarah/yq@master
         with:
-          cmd: yq eval '.zipGlobs[]' ./cloudopsworks-ci.yaml
+          cmd: yq e '.zipGlobs[]' ./cloudopsworks-ci.yaml
 
       # Get pipeline conf
       - name: Get pipeline zip packaging exclude globs
         id: exclude_globs
         uses: mikefarah/yq@master
         with:
-          cmd: yq eval '.excludeGlobs[]' ./cloudopsworks-ci.yaml
-
-      # Get pipeline conf target environment
-      - name: Get pipeline target environment
-        id: cdenv_enabled
-        uses: mikefarah/yq@master
-        with:
-          cmd: yq eval '.cd.env != null' ./cloudopsworks-ci.yaml
+          cmd: yq e '.excludeGlobs[]' ./cloudopsworks-ci.yaml
 
       # Get the owner repo
       - name: Get owner
@@ -217,19 +201,37 @@ jobs:
           echo "owner=$repo_owner" >> $GITHUB_OUTPUT
           echo "repo_name=$repo_name" >> $GITHUB_OUTPUT
 
-      # Create a VERSION file to use through the build
-      - name: Set Version File for a Release
-        env:
-          NEXT_VERSION: "${{ inputs.semver }}"
+      # Get the Package name from pom.xml
+      - name: Get Package name
+        id: package_name
+        uses: mikefarah/yq@master
+        with:
+          cmd: yq e -oy '.project.groupId + "." + .project.artifactId' pom.xml
+
+      # Versioning SET
+      - name: Version SET
+        run: make version
+
+      - name: Version Capture
+        id: semver
         run: |
-          echo -n "$NEXT_VERSION" > VERSION
+          echo "version=$(cat VERSION)" >> $GITHUB_OUTPUT
+
+      # Proceed with helm chart versioning bump
+      - name: Helm Chart Versioning
+        if: steps.pipeline_helm.outputs.result == 1
+        env:
+          HELM_REGISTRY_ADDRESS: ${{ inputs.HELM_REGISTRY_ADDRESS }}
+          DOCKER_REGISTRY_ADDRESS: ${{ inputs.DOCKER_REGISTRY_ADDRESS }}
+          REPOSITORY_OWNER: ${{ steps.getowner.outputs.owner }}
+          REPOSITORY_NAME: ${{ steps.getowner.outputs.repo_name }}
+        run: make helm/version
 
       # Build the code!
       - name: Build Code
         run: mvn --batch-mode --update-snapshots clean package
       # Deploy release to Maven Repository (defaults to Github repo)
       - name: Deploy to Maven Repo
-        if: inputs.isRelease
         run: mvn --batch-mode deploy
         env:
           GITHUB_TOKEN: ${{ secrets.BOT_TOKEN }}
@@ -247,19 +249,15 @@ jobs:
       #
       # Docker Build login AWS
       - name: Configure AWS Credentials
-        env:
-          TARGET: ${{ inputs.TARGET_CLOUD }}
-        if: ${{ steps.pipeline_docker.outputs.result == 1 && env.TARGET == 'AWS' }}
-        uses: aws-actions/configure-aws-credentials@v2
+        if: ${{ steps.pipeline_docker.outputs.result == 1 && inputs.TARGET_CLOUD == 'AWS' }}
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ inputs.AWS_REGION }}
 
       - name: Docker Login AWS
-        env:
-          TARGET: ${{ inputs.TARGET_CLOUD }}
-        if: ${{ steps.pipeline_docker.outputs.result == 1 && env.TARGET == 'AWS' }}
+        if: ${{ steps.pipeline_docker.outputs.result == 1 && inputs.TARGET_CLOUD == 'AWS' }}
         uses: docker/login-action@v2
         with:
           registry: ${{ inputs.DOCKER_REGISTRY_ADDRESS }}
@@ -270,43 +268,28 @@ jobs:
         uses: docker/setup-buildx-action@v2
       # Push docker version latest release
       - name: Docker Push Release
-        if: steps.pipeline_docker.outputs.result == 1 && inputs.isRelease == true
+        if: steps.pipeline_docker.outputs.result == 1 && inputs.isRelease
         uses: docker/build-push-action@v4
         with:
           push: true
           context: .
           tags: |
             ${{ inputs.DOCKER_REGISTRY_ADDRESS }}/${{ steps.getowner.outputs.owner }}/${{ steps.getowner.outputs.repo_name }}:latest
-            ${{ inputs.DOCKER_REGISTRY_ADDRESS }}/${{ steps.getowner.outputs.owner }}/${{ steps.getowner.outputs.repo_name }}:${{ inputs.semver }}
+            ${{ inputs.DOCKER_REGISTRY_ADDRESS }}/${{ steps.getowner.outputs.owner }}/${{ steps.getowner.outputs.repo_name }}:${{ steps.semver.outputs.version }}
       # Push docker version but is not latest release
-      - name: Docker Push Preview
-        if: steps.pipeline_docker.outputs.result == 1 && inputs.isRelease == false
+      - name: Docker Push Non-Release
+        if: steps.pipeline_docker.outputs.result == 1 && ! inputs.isRelease
         uses: docker/build-push-action@v4
         with:
           push: true
           context: .
           tags: |
-            ${{ inputs.DOCKER_REGISTRY_ADDRESS }}/${{ steps.getowner.outputs.owner }}/${{ steps.getowner.outputs.repo_name }}:${{ inputs.semver }}
-      #
-      # Helm tag pull request version
-      #
-      - name: Helm Build Preview
-        if: steps.pipeline_helm.outputs.result == 1 && inputs.isRelease == false
-        env:
-          HELM_REGISTRY_ADDRESS: ${{ inputs.HELM_REGISTRY_ADDRESS }}
-          DOCKER_REGISTRY_ADDRESS: ${{ inputs.DOCKER_REGISTRY_ADDRESS }}
-          HELM_EXPERIMENTAL_OCI: "1"
-          REPOSITORY_OWNER: ${{ steps.getowner.outputs.owner }}
-          REPOSITORY_NAME: ${{ steps.getowner.outputs.repo_name }}
-          TARGET_CLOUD: ${{ inputs.TARGET_CLOUD }}
-        run: |
-          cd charts/$REPOSITORY_NAME
-          make tag
+            ${{ inputs.DOCKER_REGISTRY_ADDRESS }}/${{ steps.getowner.outputs.owner }}/${{ steps.getowner.outputs.repo_name }}:${{ steps.semver.outputs.version }}
       #
       # Helm Build and deploy to ACR registry
       #
       - name: Helm Build Release Azure ACR
-        if: steps.pipeline_helm.outputs.result == 1 && inputs.isRelease == true && env.TARGET_CLOUD == 'AZ'
+        if: steps.pipeline_helm.outputs.result == 1 && env.TARGET_CLOUD == 'AZ'
         env:
           HELM_REGISTRY_ADDRESS: ${{ inputs.HELM_REGISTRY_ADDRESS }}
           DOCKER_REGISTRY_ADDRESS: ${{ inputs.DOCKER_REGISTRY_ADDRESS }}
@@ -316,16 +299,14 @@ jobs:
           TARGET_CLOUD: ${{ inputs.TARGET_CLOUD }}
           HELM_CREDS_USER: ${{ secrets.AZURE_SERVICE_ID }}
           HELM_CREDS_PASSWORD: ${{ secrets.AZURE_SERVICE_SECRET }}
-        run: |
-          cd charts/$REPOSITORY_NAME
-          make release
+        run: make helm/release
 
       #
       # Helm Build and deploy to ECR registry
       #
       - name: AWS ECR login
         id: ecr_login
-        if: steps.pipeline_helm.outputs.result == 1 && inputs.isRelease == true && env.TARGET_CLOUD == 'AWS'
+        if: steps.pipeline_helm.outputs.result == 1 && inputs.TARGET_CLOUD == 'AWS'
         env:
           TARGET_CLOUD: ${{ inputs.TARGET_CLOUD }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -336,7 +317,7 @@ jobs:
           echo "auth=$pass" >> $GITHUB_OUTPUT
 
       - name: Helm Build Release AWS ECR
-        if: steps.pipeline_helm.outputs.result == 1 && inputs.isRelease == true && env.TARGET_CLOUD == 'AWS'
+        if: steps.pipeline_helm.outputs.result == 1 && inputs.TARGET_CLOUD == 'AWS'
         env:
           HELM_REGISTRY_ADDRESS: ${{ inputs.HELM_REGISTRY_ADDRESS }}
           DOCKER_REGISTRY_ADDRESS: ${{ inputs.DOCKER_REGISTRY_ADDRESS }}
@@ -346,10 +327,7 @@ jobs:
           TARGET_CLOUD: ${{ inputs.TARGET_CLOUD }}
           HELM_CREDS_USER: AWS
           HELM_CREDS_PASSWORD: ${{ steps.ecr_login.outputs.auth }}
-        run: |
-          cd charts/$REPOSITORY_NAME
-          make release
-
+        run: make helm/release
       #
       # Perform ZIP packaging of target files & globbed files
       #
@@ -365,12 +343,10 @@ jobs:
 
       # Perform of upload artfiacts
       - name: Upload Artifacts to workflow
-        if: inputs.isRelease
         uses: actions/upload-artifact@v3
         with:
           name: all-artifacts
           path: |
             target/${{ steps.getowner.outputs.repo_name }}*.zip
             target/${{ steps.getowner.outputs.repo_name }}*.jar
-            CHANGELOG.md
           retention-days: 1

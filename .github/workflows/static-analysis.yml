@@ -7,8 +7,11 @@ name: Static Analysis Process
 on:
   workflow_call:
     inputs:
-      ref:
-        required: true
+#      ref:
+#        required: true
+#        type: string
+      semver:
+        required: false
         type: string
       sonarqubeUrl:
         required: true
@@ -25,23 +28,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       # Proceed with checkout of source with all the references (depth=0)  
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
           token: ${{ secrets.BOT_TOKEN }}
-          ref: ${{ inputs.ref }}
+          #ref: ${{ inputs.ref }}
       # Get pipeline conf java version
       - name: Get pipeline node version
         id: java_version
         uses: mikefarah/yq@master
         with:
-          cmd: yq eval '.build.java.version // "11"' ./cloudopsworks-ci.yaml
+          cmd: yq e '.build.java.version // "11"' ./cloudopsworks-ci.yaml
       # Get pipeline conf node dist
       - name: Get pipeline java dist
         id: java_dist
         uses: mikefarah/yq@master
         with:
-          cmd: yq eval '.build.java.dist // "adopt"' ./cloudopsworks-ci.yaml
+          cmd: yq e '.build.java.dist // "adopt"' ./cloudopsworks-ci.yaml
       # Setup Java JDK for builds
       - name: Set JDK
         uses: actions/setup-java@v3
@@ -56,8 +59,11 @@ jobs:
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-maven-
+      # Run versioning to tag the source
+      - name: Run Versioning setup
+        run: make version
 
-      # Build the code!
+      # Test the code!
       - name: Static Test Code
         env:
           JAVA_OPTIONS: "-XX:+UnlockExperimentalVMOptions -Dsun.zip.disableMemoryMapping=true -XX:+UseParallelGC -XX:MinHeapFreeRatio=5 -XX:MaxHeapFreeRatio=10 -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -Xms128m -Xmx2048m"

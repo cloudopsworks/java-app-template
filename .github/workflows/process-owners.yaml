@@ -1,0 +1,23 @@
+# (c) 2023 - Cloud Ops Works LLC - https://cloudops.works/
+#            On GitHub: https://github.com/cloudopsworks
+#            Distributed Under Apache v2.0 License
+#
+name: Process OWNERS file for configuration changes
+on:
+  push:
+    # Owners can be changed only on the following branches
+    branches:
+      - master
+      - main
+    paths:
+      - OWNERS
+      - cloudopsworks-ci.yaml
+  workflow_dispatch:
+
+concurrency: owners-${{ github.repository }}-${{ github.ref }}
+
+jobs:
+  process-owners:
+    uses: cloudopsworks/base-app-template/.github/workflows/process-owners.yml@v2
+    secrets:
+      token: ${{ secrets.BOT_TOKEN }}

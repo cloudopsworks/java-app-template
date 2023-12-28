@@ -1,11 +1,25 @@
 ##
-# (c) 2021 - Cloud Ops Works LLC - https://cloudops.works/
+# (c) 2023 - Cloud Ops Works LLC - https://cloudops.works/
 #            On GitHub: https://github.com/cloudopsworks
 #            Distributed Under Apache v2.0 License
 #
 name: Build Pull Request
 on:
   pull_request:
+    types:
+      - opened
+      - synchronize
+      - edited
+    branches:
+      - hotfix/**
+      - feature/**
+      - master
+      - release/**
+      - support/**
+      - develop
+
+
+concurrency: build-pull-${{ github.repository }}-${{ github.ref }}
 
 permissions:
   contents: read
@@ -53,11 +67,10 @@ jobs:
           echo "is_aws=$is_aws" >>$GITHUB_OUTPUT
 
   build:
-    uses: cloudopsworks/java-app-template/.github/workflows/code-build.yml@v1
+    if: ${{ ! startsWith(github.head_ref, 'release/') && ! startsWith(github.head_ref,'support/') && ! startsWith(github.head_ref,'master')}}
+    uses: ./.github/workflows/code-build.yml
     with:
       isRelease: false
-      semver: 0.1.0-SNAPSHOT-PR${{ github.event.pull_request.number }}-${{ github.run_number }}
-      ref: ${{ github.head_ref }}
       DOCKER_REGISTRY_ADDRESS: ${{ vars.DOCKER_REGISTRY_ADDRESS }}
       HELM_REGISTRY_ADDRESS: ${{ vars.DOCKER_REGISTRY_ADDRESS }}
       BOT_USER: ${{ vars.BOT_USER }}
@@ -75,10 +88,10 @@ jobs:
     needs:
       - target_cloud
       - build
-    if: needs.target_cloud.outputs.is_azure == 1 && needs.build.outputs.has_preview
-    uses: cloudopsworks/base-app-template/.github/workflows/preview-azure.yml@v1
+    if: needs.target_cloud.outputs.is_azure == 1 && needs.build.outputs.has_preview == 'true'
+    uses: cloudopsworks/base-app-template/.github/workflows/preview-azure.yml@v2
     with:
-      semver: 0.1.0-SNAPSHOT-PR${{ github.event.pull_request.number }}-${{ github.run_number }}
+      semver: ${{ needs.build.outputs.semver }}
       ref: ${{ github.head_ref }}
       pr_name: pr${{ github.event.pull_request.number }}
       DOCKER_REGISTRY_ADDRESS: ${{ vars.DOCKER_REGISTRY_ADDRESS }}
@@ -97,10 +110,10 @@ jobs:
     needs:
       - target_cloud
       - build
-    if: needs.target_cloud.outputs.is_aws == 1 && needs.build.outputs.has_preview
-    uses: cloudopsworks/base-app-template/.github/workflows/preview-aws.yml@v1
+    if: needs.target_cloud.outputs.is_aws == 1 && needs.build.outputs.has_preview == 'true'
+    uses: cloudopsworks/base-app-template/.github/workflows/preview-aws.yml@v2
     with:
-      semver: 0.1.0-SNAPSHOT-PR${{ github.event.pull_request.number }}-${{ github.run_number }}
+      semver: ${{ needs.build.outputs.semver }}
       ref: ${{ github.head_ref }}
       pr_name: pr${{ github.event.pull_request.number }}
       DOCKER_REGISTRY_ADDRESS: ${{ vars.DOCKER_REGISTRY_ADDRESS }}
@@ -118,10 +131,10 @@ jobs:
   static-analysis:
     needs:
       - build
-    if: needs.build.outputs.pipeline_sonarqube
-    uses: cloudopsworks/java-app-template/.github/workflows/static-analysis.yml@v1
+    if: needs.build.outputs.pipeline_sonarqube == 'true'
+    uses: ./.github/workflows/static-analysis.yml
     with:
-      ref: ${{ github.head_ref }}
+      #ref: ${{ github.head_ref }}
       sonarqubeUrl: ${{ vars.SONARQUBE_URL }}
     secrets:
       BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
@@ -131,12 +144,12 @@ jobs:
     needs:
       - build
       - project_data
-    if: needs.build.outputs.pipeline_dtrack
-    uses: cloudopsworks/java-app-template/.github/workflows/dependency-track.yml@v1
+    if: needs.build.outputs.pipeline_dtrack == 'true'
+    uses: ./.github/workflows/dependency-track.yml
     with:
       projectName: ${{ needs.project_data.outputs.project_name }}
       projectType: ${{ needs.build.outputs.pipeline_dtrack_project_type }}
-      ref: ${{ github.head_ref }}
+      #ref: ${{ github.head_ref }}
       dependencyTrackUrl: ${{ vars.DEPENDENCYTRACK_URL }}
     secrets:
       BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
