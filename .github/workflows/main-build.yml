@@ -66,6 +66,17 @@ jobs:
     secrets:
       token: ${{ secrets.BOT_TOKEN }}
 
+  clean-old-packages:
+    needs:
+      - data
+      - release
+    uses: cloudopsworks/base-app-template/.github/workflows/clean-old-packages.yml@v2
+    if: ${{ needs.data.outputs.hasQualifier != 'true' }}
+    with:
+      package_type: maven
+    secrets:
+      token: ${{ secrets.BOT_TOKEN }}
+
   static-analysis:
     needs:
       - data

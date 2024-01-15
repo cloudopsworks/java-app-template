@@ -74,4 +74,4 @@ jobs:
         if: ${{ github.event.pull_request.merged == true && startsWith(github.head_ref, 'feature/') }}
         run: |
           FEATURE=$(echo "${{ github.head_ref }}" | sed -e 's/feature\///g')
-          make gitflow/feature/purge $FEATURE
+          make gitflow/feature/purge:$FEATURE
