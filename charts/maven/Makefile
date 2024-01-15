@@ -30,7 +30,7 @@ release: clean
 	helm dependency build
 	helm lint
 	helm package . --app-version $(RELEASE_VERSION)
-	echo "$(HELM_CREDS_PASSWORD)" | helm registry login $(CHART_REPO_URL) --username $(HELM_CREDS_USER) --password-stdin
+	@echo "$(HELM_CREDS_PASSWORD)" | helm registry login $(CHART_REPO_URL) --username $(HELM_CREDS_USER) --password-stdin
 	helm push $(NAME)-$(RELEASE_VERSION).tgz oci://$(CHART_REPO_URL)/$(CHART_REPO)
 
 tag:
