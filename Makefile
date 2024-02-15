@@ -15,7 +15,7 @@ helm/release:
 version: packages/install/gitversion
 	$(call assert-set,GITVERSION)
 ifeq ($(GIT_IS_TAG),1)
-	@echo "$(GIT_TAG)" | sed 's/^v\([0-9]\{1,\}\.[0-9]\{1,\}\.[0-9]\{1,\}\)\(+deploy-.*\)\?$/\1/' > VERSION
+	@echo "$(GIT_TAG)" | sed 's/^v\([0-9]\{1,\}\.[0-9]\{1,\}\.[0-9]\{1,\}\)\(+deploy-.*\)\?$g$/\1/' > VERSION
 	@mvn --batch-mode versions:set -DnewVersion=$(shell echo "$(GIT_TAG)" | sed 's/^v//')
 else
 	# Translates + in version to - for helm/docker compatibility
