@@ -86,6 +86,7 @@ jobs:
       - data
       - build
     uses: cloudopsworks/base-app-template/.github/workflows/delivery-push.yml@v2
+    if: ${{ needs.data.outputs.isEnabled == 'true' }}
     with:
       release_version: ${{ needs.build.outputs.semver }}
       release_name: ${{ needs.data.outputs.targetName }}
