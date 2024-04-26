@@ -65,7 +65,7 @@ on:
         description: "Semver Output calculated on Build"
         value: ${{ jobs.build.outputs.semver }}
       package_name:
-        description: "Package name calculated on Build"
+        description: "Package Name Output calculated on Build"
         value: ${{ jobs.build.outputs.package_name }}
 
 jobs:
