@@ -69,10 +69,12 @@ jobs:
   clean-old-packages:
     needs:
       - data
+      - build
       - release
     uses: cloudopsworks/base-app-template/.github/workflows/clean-old-packages.yml@v2
     if: ${{ needs.data.outputs.hasQualifier != 'true' }}
     with:
+      package_name: ${{ needs.build.outputs.package_name }}
       package_type: maven
     secrets:
       token: ${{ secrets.BOT_TOKEN }}
