@@ -55,7 +55,7 @@ jobs:
       - push_tag
     runs-on: ubuntu-latest
     steps:
-      - name: Check out code
+      - name: Check out code (Base)
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.BOT_TOKEN }}
