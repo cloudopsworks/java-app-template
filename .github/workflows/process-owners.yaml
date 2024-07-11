@@ -12,7 +12,7 @@ on:
       - develop
     paths:
       - OWNERS
-      - .githu./.github/cloudopsworks-ci.yaml
+      - .github/cloudopsworks-ci.yaml
       - .github/cloudopsworks-cd.yaml
   workflow_dispatch:
 
