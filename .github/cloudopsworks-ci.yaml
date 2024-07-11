@@ -71,7 +71,7 @@ config:
     maintain: []
 
 #
-## Default Java version is 11, uncomment to build with different JDK
+## Default Java version is 17, uncomment to build with different JDK
 # build:
 #   java:
 #     version: 11
@@ -90,8 +90,12 @@ config:
 
 ## CD pipeline configuration uncomment and configure accordingly to enable
 cd:
-  # Indicate that the environment makes automatic merges and deploys
-  automatic: false
+  # Target Cloud
+  cloud: aws | azure | gcp
+  # Cloud deployment type depends on the target cloud
+  cloud_type: elasticbeanstalk | eks | lambda | aks | webapp | function | gke | function
+  # Indicate that the environment makes automatic merges and deploys on lower environments
+  automatic: true
 
   # These deployment environments are fixed by the GitFlow workflow
   # targetName are optional for most deployments but are required for support branches.
@@ -111,6 +115,7 @@ cd:
       env: dev
       #targetName: dev-target
     release:
+      #reviewers: false # defaults to true
       env: production
       #targetName: prod-target
       targets:
@@ -122,6 +127,7 @@ cd:
       env: uat
       #targetName: uat-target
     prerelease:
+      #reviewers: false # defaults to true
       #enabled: false
       env: demo
       #targetName: demo-target
@@ -146,3 +152,5 @@ cd:
     enabled: false
     kubernetes: true
     domain: example.com
+  apis:
+    enabled: true

@@ -1,0 +1,17 @@
+environment: prod
+apigw_definitions:
+  - name: test
+    version: v2
+    mapping: test-apis/api/2.0
+    domain_name: apigw.sample.com
+aws:
+  stage: dev
+  stage_variables:
+    vpc_link_name: test-link
+    endpoint_url: test-api.sample.com
+  authorizers:
+    - name: Lambda-Auth
+      authtype: lambda
+      lambda:
+        name: lambda-auth-prod
+        exec-role: lambda-auth-prod-lambda-exec-role

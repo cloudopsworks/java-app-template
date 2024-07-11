@@ -1,0 +1,17 @@
+environment: uat
+apigw_definitions:
+  - name: test
+    version: v2
+    mapping: test-apis/api/2.0
+    domain_name: apigw-uat.sample.com
+aws:
+  stage: dev
+  stage_variables:
+    vpc_link_name: test-link-uat
+    endpoint_url: test-api.uat.sample.com
+  authorizers:
+    - name: Lambda-Auth
+      authtype: lambda
+      lambda:
+        name: lambda-auth-uat
+        exec-role: lambda-auth-uat-lambda-exec-role

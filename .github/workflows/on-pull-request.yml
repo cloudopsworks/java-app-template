@@ -21,6 +21,6 @@ permissions:
 
 jobs:
   plan:
-    uses: cloudopsworks/base-app-template/.github/workflows/on-pull-request.yml@v2
+    uses: cloudopsworks/base-app-template/.github/workflows/on-pull-request.yml@v3
     secrets:
       token: ${{ secrets.BOT_TOKEN }}

@@ -43,13 +43,13 @@ jobs:
         id: java_version
         uses: mikefarah/yq@master
         with:
-          cmd: yq e '.build.java.version // "11"' ./cloudopsworks-ci.yaml
+          cmd: yq e '.build.java.version // "17"' ./.github/cloudopsworks-ci.yaml
       # Get pipeline conf java dist
       - name: Get pipeline Java dist
         id: java_dist
         uses: mikefarah/yq@master
         with:
-          cmd: yq e '.build.java.dist // "adopt"' ./cloudopsworks-ci.yaml
+          cmd: yq e '.build.java.dist // "adopt"' ./.github/cloudopsworks-ci.yaml
       # Setup Java JDK for builds
       - name: Set JDK
         uses: actions/setup-java@v3

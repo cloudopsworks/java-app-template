@@ -19,6 +19,6 @@ permissions:
 
 jobs:
   promote:
-    uses: cloudopsworks/base-app-template/.github/workflows/slash-on-retry-automerge.yml@v2
+    uses: cloudopsworks/base-app-template/.github/workflows/slash-on-retry-automerge.yml@v3
     secrets:
       token: ${{ secrets.BOT_TOKEN }}
