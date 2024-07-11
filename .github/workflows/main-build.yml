@@ -117,7 +117,7 @@ jobs:
       - data
       - build
       - release
-    uses: cloudopsworks/base-app-template/.github/workflows/delivery-push.yml@v3
+    uses: cloudopsworks/base-app-template/.github/workflows/deploy.yml@v3
     if: ${{ needs.data.outputs.isEnabled == 'true' && needs.data.outputs.hasQualifier != 'true' }}
     with:
       release_version: ${{ needs.build.outputs.semver }}
@@ -144,7 +144,7 @@ jobs:
     needs:
       - data
       - build
-    uses: cloudopsworks/base-app-template/.github/workflows/delivery-push.yml@v3
+    uses: cloudopsworks/base-app-template/.github/workflows/deploy.yml@v3
     if: ${{ needs.data.outputs.isEnabled == 'true' && ( startsWith(github.ref,'refs/heads/release/') || startsWith(github.ref,'refs/heads/develop') || startsWith(github.ref,'refs/heads/support/') ) }}
     with:
       release_version: ${{ needs.build.outputs.semver }}
