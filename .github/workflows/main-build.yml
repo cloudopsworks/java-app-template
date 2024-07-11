@@ -41,8 +41,7 @@ jobs:
     if: ${{ needs.data.outputs.hasQualifier != 'true' }}
     with:
       isRelease: true
-      target_cloud: ${{ needs.data.outputs.cloud }}
-      target_cloud_type: ${{ needs.data.outputs.cloud_type }}
+      TARGET_CLOUD: ${{ needs.data.outputs.cloud }}
       DOCKER_REGISTRY_ADDRESS: ${{ vars.DOCKER_REGISTRY_ADDRESS }}
       HELM_REGISTRY_ADDRESS: ${{ vars.DOCKER_REGISTRY_ADDRESS }}
       BOT_USER: ${{ vars.BOT_USER }}
@@ -190,11 +189,12 @@ jobs:
       package_name: ${{ needs.version-delivery.outputs.package_name }}
       package_type: MAVEN
       deployment_name: ${{ needs.data.outputs.deploymentName }}
+      target_cloud: ${{ needs.data.outputs.cloud }}
+      target_cloud_type: ${{ needs.data.outputs.cloud_type }}
       DOCKER_REGISTRY_ADDRESS: ${{ vars.DOCKER_REGISTRY_ADDRESS }}
       HELM_REGISTRY_ADDRESS: ${{ vars.DOCKER_REGISTRY_ADDRESS }}
       BOT_USER: ${{ vars.BOT_USER }}
       BOT_EMAIL: ${{ vars.BOT_EMAIL }}
-      TARGET_CLOUD: ${{ needs.data.outputs.cloud }}
       AWS_REGION: ${{ vars.BUILD_AWS_REGION }}
     secrets:
       token: ${{ secrets.BOT_TOKEN }}
