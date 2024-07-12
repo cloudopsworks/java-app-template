@@ -15,7 +15,7 @@ on:
       - support/**
       - release/**
     paths-ignore:
-      - ".github/workflows/**"
+      - ".github/**"
   workflow_dispatch:
 
 concurrency: build-${{ github.repository }}-${{ github.ref }}
@@ -126,16 +126,16 @@ jobs:
       package_type: MAVEN
       deployment_name: ${{ needs.data.outputs.deploymentName }}
       target_cloud: ${{ needs.data.outputs.cloud }}
-      target_cloud_type: ${{ needs.data.outputs.cloud_type }}
+      target_cloud_type: ${{ needs.data.outputs.cloudType }}
       DOCKER_REGISTRY_ADDRESS: ${{ vars.DOCKER_REGISTRY_ADDRESS }}
       HELM_REGISTRY_ADDRESS: ${{ vars.DOCKER_REGISTRY_ADDRESS }}
       BOT_USER: ${{ vars.BOT_USER }}
       BOT_EMAIL: ${{ vars.BOT_EMAIL }}
-      AWS_REGION: ${{ vars.BUILD_AWS_REGION }}
+      AWS_REGION: ${{ vars.DEPLOYMENT_AWS_REGION }}
     secrets:
       token: ${{ secrets.BOT_TOKEN }}
-      AWS_ACCESS_KEY_ID: ${{ secrets.BUILD_AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.BUILD_AWS_SECRET_ACCESS_KEY }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.TF_AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.TF_AWS_SECRET_ACCESS_KEY }}
       AZURE_SERVICE_ID: ${{ secrets.AZURE_SERVICE_ID }}
       AZURE_SERVICE_SECRET: ${{ secrets.AZURE_SERVICE_SECRET }}
 
@@ -153,16 +153,16 @@ jobs:
       package_type: MAVEN
       deployment_name: ${{ needs.data.outputs.deploymentName }}
       target_cloud: ${{ needs.data.outputs.cloud }}
-      target_cloud_type: ${{ needs.data.outputs.cloud_type }}
+      target_cloud_type: ${{ needs.data.outputs.cloudType }}
       DOCKER_REGISTRY_ADDRESS: ${{ vars.DOCKER_REGISTRY_ADDRESS }}
       HELM_REGISTRY_ADDRESS: ${{ vars.DOCKER_REGISTRY_ADDRESS }}
       BOT_USER: ${{ vars.BOT_USER }}
       BOT_EMAIL: ${{ vars.BOT_EMAIL }}
-      AWS_REGION: ${{ vars.BUILD_AWS_REGION }}
+      AWS_REGION: ${{ vars.DEPLOYMENT_AWS_REGION }}
     secrets:
       token: ${{ secrets.BOT_TOKEN }}
-      AWS_ACCESS_KEY_ID: ${{ secrets.BUILD_AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.BUILD_AWS_SECRET_ACCESS_KEY }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.TF_AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.TF_AWS_SECRET_ACCESS_KEY }}
       AZURE_SERVICE_ID: ${{ secrets.AZURE_SERVICE_ID }}
       AZURE_SERVICE_SECRET: ${{ secrets.AZURE_SERVICE_SECRET }}
 
@@ -190,16 +190,16 @@ jobs:
       package_type: MAVEN
       deployment_name: ${{ needs.data.outputs.deploymentName }}
       target_cloud: ${{ needs.data.outputs.cloud }}
-      target_cloud_type: ${{ needs.data.outputs.cloud_type }}
+      target_cloud_type: ${{ needs.data.outputs.cloudType }}
       DOCKER_REGISTRY_ADDRESS: ${{ vars.DOCKER_REGISTRY_ADDRESS }}
       HELM_REGISTRY_ADDRESS: ${{ vars.DOCKER_REGISTRY_ADDRESS }}
       BOT_USER: ${{ vars.BOT_USER }}
       BOT_EMAIL: ${{ vars.BOT_EMAIL }}
-      AWS_REGION: ${{ vars.BUILD_AWS_REGION }}
+      AWS_REGION: ${{ vars.DEPLOYMENT_AWS_REGION }}
     secrets:
       token: ${{ secrets.BOT_TOKEN }}
-      AWS_ACCESS_KEY_ID: ${{ secrets.BUILD_AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.BUILD_AWS_SECRET_ACCESS_KEY }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.TF_AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.TF_AWS_SECRET_ACCESS_KEY }}
       AZURE_SERVICE_ID: ${{ secrets.AZURE_SERVICE_ID }}
       AZURE_SERVICE_SECRET: ${{ secrets.AZURE_SERVICE_SECRET }}
 

@@ -111,10 +111,16 @@ cd:
   # Previews are run on pull requests from hotfix/** or feature/** branches into any of the development / main branches
   deployments:
     develop:
+      #variables:
+      #  var1: value1
+      #  var2: value2
       #enabled: false
       env: dev
       #targetName: dev-target
     release:
+      #variables:
+      #  var1: value1
+      #  var2: value2
       #reviewers: false # defaults to true
       env: production
       #targetName: prod-target
@@ -123,10 +129,16 @@ cd:
           env: prod-my-target
           targetName: prod-my-target
     test:
+      #variables:
+      #  var1: value1
+      #  var2: value2
       #enabled: false
       env: uat
       #targetName: uat-target
     prerelease:
+      #variables:
+      #  var1: value1
+      #  var2: value2
       #reviewers: false # defaults to true
       #enabled: false
       env: demo

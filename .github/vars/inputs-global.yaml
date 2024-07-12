@@ -1,0 +1,6 @@
+organization_name: "ORG-NAME"
+environment_name: "Beanstalk|ENV-NAME"
+namespace: "dev|uat|prod"
+repository_owner: "REPO-OWNER|<repo org/user>"
+versions_bucket: "VERSIONS-BUCKET"
+#logs_bucket: "LOGS_BUCKET"

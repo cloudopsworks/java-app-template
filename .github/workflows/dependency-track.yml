@@ -83,10 +83,11 @@ jobs:
         run: mvn org.cyclonedx:cyclonedx-maven-plugin:makeAggregateBom -DprojectType=${{ inputs.projectType }} -DoutputFormat=xml -DoutputName=dtrack-bom
 
       # SBOM generated reports upload
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: sbom
           path: target/dtrack-bom.xml
+          retention-days: 1
 
       # SBOM upload
       - name: SBOM Dtrack Upload

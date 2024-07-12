@@ -343,7 +343,7 @@ jobs:
 
       # Perform of upload artfiacts
       - name: Upload Artifacts to workflow
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: all-artifacts
           path: |
