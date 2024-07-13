@@ -96,6 +96,7 @@ cd:
   cloud_type: elasticbeanstalk | eks | lambda | aks | webapp | function | gke | function
   # Indicate that the environment makes automatic merges and deploys on lower environments
   automatic: true
+  # Indicate that the environment will use delivery push to designed environment
   legacy_delivery_push: false
 
   # These deployment environments are fixed by the GitFlow workflow
