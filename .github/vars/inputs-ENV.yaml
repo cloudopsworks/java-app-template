@@ -1,0 +1,118 @@
+versions_bucket: "VERSIONS_BUCKET"
+#logs_bucket: "LOGS_BUCKET"
+dns:
+  enabled: true
+  private_zone: false
+  domain_name: DOMAIN_NAME
+  alias_prefix: ALIAS_PREFIX
+alarms:
+  enabled: false
+  threshold: 15
+  period: 120
+  evaluation_periods: 2
+  destination_topic: DESTINATION_SNS
+api_gateway:
+  enabled: false
+  vpc_link:
+    #link_name: VPC_LINK_NAME # Optional: only valid when existing link is NOT used
+    use_existing: false
+    #lb_name: LOAD_BALANCER_NAME
+    #listener_port: 8443
+    #to_port: 443
+    #health: # Enable this and below to change the type of healthcheck
+    #  enabled: true
+    #  protocol: HTTPS
+    #  http_status: "200-401"
+    #  path: "/"
+beanstalk:
+  # Solution stack is one of:
+  #   java      = "^64bit Amazon Linux 2 (.*) Corretto 8(.*)$"
+  #   java11    = "^64bit Amazon Linux 2 (.*) Corretto 11(.*)$"
+  #   java17    = "^64bit Amazon Linux 2 (.*) Corretto 17(.*)$"
+  #   node      = "^64bit Amazon Linux 2 (.*) Node.js 12(.*)$"
+  #   node14    = "^64bit Amazon Linux 2 (.*) Node.js 14(.*)$"
+  #   node16    = "^64bit Amazon Linux 2 (.*) Node.js 16 AL2 (.*)$"
+  #   node18    = "^64bit Amazon Linux 2 (.*) Node.js 18 AL2 (.*)$"
+  #   go        = "^64bit Amazon Linux 2 (.*) Go (.*)$"
+  #   docker    = "^64bit Amazon Linux 2 (.*) Docker (.*)$"
+  #   docker-m  = "^64bit Amazon Linux 2 (.*) Multi-container Docker (.*)$"
+  #   java-amz1 = "^64bit Amazon Linux (.*)$ running Java 8(.*)$"
+  #   node-amz1 = "^64bit Amazon Linux (.*)$ running Node.js(.*)$"
+  # Can specify complete name for certain environments to Stick the stack to a specific version.
+  solution_stack: SOLUTION_STACK
+  application: APPLICATION
+  iam:
+    instance_profile: INSTANCE_PROFILE
+    service_role: SERVICE_ROLE
+  load_balancer:
+    # Shared Load Balancer configuration subset
+    #shared:
+    #  dns:
+    #    enabled: false
+    #  enabled: false
+    #  name: SHARED_LB_NAME
+    #  weight: 100
+    public: true
+    ssl_certificate_id: SSL_CERTIFICATE_ID
+    ssl_policy: ELBSecurityPolicy-2016-08
+    alias: LOAD_BALANCER_ALIAS
+  instance:
+    instance_port: 8080
+    enable_spot: true
+    default_retention: 90
+    volume_size: 20
+    volume_type: gp2
+    ec2_key: EC2_KEY
+    ami_id: AMI_ID
+    server_types:
+      - SERVER TYPE1
+      - SERVER TYPE2
+    #pool: # Instance Pool elasticity minimum & maximum number of instances
+    #  min: 1
+    #  max: 1
+  networking:
+    private_subnets: []
+    #      - SUBNET_ID
+    #      - SUBNET_ID2
+    public_subnets: []
+    #      - SUBNET_ID3
+    #      - SUBNET_ID4
+    vpc_id: VPC_ID
+  ##
+  # Optional variable for mapping ports to backend ports:
+  port_mappings: []
+  #    - name: default
+  #      from_port: 80
+  #      to_port: 8081
+  #      protocol: HTTP
+  #    - name: port443
+  #      from_port: 443
+  #      to_port: 8443
+  #      protocol: HTTPS
+  #      backend_protocol: HTTPS
+  #      health_http_status: "200-401"
+
+  ##
+  # Optional variable for adding extra tags to the environment
+  extra_tags: {}
+  #    key: value
+  #    key2: value2
+  extra_settings: []
+  #    - name: SETTING_NAME
+  #      namespace: aws:NAMESPACE
+  #      resource: ""
+  #      value: "<VALUE>"
+  #    - name: SETTING_NAME_2
+  #      namespace: aws:NAMESPACE_2
+  #      resource: ""
+  #      value: "<VALUE>"
+  ##
+  # Optional Variable for mapping rules for shared Load Balancer
+  rule_mappings: []
+#    - name: NAME
+#      host: host.address
+#      path: /path
+#      priority: 100
+tags: {}
+# TAG1: value1
+# TAG2: value2
