@@ -97,7 +97,7 @@ cd:
   # Indicate that the environment makes automatic merges and deploys on lower environments
   automatic: true
   # Indicate that the environment will use delivery push to designed environment
-  legacy_delivery_push: false
+  legacyDeliveryPush: false
 
   # These deployment environments are fixed by the GitFlow workflow
   # targetName are optional for most deployments but are required for support branches.
@@ -119,7 +119,7 @@ cd:
       # Sample variables to deploy into different account
       #  DEPLOYMENT_AWS_REGION: us-east-1
       #  DEPLOYMENT_STS_ROLE_ARN: arn:aws:iam::123456789012:role/TerraformAccessRole
-      #legacy_delivery_push: true
+      #legacyDeliveryPush: true
       #enabled: false
       env: dev
       #targetName: dev-target
@@ -128,19 +128,20 @@ cd:
       #  var1: value1
       #  var2: value2
       #reviewers: false # defaults to true
-      #legacy_delivery_push: true
+      #legacyDeliveryPush: true
       env: production
       #targetName: prod-target
       targets:
         my-target:
           env: prod-my-target
           targetName: prod-my-target
+          #legacyDeliveryPush: true
     test:
       #variables:
       #  var1: value1
       #  var2: value2
       #enabled: false
-      #legacy_delivery_push: true
+      #legacyDeliveryPush: true
       env: uat
       #targetName: uat-target
     prerelease:
@@ -148,7 +149,7 @@ cd:
       #  var1: value1
       #  var2: value2
       #reviewers: false # defaults to true
-      #legacy_delivery_push: true
+      #legacyDeliveryPush: true
       #enabled: false
       env: demo
       #targetName: demo-target
@@ -156,6 +157,7 @@ cd:
         my-target:
           env: demo-my-target
           targetName: demo-my-target
+          #legacyDeliveryPush: true
     hotfix:
       env: hotfix
       #targetName: hotfix-target
