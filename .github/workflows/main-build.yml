@@ -119,7 +119,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Output
-        run: echo "Deploy to environment: ${{ needs.data.outputs.environment }}"
+        run: 'echo "Deploy to environment: ${{ needs.data.outputs.environment }}"'
 
   deploy-release:
     needs:
@@ -225,7 +225,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Output
-        run: echo "Delivery to legacy environment: ${{ needs.data.outputs.environment }}"
+        run: 'echo "Delivery to legacy environment: ${{ needs.data.outputs.environment }}"'
 
   version-delivery:
     needs:
