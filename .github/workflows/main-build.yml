@@ -129,7 +129,6 @@ jobs:
       - deployment-process
     uses: cloudopsworks/base-app-template/.github/workflows/deploy.yml@v3
     if: ${{ needs.data.outputs.isEnabled == 'true' && needs.data.outputs.hasQualifier != 'true' }}
-    environment: ${{ needs.data.outputs.environment }}
     with:
       release_version: ${{ needs.build.outputs.semver }}
       release_name: ${{ needs.data.outputs.targetName }}
@@ -159,7 +158,6 @@ jobs:
       - deployment-process
     uses: cloudopsworks/base-app-template/.github/workflows/deploy.yml@v3
     if: ${{ needs.data.outputs.isEnabled == 'true' && ( startsWith(github.ref,'refs/heads/release/') || startsWith(github.ref,'refs/heads/develop') || startsWith(github.ref,'refs/heads/support/') ) }}
-    environment: ${{ needs.data.outputs.environment }}
     with:
       release_version: ${{ needs.build.outputs.semver }}
       release_name: ${{ needs.data.outputs.targetName }}
@@ -199,7 +197,6 @@ jobs:
       - data
       - deploy-only
     if: ${{ needs.data.outputs.isEnabled == 'true' && needs.data.outputs.hasQualifier == 'true' }}
-    environment: ${{ needs.data.outputs.environment }}
     uses: cloudopsworks/base-app-template/.github/workflows/deploy.yml@v3
     with:
       release_version: ${{ needs.version-delivery.outputs.semver }}
