@@ -241,7 +241,7 @@ jobs:
         env:
           TARGET: ${{ inputs.TARGET_CLOUD }}
         if: ${{ steps.pipeline_docker.outputs.result == 1 && env.TARGET == 'AZURE' }}
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           registry: ${{ inputs.DOCKER_REGISTRY_ADDRESS }}
           username: ${{ secrets.AZURE_SERVICE_ID }}
@@ -258,18 +258,18 @@ jobs:
 
       - name: Docker Login AWS
         if: ${{ steps.pipeline_docker.outputs.result == 1 && inputs.TARGET_CLOUD == 'AWS' }}
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           registry: ${{ inputs.DOCKER_REGISTRY_ADDRESS }}
       #
       # Build-X run
       - name: Set up Docker Buildx
         if: steps.pipeline_docker.outputs.result == 1
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@v3
       # Push docker version latest release
       - name: Docker Push Release
         if: steps.pipeline_docker.outputs.result == 1 && inputs.isRelease
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v5
         with:
           push: true
           context: .
@@ -279,7 +279,7 @@ jobs:
       # Push docker version but is not latest release
       - name: Docker Push Non-Release
         if: steps.pipeline_docker.outputs.result == 1 && ! inputs.isRelease
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v5
         with:
           push: true
           context: .
