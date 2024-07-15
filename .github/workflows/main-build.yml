@@ -168,7 +168,7 @@ jobs:
       deployment_name: ${{ needs.data.outputs.deploymentName }}
       target_cloud: ${{ needs.data.outputs.cloud }}
       target_cloud_type: ${{ needs.data.outputs.cloudType }}
-      apis_enabled: ${{ needs.data.outputs.apisEnabled }}
+      apis_enabled: ${{ needs.data.outputs.apisEnabled == 'true' }}
       DOCKER_REGISTRY_ADDRESS: ${{ vars.DOCKER_REGISTRY_ADDRESS }}
       HELM_REGISTRY_ADDRESS: ${{ vars.DOCKER_REGISTRY_ADDRESS }}
       BOT_USER: ${{ vars.BOT_USER }}
