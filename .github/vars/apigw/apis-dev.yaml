@@ -14,4 +14,4 @@ aws:
       authtype: lambda
       lambda:
         uri: 'arn:aws:lambda:us-east-1:12345678912:function:lambda-auth-dev-lambda-exec-role'
-        exec-role: lambda-auth-dev-lambda-exec-role
+        exec_role: lambda-auth-dev-lambda-exec-role
