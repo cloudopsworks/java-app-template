@@ -5,7 +5,7 @@ apigw_definitions:
     mapping: test-apis/api/2.0
     domain_name: apigw-uat.sample.com
 aws:
-  stage: dev
+  stage: uat
   stage_variables:
     vpc_link_name: test-link-uat
     endpoint_url: test-api.uat.sample.com

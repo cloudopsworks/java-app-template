@@ -129,6 +129,7 @@ jobs:
       - deployment-process
     uses: cloudopsworks/base-app-template/.github/workflows/deploy.yml@v3
     if: ${{ needs.data.outputs.isEnabled == 'true' && needs.data.outputs.hasQualifier != 'true' }}
+    environment: ${{ needs.data.outputs.environment }}
     with:
       release_version: ${{ needs.build.outputs.semver }}
       release_name: ${{ needs.data.outputs.targetName }}
@@ -138,6 +139,7 @@ jobs:
       deployment_name: ${{ needs.data.outputs.deploymentName }}
       target_cloud: ${{ needs.data.outputs.cloud }}
       target_cloud_type: ${{ needs.data.outputs.cloudType }}
+      apis_enabled: ${{ needs.data.outputs.apisEnabled }}
       DOCKER_REGISTRY_ADDRESS: ${{ vars.DOCKER_REGISTRY_ADDRESS }}
       HELM_REGISTRY_ADDRESS: ${{ vars.DOCKER_REGISTRY_ADDRESS }}
       BOT_USER: ${{ vars.BOT_USER }}
@@ -157,6 +159,7 @@ jobs:
       - deployment-process
     uses: cloudopsworks/base-app-template/.github/workflows/deploy.yml@v3
     if: ${{ needs.data.outputs.isEnabled == 'true' && ( startsWith(github.ref,'refs/heads/release/') || startsWith(github.ref,'refs/heads/develop') || startsWith(github.ref,'refs/heads/support/') ) }}
+    environment: ${{ needs.data.outputs.environment }}
     with:
       release_version: ${{ needs.build.outputs.semver }}
       release_name: ${{ needs.data.outputs.targetName }}
@@ -166,6 +169,7 @@ jobs:
       deployment_name: ${{ needs.data.outputs.deploymentName }}
       target_cloud: ${{ needs.data.outputs.cloud }}
       target_cloud_type: ${{ needs.data.outputs.cloudType }}
+      apis_enabled: ${{ needs.data.outputs.apisEnabled }}
       DOCKER_REGISTRY_ADDRESS: ${{ vars.DOCKER_REGISTRY_ADDRESS }}
       HELM_REGISTRY_ADDRESS: ${{ vars.DOCKER_REGISTRY_ADDRESS }}
       BOT_USER: ${{ vars.BOT_USER }}
@@ -195,6 +199,7 @@ jobs:
       - data
       - deploy-only
     if: ${{ needs.data.outputs.isEnabled == 'true' && needs.data.outputs.hasQualifier == 'true' }}
+    environment: ${{ needs.data.outputs.environment }}
     uses: cloudopsworks/base-app-template/.github/workflows/deploy.yml@v3
     with:
       release_version: ${{ needs.version-delivery.outputs.semver }}
@@ -205,6 +210,7 @@ jobs:
       deployment_name: ${{ needs.data.outputs.deploymentName }}
       target_cloud: ${{ needs.data.outputs.cloud }}
       target_cloud_type: ${{ needs.data.outputs.cloudType }}
+      apis_enabled: ${{ needs.data.outputs.apisEnabled }}
       DOCKER_REGISTRY_ADDRESS: ${{ vars.DOCKER_REGISTRY_ADDRESS }}
       HELM_REGISTRY_ADDRESS: ${{ vars.DOCKER_REGISTRY_ADDRESS }}
       BOT_USER: ${{ vars.BOT_USER }}
@@ -243,7 +249,7 @@ jobs:
       - data
       - version-delivery
     if: ${{ needs.data.outputs.isEnabled == 'true' && needs.data.outputs.hasQualifier == 'true' }}
-    uses: cloudopsworks/base-app-template/.github/workflows/delivery-push.yml@v2
+    uses: cloudopsworks/base-app-template/.github/workflows/delivery-push.yml@v3
     with:
       release_version: ${{ needs.version-delivery.outputs.semver }}
       release_name: ${{ needs.data.outputs.targetName }}
@@ -260,7 +266,7 @@ jobs:
       - build
       - release
       - delivery-to-env
-    uses: cloudopsworks/base-app-template/.github/workflows/delivery-push.yml@v2
+    uses: cloudopsworks/base-app-template/.github/workflows/delivery-push.yml@v3
     if: ${{ needs.data.outputs.isEnabled == 'true' && needs.data.outputs.hasQualifier != 'true' }}
     with:
       release_version: ${{ needs.build.outputs.semver }}
@@ -277,7 +283,7 @@ jobs:
       - data
       - build
       - delivery-to-env
-    uses: cloudopsworks/base-app-template/.github/workflows/delivery-push.yml@v2
+    uses: cloudopsworks/base-app-template/.github/workflows/delivery-push.yml@v3
     if: ${{ needs.data.outputs.isEnabled == 'true' && ( startsWith(github.ref,'refs/heads/release/') || startsWith(github.ref,'refs/heads/develop') || startsWith(github.ref,'refs/heads/support/') ) }}
     with:
       release_version: ${{ needs.build.outputs.semver }}
@@ -288,4 +294,3 @@ jobs:
       deployment_name: ${{ needs.data.outputs.deploymentName }}
     secrets:
       token: ${{ secrets.BOT_TOKEN }}
-
