@@ -115,6 +115,7 @@ jobs:
   deployment-process:
     needs:
       - data
+      - build
     if: ${{ needs.data.outputs.deliveryPush != 'true' }}
     runs-on: ubuntu-latest
     steps:
@@ -224,6 +225,7 @@ jobs:
   delivery-to-env:
     needs:
       - data
+      - build
     if: ${{ needs.data.outputs.deliveryPush == 'true' }}
     runs-on: ubuntu-latest
     steps:
