@@ -6,6 +6,7 @@ apigw_definitions:
     domain_name: apigw-dev.sample.com
 aws:
   stage: dev
+  stage_only: false
   stage_variables:
     vpc_link_name: test-link-dev
     endpoint_url: test-api.dev.sample.com
