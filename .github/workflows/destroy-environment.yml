@@ -38,9 +38,6 @@ jobs:
   destroy-environment:
     needs:
       - data
-      - build
-      - release
-      - deployment-process
     uses: cloudopsworks/base-app-template/.github/workflows/destroy.yml@v3
     with:
       release_version: ${{ needs.build.outputs.semver }}
