@@ -115,7 +115,6 @@ jobs:
   deployment-process:
     needs:
       - data
-      - build
     if: ${{ needs.data.outputs.deliveryPush != 'true' }}
     runs-on: ubuntu-latest
     steps:
@@ -225,7 +224,6 @@ jobs:
   delivery-to-env:
     needs:
       - data
-      - build
     if: ${{ needs.data.outputs.deliveryPush == 'true' }}
     runs-on: ubuntu-latest
     steps:
@@ -293,3 +291,56 @@ jobs:
       deployment_name: ${{ needs.data.outputs.deploymentName }}
     secrets:
       token: ${{ secrets.BOT_TOKEN }}
+
+  # Deploy after build APIs
+  deploy-apis:
+    needs:
+      - data
+      - build
+      - deployment-process
+    uses: cloudopsworks/base-app-template/.github/workflows/deploy-apis.yml@v3
+    if: ${{ needs.data.outputs.isEnabled == 'true' && needs.data.outputs.apisEnabled == 'true' && needs.data.outputs.hasQualifier != 'true' }}
+    with:
+      release_version: ${{ needs.build.outputs.semver }}
+      release_name: ${{ needs.data.outputs.targetName }}
+      environment: ${{ needs.data.outputs.environment }}
+      package_name: ${{ needs.build.outputs.package_name }}
+      package_type: MAVEN
+      deployment_name: ${{ needs.data.outputs.deploymentName }}
+      target_cloud: ${{ needs.data.outputs.cloud }}
+      apis_enabled: ${{ needs.data.outputs.apisEnabled == 'true' }}
+      BOT_USER: ${{ vars.BOT_USER }}
+      BOT_EMAIL: ${{ vars.BOT_EMAIL }}
+      AWS_REGION: ${{ vars.DEPLOYMENT_AWS_REGION }}
+    secrets:
+      token: ${{ secrets.BOT_TOKEN }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.TF_AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.TF_AWS_SECRET_ACCESS_KEY }}
+      AZURE_SERVICE_ID: ${{ secrets.AZURE_SERVICE_ID }}
+      AZURE_SERVICE_SECRET: ${{ secrets.AZURE_SERVICE_SECRET }}
+
+  # Deploy after build APIs
+  deploy-apis-only:
+    needs:
+      - data
+      - delivery-to-env
+    uses: cloudopsworks/base-app-template/.github/workflows/deploy-apis.yml@v3
+    if: ${{ needs.data.outputs.isEnabled == 'true' && needs.data.outputs.apisEnabled == 'true' }}
+    with:
+      release_version: ${{ needs.build.outputs.semver }}
+      release_name: ${{ needs.data.outputs.targetName }}
+      environment: ${{ needs.data.outputs.environment }}
+      package_name: ${{ needs.build.outputs.package_name }}
+      package_type: MAVEN
+      deployment_name: ${{ needs.data.outputs.deploymentName }}
+      target_cloud: ${{ needs.data.outputs.cloud }}
+      apis_enabled: ${{ needs.data.outputs.apisEnabled == 'true' }}
+      BOT_USER: ${{ vars.BOT_USER }}
+      BOT_EMAIL: ${{ vars.BOT_EMAIL }}
+      AWS_REGION: ${{ vars.DEPLOYMENT_AWS_REGION }}
+    secrets:
+      token: ${{ secrets.BOT_TOKEN }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.TF_AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.TF_AWS_SECRET_ACCESS_KEY }}
+      AZURE_SERVICE_ID: ${{ secrets.AZURE_SERVICE_ID }}
+      AZURE_SERVICE_SECRET: ${{ secrets.AZURE_SERVICE_SECRET }}
