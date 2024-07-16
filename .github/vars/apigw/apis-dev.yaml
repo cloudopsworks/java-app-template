@@ -7,9 +7,18 @@ apigw_definitions:
 aws:
   stage: dev
   stage_only: false
+  #endpoint_type: REGIONAL
+  #vpc_endpoint_ids:
+  # - vpce-1234567890abcdef0
+  # - vpce-1234567890abcdef1
+  #disable_execute_api_endpoint: false
+  #minimum_compression_size: null
+  vpc_link_name: test-link-dev
+  #log_location: /aws/apigateway
+  #log_retention_days: 30
   stage_variables:
-    vpc_link_name: test-link-dev
-    endpoint_url: test-api.dev.sample.com
+    - name: url
+      value: test-api.dev.sample.com
   authorizers:
     - name: Lambda-Auth
       authtype: lambda
