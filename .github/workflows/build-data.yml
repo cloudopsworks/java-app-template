@@ -34,7 +34,7 @@ on:
         value: ${{ jobs.build.outputs.package_name }}
 
 jobs:
-  build:
+  build-data:
     outputs:
       semver: ${{ steps.semver.outputs.version }}
       package_name: ${{ steps.package_name.outputs.result }}
