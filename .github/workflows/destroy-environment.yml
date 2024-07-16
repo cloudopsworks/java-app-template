@@ -39,7 +39,6 @@ jobs:
     needs:
       - data
     uses: ./.github/workflows/build-data.yml
-    if: ${{ needs.data.outputs.hasQualifier != 'true' }}
     with:
       isRelease: true
       TARGET_CLOUD: ${{ needs.data.outputs.cloud }}
