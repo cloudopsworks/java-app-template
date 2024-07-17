@@ -102,6 +102,7 @@ cd:
   # These deployment environments are fixed by the GitFlow workflow
   # targetName are optional for most deployments but are required for support branches.
   #
+  # The criteria for each deployment are as follow:
   #   Pushes to 'develop'       -> develop
   #   Pushes to 'release/**'    -> test
   #   Push TAG on 'release/**'  -> prerelease    - Tags are in the form v*.*.*-[alpha|beta].*
@@ -176,4 +177,4 @@ cd:
     kubernetes: true
     domain: example.com
   apis:
-    enabled: true
+    enabled: false
