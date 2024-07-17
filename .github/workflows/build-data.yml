@@ -28,10 +28,10 @@ on:
     outputs:
       semver:
         description: "Semver Output calculated on Build"
-        value: ${{ jobs.build.outputs.semver }}
+        value: ${{ jobs.build-data.outputs.semver }}
       package_name:
         description: "Package Name Output calculated on Build"
-        value: ${{ jobs.build.outputs.package_name }}
+        value: ${{ jobs.build-data.outputs.package_name }}
 
 jobs:
   build-data:
