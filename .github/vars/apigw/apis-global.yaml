@@ -1,0 +1,5 @@
+provider: aws
+apis:
+  - name: test
+    version: v2
+    apisource: test

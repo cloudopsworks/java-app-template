@@ -3,30 +3,38 @@
 #            On GitHub: https://github.com/cloudopsworks
 #            Distributed Under Apache v2.0 License
 #
-name: Code Version Extraction
+name: Code Build Workflow Template
 
 on:
   workflow_call:
     inputs:
-      deployment_name:
+      isRelease:
+        required: true
+        type: boolean
+      BOT_USER:
         required: true
         type: string
+      BOT_EMAIL:
+        required: true
+        type: string
+      TARGET_CLOUD:
+        required: true
+        type: string
+
     secrets:
-      token:
+      BOT_TOKEN:
         required: true
 
     outputs:
       semver:
         description: "Semver Output calculated on Build"
-        value: ${{ jobs.versioning.outputs.semver }}
+        value: ${{ jobs.build-data.outputs.semver }}
       package_name:
         description: "Package Name Output calculated on Build"
-        value: ${{ jobs.versioning.outputs.package_name }}
+        value: ${{ jobs.build-data.outputs.package_name }}
 
 jobs:
-  versioning:
-#    environment:
-#      name: ${{ inputs.deployment_name }}
+  build-data:
     outputs:
       semver: ${{ steps.semver.outputs.version }}
       package_name: ${{ steps.package_name.outputs.result }}
@@ -37,7 +45,7 @@ jobs:
         with:
           fetch-depth: 0
           #ref: ${{ inputs.ref }}
-          token: ${{ secrets.token }}
+          token: ${{ secrets.BOT_TOKEN }}
       # Get pipeline conf java version
       - name: Get pipeline Java version
         id: java_version
@@ -56,6 +64,7 @@ jobs:
         with:
           java-version: "${{ steps.java_version.outputs.result }}"
           distribution: "${{ steps.java_dist.outputs.result }}"
+
       # Cache all maven packages
       - name: Cache Maven packages
         uses: actions/cache@v4

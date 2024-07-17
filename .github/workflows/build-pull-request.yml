@@ -30,6 +30,11 @@ permissions:
   checks: write
 
 jobs:
+  data:
+    uses: cloudopsworks/base-app-template/.github/workflows/cd-data.yml@v3
+    secrets:
+      token: ${{ secrets.BOT_TOKEN }}
+
   project_data:
     runs-on: ubuntu-latest
     outputs:
@@ -44,29 +49,10 @@ jobs:
           echo "owner=$repo_owner" >> $GITHUB_OUTPUT
           echo "repo_name=$repo_name" >> $GITHUB_OUTPUT
 
-  target_cloud:
-    runs-on: ubuntu-latest
-    outputs:
-      is_azure: ${{ steps.provider.outputs.is_azure }}
-      is_aws: ${{ steps.provider.outputs.is_aws }}
-    steps:
-      - name: extract cloud provider
-        id: provider
-        env:
-          TARGET: ${{ vars.TARGET_CLOUD }}
-        run: |
-          is_azure=0
-          is_aws=0
-          if [[ "$TARGET" == "AWS" ]] ; then
-            is_aws=1
-          fi
-          if [[ "$TARGET" == "AZ" ]] ; then
-            is_azure=1
-          fi
-          echo "is_azure=$is_azure" >>$GITHUB_OUTPUT
-          echo "is_aws=$is_aws" >>$GITHUB_OUTPUT
-
   build:
+    needs:
+      - data
+      - project_data
     if: ${{ ! startsWith(github.head_ref, 'release/') && ! startsWith(github.head_ref,'support/') && ! startsWith(github.head_ref,'master')}}
     uses: ./.github/workflows/code-build.yml
     with:
@@ -75,7 +61,7 @@ jobs:
       HELM_REGISTRY_ADDRESS: ${{ vars.DOCKER_REGISTRY_ADDRESS }}
       BOT_USER: ${{ vars.BOT_USER }}
       BOT_EMAIL: ${{ vars.BOT_EMAIL }}
-      TARGET_CLOUD: ${{ vars.TARGET_CLOUD }}
+      TARGET_CLOUD: ${{ needs.data.outputs.cloud }}
       AWS_REGION: ${{ vars.BUILD_AWS_REGION }}
     secrets:
       BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
@@ -86,10 +72,10 @@ jobs:
 
   preview-azure:
     needs:
-      - target_cloud
+      - data
       - build
-    if: needs.target_cloud.outputs.is_azure == 1 && needs.build.outputs.has_preview == 'true'
-    uses: cloudopsworks/base-app-template/.github/workflows/preview-azure.yml@v2
+    if: needs.data.outputs.cloud == 'AZURE' && needs.build.outputs.has_preview == 'true'
+    uses: cloudopsworks/base-app-template/.github/workflows/preview-azure.yml@v3
     with:
       semver: ${{ needs.build.outputs.semver }}
       ref: ${{ github.head_ref }}
@@ -108,10 +94,10 @@ jobs:
 
   preview-aws:
     needs:
-      - target_cloud
+      - data
       - build
-    if: needs.target_cloud.outputs.is_aws == 1 && needs.build.outputs.has_preview == 'true'
-    uses: cloudopsworks/base-app-template/.github/workflows/preview-aws.yml@v2
+    if: needs.data.outputs.cloud == 'AWS' && needs.build.outputs.has_preview == 'true'
+    uses: cloudopsworks/base-app-template/.github/workflows/preview-aws.yml@v3
     with:
       semver: ${{ needs.build.outputs.semver }}
       ref: ${{ github.head_ref }}
@@ -120,7 +106,7 @@ jobs:
       HELM_REGISTRY_ADDRESS: ${{ vars.DOCKER_REGISTRY_ADDRESS }}
       BOT_USER: ${{ vars.BOT_USER }}
       BOT_EMAIL: ${{ vars.BOT_EMAIL }}
-      TARGET_CLOUD: ${{ vars.TARGET_CLOUD }}
+      TARGET_CLOUD: ${{ needs.data.outputs.cloud }}
       AWS_EKS_CLUSTER_NAME: ${{ vars.PREVIEW_AWS_EKS_CLUSTER_NAME }}
       AWS_REGION: ${{ vars.PREVIEW_AWS_REGION }}
     secrets:

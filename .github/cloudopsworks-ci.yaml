@@ -71,7 +71,7 @@ config:
     maintain: []
 
 #
-## Default Java version is 11, uncomment to build with different JDK
+## Default Java version is 17, uncomment to build with different JDK
 # build:
 #   java:
 #     version: 11
@@ -90,8 +90,14 @@ config:
 
 ## CD pipeline configuration uncomment and configure accordingly to enable
 cd:
-  # Indicate that the environment makes automatic merges and deploys
-  automatic: false
+  # Target Cloud
+  cloud: aws | azure | gcp
+  # Cloud deployment type depends on the target cloud
+  cloud_type: elasticbeanstalk | eks | lambda | aks | webapp | function | gke | function
+  # Indicate that the environment makes automatic merges and deploys on lower environments
+  automatic: true
+  # Indicate that the environment will use delivery push to designed environment
+  legacyDeliveryPush: false
 
   # These deployment environments are fixed by the GitFlow workflow
   # targetName are optional for most deployments but are required for support branches.
@@ -107,21 +113,43 @@ cd:
   # Previews are run on pull requests from hotfix/** or feature/** branches into any of the development / main branches
   deployments:
     develop:
+      #variables:
+      #  var1: value1
+      #  var2: value2
+      # Sample variables to deploy into different account
+      #  DEPLOYMENT_AWS_REGION: us-east-1
+      #  DEPLOYMENT_STS_ROLE_ARN: arn:aws:iam::123456789012:role/TerraformAccessRole
+      #legacyDeliveryPush: true
       #enabled: false
       env: dev
       #targetName: dev-target
     release:
+      #variables:
+      #  var1: value1
+      #  var2: value2
+      #reviewers: false # defaults to true
+      #legacyDeliveryPush: true
       env: production
       #targetName: prod-target
       targets:
         my-target:
           env: prod-my-target
           targetName: prod-my-target
+          #legacyDeliveryPush: true
     test:
+      #variables:
+      #  var1: value1
+      #  var2: value2
       #enabled: false
+      #legacyDeliveryPush: true
       env: uat
       #targetName: uat-target
     prerelease:
+      #variables:
+      #  var1: value1
+      #  var2: value2
+      #reviewers: false # defaults to true
+      #legacyDeliveryPush: true
       #enabled: false
       env: demo
       #targetName: demo-target
@@ -129,6 +157,7 @@ cd:
         my-target:
           env: demo-my-target
           targetName: demo-my-target
+          #legacyDeliveryPush: true
     hotfix:
       env: hotfix
       #targetName: hotfix-target
@@ -146,3 +175,5 @@ cd:
     enabled: false
     kubernetes: true
     domain: example.com
+  apis:
+    enabled: true

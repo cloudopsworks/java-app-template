@@ -1,0 +1,34 @@
+environment: prod
+apigw_definitions:
+  - name: test
+    version: v2
+    mapping: test-apis/api/2.0
+    domain_name: apigw.sample.com
+aws:
+  stage: production
+  stage_only: false
+  #endpoint_type: REGIONAL
+  #vpc_endpoint_ids:
+  # - vpce-1234567890abcdef0
+  # - vpce-1234567890abcdef1
+  #disable_execute_api_endpoint: false
+  #minimum_compression_size: null
+  #xray_enabled: true
+  #cache_cluster_enabled: true
+  #cache_cluster_size: 0.5
+
+  vpc_link_name: test-link
+  #log_location: /aws/apigateway
+  #log_retention_days: 30
+  stage_variables:
+    - name: url
+      value: test-api.sample.com
+  authorizers:
+    - name: Lambda-Auth
+      authtype: lambda
+      #result_ttl_seconds: 10
+      #identity_source: method.request.header.Authorization
+      #type: request
+      lambda:
+        function: lambda-auth-prod
+        exec_role: lambda-auth-prod-lambda-exec-role

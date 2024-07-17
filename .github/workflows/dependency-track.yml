@@ -44,22 +44,22 @@ jobs:
         id: java_version
         uses: mikefarah/yq@master
         with:
-          cmd: yq e '.build.java.version // "11"' ./cloudopsworks-ci.yaml
+          cmd: yq e '.build.java.version // "17"' ./.github/cloudopsworks-ci.yaml
       # Get pipeline conf node dist
       - name: Get pipeline java dist
         id: java_dist
         uses: mikefarah/yq@master
         with:
-          cmd: yq e '.build.java.dist // "adopt"' ./cloudopsworks-ci.yaml
+          cmd: yq e '.build.java.dist // "adopt"' ./.github/cloudopsworks-ci.yaml
       # Setup Java JDK for builds
       - name: Set JDK
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           java-version: "${{ steps.java_version.outputs.result }}"
           distribution: "${{ steps.java_dist.outputs.result }}"
       # Cache all maven packages
       - name: Cache Maven packages
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
@@ -83,10 +83,11 @@ jobs:
         run: mvn org.cyclonedx:cyclonedx-maven-plugin:makeAggregateBom -DprojectType=${{ inputs.projectType }} -DoutputFormat=xml -DoutputName=dtrack-bom
 
       # SBOM generated reports upload
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: sbom
           path: target/dtrack-bom.xml
+          retention-days: 1
 
       # SBOM upload
       - name: SBOM Dtrack Upload

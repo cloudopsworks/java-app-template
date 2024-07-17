@@ -1,0 +1,75 @@
+##
+# (c) 2024 - Cloud Ops Works LLC - https://cloudops.works/
+#            On GitHub: https://github.com/cloudopsworks
+#            Distributed Under Apache v2.0 License
+#
+name: Environment Destruction Process
+on:
+  # Runs only on demand
+  workflow_dispatch:
+    inputs:
+      destroyedDeploymentName:
+        type: choice
+        description: Select Environment to destroy
+        options:
+          - develop/dev
+          - release/production
+          - test/uat
+          - prerelease/demo
+
+
+
+concurrency: build-${{ github.repository }}-${{ github.ref }}
+
+# Permission Settings for the entire RUN
+permissions:
+  actions: write
+  contents: write
+  issues: write
+  packages: write
+  statuses: write
+
+jobs:
+  data:
+    uses: cloudopsworks/base-app-template/.github/workflows/cd-data.yml@v3
+    secrets:
+      token: ${{ secrets.BOT_TOKEN }}
+
+  build-data:
+    needs:
+      - data
+    uses: ./.github/workflows/build-data.yml
+    with:
+      isRelease: true
+      TARGET_CLOUD: ${{ needs.data.outputs.cloud }}
+      BOT_USER: ${{ vars.BOT_USER }}
+      BOT_EMAIL: ${{ vars.BOT_EMAIL }}
+    secrets:
+      BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+
+  destroy-environment:
+    needs:
+      - data
+      - build-data
+    uses: cloudopsworks/base-app-template/.github/workflows/destroy.yml@v3
+    with:
+      release_version: ${{ needs.build-data.outputs.semver }}
+      release_name: ${{ needs.data.outputs.targetName }}
+      environment: ${{ needs.data.outputs.environment }}
+      package_name: ${{ needs.build-data.outputs.package_name }}
+      package_type: MAVEN
+      deployment_name: ${{ inputs.destroyedDeploymentName }}
+      target_cloud: ${{ needs.data.outputs.cloud }}
+      target_cloud_type: ${{ needs.data.outputs.cloudType }}
+      apis_enabled: ${{ needs.data.outputs.apisEnabled == 'true' }}
+      DOCKER_REGISTRY_ADDRESS: ${{ vars.DOCKER_REGISTRY_ADDRESS }}
+      HELM_REGISTRY_ADDRESS: ${{ vars.DOCKER_REGISTRY_ADDRESS }}
+      BOT_USER: ${{ vars.BOT_USER }}
+      BOT_EMAIL: ${{ vars.BOT_EMAIL }}
+      AWS_REGION: ${{ vars.DEPLOYMENT_AWS_REGION }}
+    secrets:
+      token: ${{ secrets.BOT_TOKEN }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.TF_AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.TF_AWS_SECRET_ACCESS_KEY }}
+      AZURE_SERVICE_ID: ${{ secrets.AZURE_SERVICE_ID }}
+      AZURE_SERVICE_SECRET: ${{ secrets.AZURE_SERVICE_SECRET }}

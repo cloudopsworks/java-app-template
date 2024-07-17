@@ -9,15 +9,17 @@ on:
     branches:
       - master
       - main
+      - develop
     paths:
       - OWNERS
-      - cloudopsworks-ci.yaml
+      - .github/cloudopsworks-ci.yaml
+      - .github/cloudopsworks-cd.yaml
   workflow_dispatch:
 
 concurrency: owners-${{ github.repository }}-${{ github.ref }}
 
 jobs:
   process-owners:
-    uses: cloudopsworks/base-app-template/.github/workflows/process-owners.yml@v2
+    uses: cloudopsworks/base-app-template/.github/workflows/process-owners.yml@v3
     secrets:
       token: ${{ secrets.BOT_TOKEN }}

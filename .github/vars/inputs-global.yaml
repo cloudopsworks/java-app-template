@@ -1,0 +1,5 @@
+organization_name: "ORG_NAME"
+environment_name: "ENV_NAME|Beanstalk"
+namespace: "GITHUB TEAM OWNER|dev|prod|uat"
+repository_owner: "REPO_OWNER"
+#api_files_dir: "relative-path-to-apidefs"
