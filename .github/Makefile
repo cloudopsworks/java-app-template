@@ -13,8 +13,17 @@ VER_MINOR := $(shell echo $(VER_NUM) | cut -f2 -d.)
 VER_PATCH := $(shell echo $(VER_NUM) | cut -f3 -d.)
 
 .PHONY: tag
+.PHONY: tag_local
+.PHONY: version
 
-tag:
+co_master:
+	git checkout master
+
+tag_local: co_master
 	git tag -f $(VER_MAJOR).$(VER_MINOR)
 	git tag -f $(VER_MAJOR)
 
+tag: tag_local
+	git push origin -f $(VER_MAJOR).$(VER_MINOR)
+	git push origin -f $(VER_MAJOR)
+	git switch -
