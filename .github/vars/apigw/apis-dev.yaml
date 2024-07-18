@@ -4,6 +4,10 @@ apigw_definitions:
     version: v2
     mapping: test-apis/api/2.0
     domain_name: apigw-dev.sample.com
+    file_name: test
+    stage_variables:  # comment out if not needed
+      - name: api_variable
+        value: api_value
 aws:
   stage: dev
   stage_only: false
