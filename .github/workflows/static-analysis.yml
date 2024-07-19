@@ -60,7 +60,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-
 
-      # Get the Package name from pom.xml
+      # Get the Package key from pom.xml
       - name: Get Package name
         id: package_key
         uses: mikefarah/yq@master
