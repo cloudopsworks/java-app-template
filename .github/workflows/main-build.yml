@@ -90,6 +90,21 @@ jobs:
     if: ${{ needs.build.outputs.pipeline_sonarqube == 'true' && needs.data.outputs.hasQualifier != 'true' }}
     uses: ./.github/workflows/static-analysis.yml
     with:
+      ref: ${{ github.head_ref }}
+      semver: ${{ needs.build.outputs.semver }}
+      sonarqubeUrl: ${{ vars.SONARQUBE_URL }}
+    secrets:
+      BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+      sonarqubeToken: ${{ secrets.SONARQUBE_TOKEN }}
+
+  apis-static-analysis:
+    needs:
+      - data
+      - build
+    if: ${{ needs.build.outputs.pipeline_sonarqube == 'true' && needs.data.outputs.hasQualifier != 'true' && needs.data.outputs.apisEnabled == 'true' }}
+    uses: ./.github/workflows/static-analysis-apis.yml
+    with:
+      ref: ${{ github.head_ref }}
       semver: ${{ needs.build.outputs.semver }}
       sonarqubeUrl: ${{ vars.SONARQUBE_URL }}
     secrets:
