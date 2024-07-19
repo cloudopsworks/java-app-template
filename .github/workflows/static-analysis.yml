@@ -96,5 +96,5 @@ jobs:
           args: >
             -Dsonar.projectKey=${{ steps.package_key.outputs.result }}
             -Dsonar.projectVersion=${{ inputs.semver }}
-            -Dsonar.branch.name=${{ github.ref }}
             -Dsonar.language=java
+#            -Dsonar.branch.name=${{ github.ref }}
