@@ -73,9 +73,10 @@ jobs:
           mvn --batch-mode verify
       - name: Sonar Scan
         uses: sonarsource/sonarqube-scan-action@v2
-        with:
+        env:
           SONAR_TOKEN: ${{ secrets.sonarqubeToken }}
           SONAR_HOST_URL: ${{ inputs.sonarqubeUrl }}
+        with:
           projectBaseDir: src/java
           args: >
             -Dsonar.projectKey=${{ github.repository }}

@@ -54,9 +54,10 @@ jobs:
 
       - name: Sonar Scan
         uses: sonarsource/sonarqube-scan-action@v2
-        with:
+        env:
           SONAR_TOKEN: ${{ secrets.sonarqubeToken }}
           SONAR_HOST_URL: ${{ inputs.sonarqubeUrl }}
+        with:
           projectBaseDir: apifiles/
           args: >
             -Dsonar.projectKey=${{ github.repository }}
