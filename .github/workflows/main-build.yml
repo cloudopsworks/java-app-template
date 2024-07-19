@@ -101,6 +101,7 @@ jobs:
     needs:
       - data
       - build
+      - static-analysis
     if: ${{ needs.build.outputs.pipeline_sonarqube == 'true' && needs.data.outputs.hasQualifier != 'true' && needs.data.outputs.apisEnabled == 'true' }}
     uses: ./.github/workflows/static-analysis-apis.yml
     with:
