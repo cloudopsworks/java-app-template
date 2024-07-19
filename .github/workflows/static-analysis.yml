@@ -59,6 +59,21 @@ jobs:
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-maven-
+
+      # Get the Package name from pom.xml
+      - name: Get Package name
+        id: package_key
+        uses: mikefarah/yq@master
+        with:
+          cmd: yq e -oy '.project.groupId + ":" + .project.artifactId' pom.xml
+
+      # Get the Package name from pom.xml
+      - name: Get Package Description
+        id: package_name
+        uses: mikefarah/yq@master
+        with:
+          cmd: yq e -oy '.project.name' pom.xml
+
       # Run versioning to tag the source
       - name: Run Versioning setup
         run: make version
@@ -79,8 +94,8 @@ jobs:
         with:
           projectBaseDir: src/main
           args: >
-            -Dsonar.projectKey=${{ github.repository }}
-            -Dsonar.projectName=${{ github.repository }}
+            -Dsonar.projectKey=${{ steps.package_key.outputs.result }}
+            -Dsonar.projectName="${{ steps.package_name.outputs.result }}"
             -Dsonar.projectVersion=${{ inputs.semver }}
             -Dsonar.branch.name=${{ github.ref }}
             -Dsonar.language=java
