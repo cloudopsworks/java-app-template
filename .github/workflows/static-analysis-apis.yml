@@ -3,7 +3,7 @@
 #            On GitHub: https://github.com/cloudopsworks
 #            Distributed Under Apache v2.0 License
 #
-name: Static Analysis Process
+name: Static Analysis Process for APIS
 on:
   workflow_call:
     inputs:
@@ -51,14 +51,6 @@ jobs:
         with:
           java-version: "${{ steps.java_version.outputs.result }}"
           distribution: "${{ steps.java_dist.outputs.result }}"
-      # Cache all maven packages
-      - name: Cache Maven packages
-        uses: actions/cache@v4
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-maven-
 
       # Get the Package key from pom.xml
       - name: Get Package name
@@ -74,29 +66,15 @@ jobs:
         with:
           cmd: yq e -oy '.project.name' pom.xml
 
-      # Run versioning to tag the source
-      - name: Run Versioning setup
-        run: make version
-
-      # Test the code!
-      - name: Static Test Code
-        env:
-          JAVA_OPTIONS: "-XX:+UnlockExperimentalVMOptions -Dsun.zip.disableMemoryMapping=true -XX:+UseParallelGC -XX:MinHeapFreeRatio=5 -XX:MaxHeapFreeRatio=10 -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -Xms128m -Xmx2048m"
-          SONARQUBE_URL: ${{ inputs.sonarqubeUrl }}
-          SONARQUBE_TOKEN: ${{ secrets.sonarqubeToken }}
-        run: |
-          mvn --batch-mode verify
       - name: Sonar Scan
         uses: sonarsource/sonarqube-scan-action@v2
         env:
           SONAR_TOKEN: ${{ secrets.sonarqubeToken }}
           SONAR_HOST_URL: ${{ inputs.sonarqubeUrl }}
         with:
-          projectBaseDir: .
+          projectBaseDir: apifiles/
           args: >
             -Dsonar.projectKey=${{ steps.package_key.outputs.result }}
             -Dsonar.projectVersion=${{ inputs.semver }}
-            -Dsonar.sources=src/main/java
-            -Dsonar.java.binaries=target/classes
-            -Dsonar.language=java
-#            -Dsonar.branch.name=${{ github.ref }}
+            -Dsonar.branch.name=openapi
+            -Dsonar.language=openapi

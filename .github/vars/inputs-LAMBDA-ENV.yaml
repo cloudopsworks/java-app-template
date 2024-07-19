@@ -110,8 +110,7 @@ lambda:
 
   ##
   # Optional: triggers notifications for the lambda function.
-  triggers:
-    enabled: false
+  triggers: {}
   #  s3:
   #    bucketName: BUCKET_NAME
   #    events:
