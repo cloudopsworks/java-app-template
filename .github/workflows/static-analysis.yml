@@ -77,7 +77,7 @@ jobs:
           SONAR_TOKEN: ${{ secrets.sonarqubeToken }}
           SONAR_HOST_URL: ${{ inputs.sonarqubeUrl }}
         with:
-          projectBaseDir: src/java
+          projectBaseDir: src/main/java
           args: >
             -Dsonar.projectKey=${{ github.repository }}
             -Dsonar.projectName=${{ github.repository }}
