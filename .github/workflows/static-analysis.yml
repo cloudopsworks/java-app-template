@@ -92,9 +92,11 @@ jobs:
           SONAR_TOKEN: ${{ secrets.sonarqubeToken }}
           SONAR_HOST_URL: ${{ inputs.sonarqubeUrl }}
         with:
-          projectBaseDir: src/main
+          projectBaseDir: .
           args: >
             -Dsonar.projectKey=${{ steps.package_key.outputs.result }}
             -Dsonar.projectVersion=${{ inputs.semver }}
+            -Dsonar.sources=src/main/java
+            -Dsonar.java.binaries=target/classes
             -Dsonar.language=java
 #            -Dsonar.branch.name=${{ github.ref }}
