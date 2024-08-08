@@ -29,6 +29,10 @@ on:
       AWS_REGION:
         required: true
         type: string
+      AWS_STS_ROLE_ARN:
+        required: false
+        type: string
+        default: ""
 
     secrets:
       BOT_TOKEN:
@@ -249,11 +253,23 @@ jobs:
       #
       # Docker Build login AWS
       - name: Configure AWS Credentials
-        if: ${{ steps.pipeline_docker.outputs.result == 1 && inputs.TARGET_CLOUD == 'AWS' }}
+        if: ${{ steps.pipeline_docker.outputs.result == 1 && inputs.TARGET_CLOUD == 'AWS' && inputs.AWS_STS_ROLE_ARN == '' }}
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ inputs.AWS_REGION }}
+
+      #
+      # Docker Build login AWS - w/Assume Role
+      - name: Configure AWS Credentials
+        if: ${{ steps.pipeline_docker.outputs.result == 1 && inputs.TARGET_CLOUD == 'AWS' && inputs.AWS_STS_ROLE_ARN != '' }}
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          role-to-assume: ${{ inputs.AWS_STS_ROLE_ARN }}
+          role-session-name: ${{ steps.getowner.outputs.repo_name }}-build
           aws-region: ${{ inputs.AWS_REGION }}
 
       - name: Docker Login AWS
