@@ -59,7 +59,7 @@ jobs:
       buildEnvironment: ${{ needs.data.outputs.deploymentName }}
       isRelease: false
       DOCKER_REGISTRY_ADDRESS: ${{ needs.data.outputs.dockerRegistry == '' && needs.data.outputs.dockerRegistry || vars.DOCKER_REGISTRY_ADDRESS }}
-      HELM_REGISTRY_ADDRESS: ${{ needs.data.outputs.helmRegistry == '' && needs.data.outputs.helmRegistry || vars.DOCKER_REGISTRY_ADDRESS }}
+      HELM_REGISTRY_ADDRESS: ${{ needs.data.outputs.helmRegistry == '' && needs.data.outputs.helmRegistry || vars.HELM_REGISTRY_ADDRESS }}
       BOT_USER: ${{ vars.BOT_USER }}
       BOT_EMAIL: ${{ vars.BOT_EMAIL }}
       TARGET_CLOUD: ${{ needs.data.outputs.cloud }}
@@ -82,8 +82,8 @@ jobs:
       semver: ${{ needs.build.outputs.semver }}
       ref: ${{ github.head_ref }}
       pr_name: pr${{ github.event.pull_request.number }}
-      DOCKER_REGISTRY_ADDRESS: ${{ vars.DOCKER_REGISTRY_ADDRESS }}
-      HELM_REGISTRY_ADDRESS: ${{ vars.DOCKER_REGISTRY_ADDRESS }}
+      DOCKER_REGISTRY_ADDRESS: ${{ needs.data.outputs.dockerRegistry == '' && needs.data.outputs.dockerRegistry || vars.DOCKER_REGISTRY_ADDRESS }}
+      HELM_REGISTRY_ADDRESS: ${{ needs.data.outputs.helmRegistry == '' && needs.data.outputs.helmRegistry || vars.HELM_REGISTRY_ADDRESS }}
       BOT_USER: ${{ vars.BOT_USER }}
       BOT_EMAIL: ${{ vars.BOT_EMAIL }}
       AZ_AKS_CLUSTER_NAME: ${{ vars.PREVIEW_AZURE_AKS_CLUSTER_NAME }}
@@ -104,8 +104,8 @@ jobs:
       semver: ${{ needs.build.outputs.semver }}
       ref: ${{ github.head_ref }}
       pr_name: pr${{ github.event.pull_request.number }}
-      DOCKER_REGISTRY_ADDRESS: ${{ vars.DOCKER_REGISTRY_ADDRESS }}
-      HELM_REGISTRY_ADDRESS: ${{ vars.DOCKER_REGISTRY_ADDRESS }}
+      DOCKER_REGISTRY_ADDRESS: ${{ needs.data.outputs.dockerRegistry == '' && needs.data.outputs.dockerRegistry || vars.DOCKER_REGISTRY_ADDRESS }}
+      HELM_REGISTRY_ADDRESS: ${{ needs.data.outputs.helmRegistry == '' && needs.data.outputs.helmRegistry || vars.HELM_REGISTRY_ADDRESS }}
       BOT_USER: ${{ vars.BOT_USER }}
       BOT_EMAIL: ${{ vars.BOT_EMAIL }}
       TARGET_CLOUD: ${{ needs.data.outputs.cloud }}
