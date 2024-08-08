@@ -8,6 +8,9 @@ name: Code Build Workflow Template
 on:
   workflow_call:
     inputs:
+      environment:
+        required: true
+        type: string
       isRelease:
         required: true
         type: boolean
@@ -84,6 +87,8 @@ jobs:
       semver: ${{ steps.semver.outputs.version }}
       package_name: ${{ steps.package_name.outputs.result }}
     runs-on: ubuntu-latest
+    environment:
+      name: ${{ inputs.environment }}
     steps:
       # Proceed with checkout of source with all the references (depth=0)  
       - uses: actions/checkout@v4
