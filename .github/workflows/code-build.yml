@@ -87,8 +87,6 @@ jobs:
       semver: ${{ steps.semver.outputs.version }}
       package_name: ${{ steps.package_name.outputs.result }}
     runs-on: ubuntu-latest
-    environment:
-      name: ${{ inputs.buildEnvironment }}
     steps:
       # Proceed with checkout of source with all the references (depth=0)  
       - uses: actions/checkout@v4
@@ -267,7 +265,7 @@ jobs:
 
       #
       # Docker Build login AWS - w/Assume Role
-      - name: Configure AWS Credentials
+      - name: Configure AWS Credentials with Assume Role
         if: ${{ steps.pipeline_docker.outputs.result == 1 && inputs.TARGET_CLOUD == 'AWS' && inputs.AWS_STS_ROLE_ARN != '' }}
         uses: aws-actions/configure-aws-credentials@v4
         with:
