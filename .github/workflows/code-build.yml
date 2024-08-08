@@ -8,7 +8,7 @@ name: Code Build Workflow Template
 on:
   workflow_call:
     inputs:
-      environment:
+      buildEnvironment:
         required: true
         type: string
       isRelease:
@@ -88,7 +88,7 @@ jobs:
       package_name: ${{ steps.package_name.outputs.result }}
     runs-on: ubuntu-latest
     environment:
-      name: ${{ inputs.environment }}
+      name: ${{ intputs.buildEnvironment }}
     steps:
       # Proceed with checkout of source with all the references (depth=0)  
       - uses: actions/checkout@v4

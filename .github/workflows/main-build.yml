@@ -40,7 +40,7 @@ jobs:
     uses: ./.github/workflows/code-build.yml
     if: ${{ needs.data.outputs.hasQualifier != 'true' }}
     with:
-      environment: ${{ needs.data.outputs.environment }}
+      buildEnvironment: ${{ needs.data.outputs.deploymentName }}
       isRelease: true
       TARGET_CLOUD: ${{ needs.data.outputs.cloud }}
       DOCKER_REGISTRY_ADDRESS: ${{ vars.DOCKER_REGISTRY_ADDRESS }}
