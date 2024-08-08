@@ -241,6 +241,7 @@ jobs:
       - name: Deploy to Maven Repo
         run: mvn --batch-mode deploy
         env:
+          GITHUB_ACTOR: ${{ vars.BOT_USER }}
           GITHUB_TOKEN: ${{ secrets.BOT_TOKEN }}
       #
       # Docker Build login Azure
