@@ -37,7 +37,7 @@ jobs:
   data:
     uses: cloudopsworks/base-app-template/.github/workflows/cd-data.yml@v3
     secrets:
-      token: ${{ secrets.BOT_TOKEN }}
+      token: ${{ secrets.BOT_TOKEN_SCOPED }}
 
   push_tag:
     if: ${{ github.event.pull_request.merged == true && ( github.base_ref == 'master' || github.base_ref == 'main' || startsWith(github.base_ref,'support/') ) }}

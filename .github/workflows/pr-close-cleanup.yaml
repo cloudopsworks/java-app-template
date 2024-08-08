@@ -23,7 +23,7 @@ jobs:
   data:
     uses: cloudopsworks/base-app-template/.github/workflows/cd-data.yml@v3
     secrets:
-      token: ${{ secrets.BOT_TOKEN }}
+      token: ${{ secrets.BOT_TOKEN_SCOPED }}
 
   project_data:
     runs-on: ubuntu-latest
