@@ -47,8 +47,8 @@ jobs:
       BOT_USER: ${{ vars.BOT_USER }}
       BOT_EMAIL: ${{ vars.BOT_EMAIL }}
       TARGET_CLOUD: ${{ needs.data.outputs.cloud }}
-      AWS_REGION: ${{ needs.data.outputs.awsRegion == '' && needs.data.outputs.awsRegion || vars.BUILD_AWS_REGION }}
-      AWS_STS_ROLE_ARN: ${{ needs.data.outputs.awsStsRoleArn == '' && needs.data.outputs.awsStsRoleArn || vars.BUILD_AWS_STS_ROLE_ARN }}
+      AWS_REGION: ${{ needs.data.outputs.awsRegion != '' && needs.data.outputs.awsRegion || vars.BUILD_AWS_REGION }}
+      AWS_STS_ROLE_ARN: ${{ needs.data.outputs.awsStsRoleArn != '' && needs.data.outputs.awsStsRoleArn || vars.BUILD_AWS_STS_ROLE_ARN }}
     secrets:
       BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
       AWS_ACCESS_KEY_ID: ${{ secrets.BUILD_AWS_ACCESS_KEY_ID }}
