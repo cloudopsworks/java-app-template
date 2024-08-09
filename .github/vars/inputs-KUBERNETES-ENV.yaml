@@ -1,4 +1,5 @@
 # This file contains the environment variables for the Kubernetes deployment
+runner_set: "KUBERNETES-ENV"
 container_registry: REGISTRY
 cluster_name: CLUSTER_NAME
 namespace: NAMESPACE
