@@ -62,6 +62,7 @@ jobs:
       target_cloud: ${{ needs.data.outputs.cloud }}
       target_cloud_type: ${{ needs.data.outputs.cloudType }}
       apis_enabled: ${{ needs.data.outputs.apisEnabled == 'true' }}
+      runner_set: ${{ needs.data.outputs.runnerSet }}
       DOCKER_REGISTRY_ADDRESS: ${{ needs.data.outputs.dockerRegistry != '' && needs.data.outputs.dockerRegistry || vars.DOCKER_REGISTRY_ADDRESS }}
       HELM_REGISTRY_ADDRESS: ${{ needs.data.outputs.helmRegistry != '' && needs.data.outputs.helmRegistry || vars.HELM_REGISTRY_ADDRESS }}
       BOT_USER: ${{ vars.BOT_USER }}
