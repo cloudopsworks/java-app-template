@@ -31,9 +31,9 @@ permissions:
 
 jobs:
   data:
-    uses: cloudopsworks/base-app-template/.github/workflows/cd-data.yml@v3
+    uses: ${{ github.repository_owner }}/base-app-template/.github/workflows/cd-data.yml@v3
     secrets:
-      token: ${{ secrets.BOT_TOKEN }}
+      token: ${{ secrets.BOT_TOKEN_SCOPED }}
 
   project_data:
     runs-on: ubuntu-latest
@@ -56,13 +56,15 @@ jobs:
     if: ${{ ! startsWith(github.head_ref, 'release/') && ! startsWith(github.head_ref,'support/') && ! startsWith(github.head_ref,'master')}}
     uses: ./.github/workflows/code-build.yml
     with:
+      buildEnvironment: ${{ needs.data.outputs.deploymentName }}
       isRelease: false
-      DOCKER_REGISTRY_ADDRESS: ${{ vars.DOCKER_REGISTRY_ADDRESS }}
-      HELM_REGISTRY_ADDRESS: ${{ vars.DOCKER_REGISTRY_ADDRESS }}
+      DOCKER_REGISTRY_ADDRESS: ${{ needs.data.outputs.dockerRegistry != '' && needs.data.outputs.dockerRegistry || vars.DOCKER_REGISTRY_ADDRESS }}
+      HELM_REGISTRY_ADDRESS: ${{ needs.data.outputs.helmRegistry != '' && needs.data.outputs.helmRegistry || vars.HELM_REGISTRY_ADDRESS }}
       BOT_USER: ${{ vars.BOT_USER }}
       BOT_EMAIL: ${{ vars.BOT_EMAIL }}
       TARGET_CLOUD: ${{ needs.data.outputs.cloud }}
-      AWS_REGION: ${{ vars.BUILD_AWS_REGION }}
+      AWS_REGION: ${{ needs.data.outputs.awsRegion != '' && needs.data.outputs.awsRegion || vars.BUILD_AWS_REGION }}
+      AWS_STS_ROLE_ARN: ${{ needs.data.outputs.awsStsRoleArn != '' && needs.data.outputs.awsStsRoleArn || vars.BUILD_AWS_STS_ROLE_ARN }}
     secrets:
       BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
       AWS_ACCESS_KEY_ID: ${{ secrets.BUILD_AWS_ACCESS_KEY_ID }}
@@ -75,13 +77,14 @@ jobs:
       - data
       - build
     if: needs.data.outputs.cloud == 'AZURE' && needs.build.outputs.has_preview == 'true'
-    uses: cloudopsworks/base-app-template/.github/workflows/preview-azure.yml@v3
+    uses: ${{ github.repository_owner }}/base-app-template/.github/workflows/preview-azure.yml@v3
     with:
       semver: ${{ needs.build.outputs.semver }}
       ref: ${{ github.head_ref }}
       pr_name: pr${{ github.event.pull_request.number }}
-      DOCKER_REGISTRY_ADDRESS: ${{ vars.DOCKER_REGISTRY_ADDRESS }}
-      HELM_REGISTRY_ADDRESS: ${{ vars.DOCKER_REGISTRY_ADDRESS }}
+      runner_set: ${{ needs.data.outputs.runnerSet != '' && needs.data.outputs.runnerSet || vars.PREVIEW_RUNNER_SET }}
+      DOCKER_REGISTRY_ADDRESS: ${{ needs.data.outputs.dockerRegistry != '' && needs.data.outputs.dockerRegistry || vars.DOCKER_REGISTRY_ADDRESS }}
+      HELM_REGISTRY_ADDRESS: ${{ needs.data.outputs.helmRegistry != '' && needs.data.outputs.helmRegistry || vars.HELM_REGISTRY_ADDRESS }}
       BOT_USER: ${{ vars.BOT_USER }}
       BOT_EMAIL: ${{ vars.BOT_EMAIL }}
       AZ_AKS_CLUSTER_NAME: ${{ vars.PREVIEW_AZURE_AKS_CLUSTER_NAME }}
@@ -97,13 +100,14 @@ jobs:
       - data
       - build
     if: needs.data.outputs.cloud == 'AWS' && needs.build.outputs.has_preview == 'true'
-    uses: cloudopsworks/base-app-template/.github/workflows/preview-aws.yml@v3
+    uses: ${{ github.repository_owner }}/base-app-template/.github/workflows/preview-aws.yml@v3
     with:
       semver: ${{ needs.build.outputs.semver }}
       ref: ${{ github.head_ref }}
       pr_name: pr${{ github.event.pull_request.number }}
-      DOCKER_REGISTRY_ADDRESS: ${{ vars.DOCKER_REGISTRY_ADDRESS }}
-      HELM_REGISTRY_ADDRESS: ${{ vars.DOCKER_REGISTRY_ADDRESS }}
+      runner_set: ${{ needs.data.outputs.runnerSet != '' && needs.data.outputs.runnerSet || vars.PREVIEW_RUNNER_SET }}
+      DOCKER_REGISTRY_ADDRESS: ${{ needs.data.outputs.dockerRegistry != '' && needs.data.outputs.dockerRegistry || vars.DOCKER_REGISTRY_ADDRESS }}
+      HELM_REGISTRY_ADDRESS: ${{ needs.data.outputs.helmRegistry != '' && needs.data.outputs.helmRegistry || vars.HELM_REGISTRY_ADDRESS }}
       BOT_USER: ${{ vars.BOT_USER }}
       BOT_EMAIL: ${{ vars.BOT_EMAIL }}
       TARGET_CLOUD: ${{ needs.data.outputs.cloud }}

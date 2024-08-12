@@ -31,9 +31,9 @@ permissions:
 
 jobs:
   data:
-    uses: cloudopsworks/base-app-template/.github/workflows/cd-data.yml@v3
+    uses: ${{ github.repository_owner }}/base-app-template/.github/workflows/cd-data.yml@v3
     secrets:
-      token: ${{ secrets.BOT_TOKEN }}
+      token: ${{ secrets.BOT_TOKEN_SCOPED }}
 
   build-data:
     needs:
@@ -51,7 +51,7 @@ jobs:
     needs:
       - data
       - build-data
-    uses: cloudopsworks/base-app-template/.github/workflows/destroy.yml@v3
+    uses: ${{ github.repository_owner }}/base-app-template/.github/workflows/destroy.yml@v3
     with:
       release_version: ${{ needs.build-data.outputs.semver }}
       release_name: ${{ needs.data.outputs.targetName }}
@@ -62,8 +62,9 @@ jobs:
       target_cloud: ${{ needs.data.outputs.cloud }}
       target_cloud_type: ${{ needs.data.outputs.cloudType }}
       apis_enabled: ${{ needs.data.outputs.apisEnabled == 'true' }}
-      DOCKER_REGISTRY_ADDRESS: ${{ vars.DOCKER_REGISTRY_ADDRESS }}
-      HELM_REGISTRY_ADDRESS: ${{ vars.DOCKER_REGISTRY_ADDRESS }}
+      runner_set: ${{ needs.data.outputs.runnerSet }}
+      DOCKER_REGISTRY_ADDRESS: ${{ needs.data.outputs.dockerRegistry != '' && needs.data.outputs.dockerRegistry || vars.DOCKER_REGISTRY_ADDRESS }}
+      HELM_REGISTRY_ADDRESS: ${{ needs.data.outputs.helmRegistry != '' && needs.data.outputs.helmRegistry || vars.HELM_REGISTRY_ADDRESS }}
       BOT_USER: ${{ vars.BOT_USER }}
       BOT_EMAIL: ${{ vars.BOT_EMAIL }}
       AWS_REGION: ${{ vars.DEPLOYMENT_AWS_REGION }}
