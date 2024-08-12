@@ -30,7 +30,7 @@ permissions:
 
 jobs:
   data:
-    uses: cloudopsworks/base-app-template/.github/workflows/cd-data.yml@v3
+    uses: ${{ github.repository_owner }}/base-app-template/.github/workflows/cd-data.yml@v3
     secrets:
       token: ${{ secrets.BOT_TOKEN_SCOPED }}
 
@@ -60,7 +60,7 @@ jobs:
     needs:
       - data
       - build
-    uses: cloudopsworks/base-app-template/.github/workflows/create-release.yml@v3
+    uses: ${{ github.repository_owner }}/base-app-template/.github/workflows/create-release.yml@v3
     if: ${{ needs.data.outputs.hasQualifier != 'true' && startsWith(github.ref,'refs/tags/') }}
     with:
       ref_name: v${{ needs.build.outputs.semver }}
@@ -77,7 +77,7 @@ jobs:
       - data
       - build
       - release
-    uses: cloudopsworks/base-app-template/.github/workflows/clean-old-packages.yml@v3
+    uses: ${{ github.repository_owner }}/base-app-template/.github/workflows/clean-old-packages.yml@v3
     if: ${{ needs.data.outputs.hasQualifier != 'true' }}
     with:
       package_name: ${{ needs.build.outputs.package_name }}
@@ -145,7 +145,7 @@ jobs:
       - build
       - release
       - deployment-process
-    uses: cloudopsworks/base-app-template/.github/workflows/deploy.yml@v3
+    uses: ${{ github.repository_owner }}/base-app-template/.github/workflows/deploy.yml@v3
     if: ${{ needs.data.outputs.isEnabled == 'true' && needs.data.outputs.hasQualifier != 'true' }}
     with:
       release_version: ${{ needs.build.outputs.semver }}
@@ -157,7 +157,7 @@ jobs:
       target_cloud: ${{ needs.data.outputs.cloud }}
       target_cloud_type: ${{ needs.data.outputs.cloudType }}
       apis_enabled: ${{ needs.data.outputs.apisEnabled == 'true' }}
-      runner_set: ${{ needs.data.outputs.runnerSet }}
+      runner_set: ${{ needs.data.outputs.runnerSet != '' && needs.data.outputs.runnerSet || vars.DEPLOYMENT_RUNNER_SET }}
       DOCKER_REGISTRY_ADDRESS: ${{ needs.data.outputs.dockerRegistry != '' && needs.data.outputs.dockerRegistry || vars.DOCKER_REGISTRY_ADDRESS }}
       HELM_REGISTRY_ADDRESS: ${{ needs.data.outputs.helmRegistry != '' && needs.data.outputs.helmRegistry || vars.HELM_REGISTRY_ADDRESS }}
       BOT_USER: ${{ vars.BOT_USER }}
@@ -175,7 +175,7 @@ jobs:
       - data
       - build
       - deployment-process
-    uses: cloudopsworks/base-app-template/.github/workflows/deploy.yml@v3
+    uses: ${{ github.repository_owner }}/base-app-template/.github/workflows/deploy.yml@v3
     if: ${{ needs.data.outputs.isEnabled == 'true' && ( startsWith(github.ref,'refs/heads/release/') || startsWith(github.ref,'refs/heads/develop') || startsWith(github.ref,'refs/heads/support/') ) }}
     with:
       release_version: ${{ needs.build.outputs.semver }}
@@ -187,7 +187,7 @@ jobs:
       target_cloud: ${{ needs.data.outputs.cloud }}
       target_cloud_type: ${{ needs.data.outputs.cloudType }}
       apis_enabled: ${{ needs.data.outputs.apisEnabled == 'true' }}
-      runner_set: ${{ needs.data.outputs.runnerSet }}
+      runner_set: ${{ needs.data.outputs.runnerSet != '' && needs.data.outputs.runnerSet || vars.DEPLOYMENT_RUNNER_SET }}
       DOCKER_REGISTRY_ADDRESS: ${{ needs.data.outputs.dockerRegistry != '' && needs.data.outputs.dockerRegistry || vars.DOCKER_REGISTRY_ADDRESS }}
       HELM_REGISTRY_ADDRESS: ${{ needs.data.outputs.helmRegistry != '' && needs.data.outputs.helmRegistry || vars.HELM_REGISTRY_ADDRESS }}
       BOT_USER: ${{ vars.BOT_USER }}
@@ -217,7 +217,7 @@ jobs:
       - data
       - deploy-only
     if: ${{ needs.data.outputs.isEnabled == 'true' && needs.data.outputs.hasQualifier == 'true' }}
-    uses: cloudopsworks/base-app-template/.github/workflows/deploy.yml@v3
+    uses: ${{ github.repository_owner }}/base-app-template/.github/workflows/deploy.yml@v3
     with:
       release_version: ${{ needs.version-delivery.outputs.semver }}
       release_name: ${{ needs.data.outputs.targetName }}
@@ -228,7 +228,7 @@ jobs:
       target_cloud: ${{ needs.data.outputs.cloud }}
       target_cloud_type: ${{ needs.data.outputs.cloudType }}
       apis_enabled: ${{ needs.data.outputs.apisEnabled == 'true' }}
-      runner_set: ${{ needs.data.outputs.runnerSet }}
+      runner_set: ${{ needs.data.outputs.runnerSet != '' && needs.data.outputs.runnerSet || vars.DEPLOYMENT_RUNNER_SET }}
       DOCKER_REGISTRY_ADDRESS: ${{ needs.data.outputs.dockerRegistry != '' && needs.data.outputs.dockerRegistry || vars.DOCKER_REGISTRY_ADDRESS }}
       HELM_REGISTRY_ADDRESS: ${{ needs.data.outputs.helmRegistry != '' && needs.data.outputs.helmRegistry || vars.HELM_REGISTRY_ADDRESS }}
       BOT_USER: ${{ vars.BOT_USER }}
@@ -267,7 +267,7 @@ jobs:
       - data
       - version-delivery
     if: ${{ needs.data.outputs.isEnabled == 'true' && needs.data.outputs.hasQualifier == 'true' }}
-    uses: cloudopsworks/base-app-template/.github/workflows/delivery-push.yml@v3
+    uses: ${{ github.repository_owner }}/base-app-template/.github/workflows/delivery-push.yml@v3
     with:
       release_version: ${{ needs.version-delivery.outputs.semver }}
       release_name: ${{ needs.data.outputs.targetName }}
@@ -284,7 +284,7 @@ jobs:
       - build
       - release
       - delivery-to-env
-    uses: cloudopsworks/base-app-template/.github/workflows/delivery-push.yml@v3
+    uses: ${{ github.repository_owner }}/base-app-template/.github/workflows/delivery-push.yml@v3
     if: ${{ needs.data.outputs.isEnabled == 'true' && needs.data.outputs.hasQualifier != 'true' }}
     with:
       release_version: ${{ needs.build.outputs.semver }}
@@ -301,7 +301,7 @@ jobs:
       - data
       - build
       - delivery-to-env
-    uses: cloudopsworks/base-app-template/.github/workflows/delivery-push.yml@v3
+    uses: ${{ github.repository_owner }}/base-app-template/.github/workflows/delivery-push.yml@v3
     if: ${{ needs.data.outputs.isEnabled == 'true' && ( startsWith(github.ref,'refs/heads/release/') || startsWith(github.ref,'refs/heads/develop') || startsWith(github.ref,'refs/heads/support/') ) }}
     with:
       release_version: ${{ needs.build.outputs.semver }}
@@ -319,7 +319,7 @@ jobs:
       - data
       - build
       - deployment-process
-    uses: cloudopsworks/base-app-template/.github/workflows/deploy-apis.yml@v3
+    uses: ${{ github.repository_owner }}/base-app-template/.github/workflows/deploy-apis.yml@v3
     if: ${{ needs.data.outputs.isEnabled == 'true' && needs.data.outputs.apisEnabled == 'true' && needs.data.outputs.hasQualifier != 'true' }}
     with:
       release_version: ${{ needs.build.outputs.semver }}
@@ -330,7 +330,7 @@ jobs:
       deployment_name: ${{ needs.data.outputs.deploymentName }}
       target_cloud: ${{ needs.data.outputs.cloud }}
       apis_enabled: ${{ needs.data.outputs.apisEnabled == 'true' }}
-      runner_set: ${{ needs.data.outputs.runnerSet }}
+      runner_set: ${{ needs.data.outputs.runnerSet != '' && needs.data.outputs.runnerSet || vars.DEPLOYMENT_RUNNER_SET }}
       BOT_USER: ${{ vars.BOT_USER }}
       BOT_EMAIL: ${{ vars.BOT_EMAIL }}
       AWS_REGION: ${{ vars.DEPLOYMENT_AWS_REGION }}
@@ -346,7 +346,7 @@ jobs:
     needs:
       - data
       - delivery-to-env
-    uses: cloudopsworks/base-app-template/.github/workflows/deploy-apis.yml@v3
+    uses: ${{ github.repository_owner }}/base-app-template/.github/workflows/deploy-apis.yml@v3
     if: ${{ needs.data.outputs.isEnabled == 'true' && needs.data.outputs.apisEnabled == 'true' }}
     with:
       release_version: ${{ needs.build.outputs.semver }}
@@ -357,7 +357,7 @@ jobs:
       deployment_name: ${{ needs.data.outputs.deploymentName }}
       target_cloud: ${{ needs.data.outputs.cloud }}
       apis_enabled: ${{ needs.data.outputs.apisEnabled == 'true' }}
-      runner_set: ${{ needs.data.outputs.runnerSet }}
+      runner_set: ${{ needs.data.outputs.runnerSet != '' && needs.data.outputs.runnerSet || vars.DEPLOYMENT_RUNNER_SET }}
       BOT_USER: ${{ vars.BOT_USER }}
       BOT_EMAIL: ${{ vars.BOT_EMAIL }}
       AWS_REGION: ${{ vars.DEPLOYMENT_AWS_REGION }}

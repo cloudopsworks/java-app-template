@@ -21,7 +21,7 @@ permissions:
 
 jobs:
   data:
-    uses: cloudopsworks/base-app-template/.github/workflows/cd-data.yml@v3
+    uses: ${{ github.repository_owner }}/base-app-template/.github/workflows/cd-data.yml@v3
     secrets:
       token: ${{ secrets.BOT_TOKEN_SCOPED }}
 
@@ -149,7 +149,7 @@ jobs:
       - data
       - build-data
     if: needs.data.outputs.cloud == 'AZURE' && needs.build-data.outputs.has_preview
-    uses: cloudopsworks/base-app-template/.github/workflows/cleanup-preview-azure.yml@v3
+    uses: ${{ github.repository_owner }}/base-app-template/.github/workflows/cleanup-preview-azure.yml@v3
     with:
       semver: 0.1.0-SNAPSHOT-PR${{ github.event.pull_request.number }}-${{ github.run_number }}
       ref: ${{ github.head_ref }}
@@ -172,7 +172,7 @@ jobs:
       - target_cloud
       - build-data
     if: needs.data.outputs.cloud == 'AWS' && needs.build-data.outputs.has_preview
-    uses: cloudopsworks/base-app-template/.github/workflows/cleanup-preview-aws.yml@v3
+    uses: ${{ github.repository_owner }}/base-app-template/.github/workflows/cleanup-preview-aws.yml@v3
     with:
       semver: 0.1.0-SNAPSHOT-PR${{ github.event.pull_request.number }}-${{ github.run_number }}
       ref: ${{ github.head_ref }}
