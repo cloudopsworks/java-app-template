@@ -5,7 +5,7 @@
 #
 pipeline:
   - docker
-  - helm
+#  - helm
 #  - zip
 zipGlobs:
   - target/*.jar
@@ -99,7 +99,7 @@ cd:
   # Indicate that the environment will use delivery push to designed environment
   legacyDeliveryPush: false
   # Indicate the Runner that will be used for the deployment - usually will be a hosted runner
-  runner_set: "arc-runner-set"
+  # runner_set: "arc-runner-set"
 
   # These deployment environments are fixed by the GitFlow workflow
   # targetName are optional for most deployments but are required for support branches.
