@@ -1,0 +1,24 @@
+#annotations: []
+#podAnnotations: []
+#replicaCount: 1
+#env: []
+probePath: /healthz
+startupProbe:
+  enabled: true
+#livenessProbe:
+#  port: 8082
+#readinessProbe:
+#  port: 8082
+ingress:
+  enabled: true
+  className: nginx
+  rules:
+    - host: PROD-URL
+      paths:
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: PROJECT_NAME-helm
+              port:
+                number: 80
