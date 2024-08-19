@@ -248,7 +248,9 @@ jobs:
           mvn --batch-mode --update-snapshots clean package
       # Deploy release to Maven Repository (defaults to Github repo)
       - name: Deploy to Maven Repo
-        run: mvn --batch-mode deploy
+        run: |
+          MAVEN_OPTS="$MAVEN_OPTS ${{ steps.maven_opts.outputs.result }}"
+          mvn --batch-mode deploy
         env:
           GITHUB_ACTOR: ${{ vars.BOT_USER }}
       #
