@@ -234,15 +234,23 @@ jobs:
           REPOSITORY_NAME: ${{ steps.getowner.outputs.repo_name }}
         run: make helm/version
 
+      # Get from global inputs the custom Maven Options
+      - name: Get Custom Install Command
+        id: maven_opts
+        uses: mikefarah/yq@master
+        with:
+          cmd: yq e -I=0 '.maven_options // ""' ./.github/vars/inputs-global.yaml
+
       # Build the code!
       - name: Build Code
-        run: mvn --batch-mode --update-snapshots clean package
+        run: |
+          MAVEN_OPTS="$MAVEN_OPTS ${{ steps.maven_opts.outputs.result }}"
+          mvn --batch-mode --update-snapshots clean package
       # Deploy release to Maven Repository (defaults to Github repo)
       - name: Deploy to Maven Repo
         run: mvn --batch-mode deploy
         env:
           GITHUB_ACTOR: ${{ vars.BOT_USER }}
-          GITHUB_TOKEN: ${{ secrets.BOT_TOKEN }}
       #
       # Docker Build login Azure
       - name: Docker Login Azure
