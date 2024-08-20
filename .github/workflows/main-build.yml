@@ -15,7 +15,9 @@ on:
       - support/**
       - release/**
     paths-ignore:
-      - ".github/**"
+      - '.github/**'
+      - '!.github/vars/**'
+      - '!.github/values/**'
   workflow_dispatch:
 
 concurrency: build-${{ github.repository }}-${{ github.ref }}
