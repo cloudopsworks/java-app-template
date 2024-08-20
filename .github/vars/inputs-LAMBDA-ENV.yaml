@@ -1,4 +1,5 @@
-runner_set: "KUBERNETES-ENV"
+environment: "dev|uat|prod|demo"
+runner_set: "RUNNER-ENV"
 lambda:
   arch: x86_64 | arm64
   #  iam:

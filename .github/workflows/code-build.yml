@@ -11,6 +11,13 @@ on:
       buildEnvironment:
         required: true
         type: string
+      environment:
+        required: true
+        type: string
+      targetName:
+        required: false
+        type: string
+        default: ''
       isRelease:
         required: true
         type: boolean
