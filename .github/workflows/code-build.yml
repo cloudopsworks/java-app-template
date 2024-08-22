@@ -215,13 +215,6 @@ jobs:
           echo "owner=$repo_owner" >> $GITHUB_OUTPUT
           echo "repo_name=$repo_name" >> $GITHUB_OUTPUT
 
-      # Get the Package name from pom.xml
-      - name: Get Package name
-        id: package_name
-        uses: mikefarah/yq@master
-        with:
-          cmd: yq e -oy '.project.groupId + "." + .project.artifactId' pom.xml
-
       # Versioning SET
       - name: Version SET
         run: make version
@@ -240,6 +233,13 @@ jobs:
           REPOSITORY_OWNER: ${{ steps.getowner.outputs.owner }}
           REPOSITORY_NAME: ${{ steps.getowner.outputs.repo_name }}
         run: make helm/version
+
+      # Get the Package name from pom.xml
+      - name: Get Package name
+        id: package_name
+        uses: mikefarah/yq@master
+        with:
+          cmd: yq e -oy '.project.groupId + "." + .project.artifactId' pom.xml
 
       # Get from global inputs the custom Maven Options
       - name: Get Custom Install Command

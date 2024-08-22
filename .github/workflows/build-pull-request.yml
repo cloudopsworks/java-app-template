@@ -91,6 +91,7 @@ jobs:
       BOT_EMAIL: ${{ vars.BOT_EMAIL }}
       AZ_AKS_CLUSTER_NAME: ${{ vars.PREVIEW_AZURE_AKS_CLUSTER_NAME }}
       AZ_AKS_RESOURCE_GROUP: ${{ vars.PREVIEW_AZURE_RESOURCE_GROUP }}
+      RANCHER_PROJECT_ID: ${{ vars.PREVIEW_RANCHER_PROJECT_ID }}
     secrets:
       BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
       AZURE_SERVICE_ID: ${{ secrets.PREVIEW_AZURE_SERVICE_ID }}
@@ -116,6 +117,7 @@ jobs:
       AWS_EKS_CLUSTER_NAME: ${{ vars.PREVIEW_AWS_EKS_CLUSTER_NAME }}
       AWS_REGION: ${{ vars.PREVIEW_AWS_REGION }}
       AWS_STS_ROLE_ARN: ${{ vars.PREVIEW_AWS_STS_ROLE_ARN }}
+      RANCHER_PROJECT_ID: ${{ vars.PREVIEW_RANCHER_PROJECT_ID }}
     secrets:
       BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
       AWS_ACCESS_KEY_ID: ${{ secrets.PREVIEW_AWS_ACCESS_KEY_ID }}

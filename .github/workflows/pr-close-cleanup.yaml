@@ -42,8 +42,8 @@ jobs:
   build-data:
     if: ${{ startsWith(github.head_ref, 'hotfix/') || startsWith(github.head_ref, 'feature/') }}
     needs:
+      - data
       - project_data
-      - target_cloud
     runs-on: ubuntu-latest
     outputs:
       has_preview: ${{ steps.has_preview.outputs.result == 1 }}
@@ -169,7 +169,7 @@ jobs:
 
   preview-aws:
     needs:
-      - target_cloud
+      - data
       - build-data
     if: needs.data.outputs.cloud == 'AWS' && needs.build-data.outputs.has_preview
     uses: ${{ github.repository_owner }}/base-app-template/.github/workflows/cleanup-preview-aws.yml@v3
