@@ -10,10 +10,14 @@ PREVIEW_VERSION := $(shell cat ../../VERSION)
 PREVIEW_NAME := $(PR_NAME)
 NS := $(shell kubectl get ns | grep $(NAME)-$(PREVIEW_NAME))
 PREVIEW_DOMAIN := $(PREVIEW_DOMAIN_NAME)
+RANCHER_PROJECT_ID := $(RANCHER_PROJECT_ID)
 
 create-namespace:
 ifndef NS
 	kubectl create ns $(NAME)-$(PREVIEW_NAME)
+endif
+ifneq ($(RANCHER_PROJECT_ID),)
+	kubectl annotate ns --overwrite $(NAME)-$(PREVIEW_NAME) "field.cattle.io/projectId=$(RANCHER_PROJECT_ID)"
 endif
 
 check-release:
