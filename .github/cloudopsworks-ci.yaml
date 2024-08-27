@@ -87,7 +87,7 @@ config:
 #     enabled: false
 #     type: Library
 #   # Set if this is a library project
-#   library: true
+#   isLibrary: true
 
 ## CD pipeline configuration uncomment and configure accordingly to enable
 cd:
