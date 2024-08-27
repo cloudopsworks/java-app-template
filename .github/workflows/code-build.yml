@@ -11,6 +11,13 @@ on:
       buildEnvironment:
         required: true
         type: string
+      environment:
+        required: true
+        type: string
+      targetName:
+        required: false
+        type: string
+        default: ''
       isRelease:
         required: true
         type: boolean
@@ -208,13 +215,6 @@ jobs:
           echo "owner=$repo_owner" >> $GITHUB_OUTPUT
           echo "repo_name=$repo_name" >> $GITHUB_OUTPUT
 
-      # Get the Package name from pom.xml
-      - name: Get Package name
-        id: package_name
-        uses: mikefarah/yq@master
-        with:
-          cmd: yq e -oy '.project.groupId + "." + .project.artifactId' pom.xml
-
       # Versioning SET
       - name: Version SET
         run: make version
@@ -234,12 +234,30 @@ jobs:
           REPOSITORY_NAME: ${{ steps.getowner.outputs.repo_name }}
         run: make helm/version
 
+      # Get the Package name from pom.xml
+      - name: Get Package name
+        id: package_name
+        uses: mikefarah/yq@master
+        with:
+          cmd: yq e -oy '.project.groupId + "." + .project.artifactId' pom.xml
+
+      # Get from global inputs the custom Maven Options
+      - name: Get Custom Install Command
+        id: maven_opts
+        uses: mikefarah/yq@master
+        with:
+          cmd: yq e -I=0 '.maven_options // ""' ./.github/vars/inputs-global.yaml
+
       # Build the code!
       - name: Build Code
-        run: mvn --batch-mode --update-snapshots clean package
+        run: |
+          MAVEN_OPTS="$MAVEN_OPTS ${{ steps.maven_opts.outputs.result }}"
+          mvn --batch-mode --update-snapshots clean package
       # Deploy release to Maven Repository (defaults to Github repo)
       - name: Deploy to Maven Repo
-        run: mvn --batch-mode deploy
+        run: |
+          MAVEN_OPTS="$MAVEN_OPTS ${{ steps.maven_opts.outputs.result }}"
+          mvn --batch-mode deploy
         env:
           GITHUB_ACTOR: ${{ vars.BOT_USER }}
           GITHUB_TOKEN: ${{ secrets.BOT_TOKEN }}

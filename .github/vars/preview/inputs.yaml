@@ -1,17 +1,9 @@
-environment: "dev|uat|prod|demo"
-# This file contains the environment variables for the Kubernetes deployment
-runner_set: "RUNNER-ENV"
-container_registry: REGISTRY
-cluster_name: CLUSTER_NAME
-namespace: NAMESPACE
+environment: "preview"
 config_map:
   enabled:  false
   files_path: values/configmaps
-#helm_repo_url: oci://HELM_REPO_URL|https://HELM_REPO_URL
-#helm_chart_name: CHART_NAME
-#helm_chart_path: CHART_PATH
-helm_values_overrides:
-  'image.repository': REGISTRY/REPOSITORY
+  mount_point: /var/configmaps
+helm_values_overrides: {}
 
 # The following are for cloud specific configurations
 # These will be used to filter the secrets from the secret manager

@@ -15,7 +15,9 @@ on:
       - support/**
       - release/**
     paths-ignore:
-      - ".github/**"
+      - '.github/**'
+      - '!.github/vars/**'
+      - '!.github/values/**'
   workflow_dispatch:
 
 concurrency: build-${{ github.repository }}-${{ github.ref }}
@@ -41,7 +43,9 @@ jobs:
     if: ${{ needs.data.outputs.hasQualifier != 'true' }}
     with:
       buildEnvironment: ${{ needs.data.outputs.deploymentName }}
-      isRelease: true
+      environment: ${{ needs.data.outputs.environment }}
+      targetName: ${{ needs.data.outputs.targetName }}
+      isRelease: ${{ startsWith(github.ref,'refs/tags/') }}
       DOCKER_REGISTRY_ADDRESS: ${{ needs.data.outputs.dockerRegistry != '' && needs.data.outputs.dockerRegistry || vars.DOCKER_REGISTRY_ADDRESS }}
       HELM_REGISTRY_ADDRESS: ${{ needs.data.outputs.helmRegistry != '' && needs.data.outputs.helmRegistry || vars.HELM_REGISTRY_ADDRESS }}
       BOT_USER: ${{ vars.BOT_USER }}

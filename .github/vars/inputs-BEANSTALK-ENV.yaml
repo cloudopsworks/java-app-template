@@ -1,4 +1,5 @@
-runner_set: "KUBERNETES-ENV"
+environment: "dev|uat|prod|demo"
+runner_set: "RUNNER-ENV"
 versions_bucket: "VERSIONS_BUCKET"
 #logs_bucket: "LOGS_BUCKET"
 dns:

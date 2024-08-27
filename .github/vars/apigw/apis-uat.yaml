@@ -4,6 +4,10 @@ apigw_definitions:
     version: v2
     mapping: test-apis/api/2.0
     domain_name: apigw-uat.sample.com
+    file_name: test
+    stage_variables:  # comment out if not needed
+      - name: api_variable
+        value: api_value
 aws:
   stage: uat
   stage_only: false
@@ -16,10 +20,13 @@ aws:
   #xray_enabled: true
   #cache_cluster_enabled: true
   #cache_cluster_size: 0.5
-
   vpc_link_name: test-link-uat
   #log_location: /aws/apigateway
   #log_retention_days: 30
+  publish_bucket:
+    enabled: false
+    name: test-apigw-backup
+    prefix_path: test
   stage_variables:
     - name: url
       value: test-api.uat.sample.com
