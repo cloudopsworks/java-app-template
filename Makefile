@@ -6,14 +6,6 @@ GH ?= $(INSTALL_PATH)/gh
 
 -include $(shell curl -sSL -o .tronador "https://cowk.io/acc"; echo .tronador)
 
-## Runs make within charts/$(PROJECT) directory for Helm Chart Versioning
-helm/version: packages/install/gitversion
-	@$(MAKE) -C charts/$(PROJECT) tag
-
-## Runs make within charts/$(PROJECT) directory to execute the helm release into repository
-helm/release:
-	@$(MAKE) -C charts/$(PROJECT) release
-
 ## Version Bump and creates VERSION File - Uses always the FullSemVer from GitVersion (no need to prepend the 'v').
 version: packages/install/gitversion
 	$(call assert-set,GITVERSION)
@@ -24,17 +16,6 @@ else
 	# Translates + in version to - for helm/docker compatibility
 	@echo "$(shell $(GITVERSION) -output json -showvariable FullSemVer | tr '+' '-')" > VERSION
 	@mvn --batch-mode versions:set -DnewVersion=$(shell $(GITVERSION) -output json -showvariable FullSemVer | tr '+' '-')
-endif
-
-## Charts initialization for Node Project
-charts/init:
-	@cp -r charts/maven/ charts/$(PROJECT)
-ifeq ($(OS),darwin)
-	@sed -i '' -e "s|  repository: file.*$$|  repository: file://../$(PROJECT)|g" charts/preview/requirements.yaml
-	@sed -i '' -e "s/^name: .*$$/name: $(PROJECT)/g" charts/$(PROJECT)/Chart.yaml
-else ifeq ($(OS),linux)
-	@sed -i -e "s|  repository: file.*$$|  repository: file://../$(PROJECT)|g" charts/preview/requirements.yaml
-	@sed -i -e "s/^name: .*$$/name: $(PROJECT)/g" charts/$(PROJECT)/Chart.yaml
 endif
 
 # Modify pom.xml to change the project name with the $(PROJECT) variable

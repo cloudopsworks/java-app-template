@@ -23,6 +23,10 @@ aws:
   vpc_link_name: test-link-dev
   #log_location: /aws/apigateway
   #log_retention_days: 30
+  publish_bucket:
+    enabled: false
+    name: test-apigw-backup
+    prefix_path: test
   stage_variables:
     - name: url
       value: test-api.dev.sample.com
