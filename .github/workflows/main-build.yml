@@ -137,7 +137,7 @@ jobs:
   deployment-process:
     needs:
       - data
-    if: ${{ needs.data.outputs.deliveryPush != 'true' }}
+    if: ${{ needs.data.outputs.deliveryPush != 'true' && needs.data.outputs.isLibrary != 'true' }}
     runs-on: ubuntu-latest
     steps:
       - name: Output
@@ -209,7 +209,7 @@ jobs:
     needs:
       - data
       - deployment-process
-    if: ${{ needs.data.outputs.isEnabled == 'true' && needs.data.outputs.hasQualifier == 'true'  && needs.data.outputs.deliveryPush != 'true'  }}
+    if: ${{ needs.data.outputs.isEnabled == 'true' && needs.data.outputs.hasQualifier == 'true'  && needs.data.outputs.deliveryPush != 'true'  && needs.data.outputs.isLibrary != 'true' }}
     uses: ./.github/workflows/code-version.yml
     with:
       deployment_name: ${{ needs.data.outputs.deploymentName }}
@@ -249,7 +249,7 @@ jobs:
   delivery-to-env:
     needs:
       - data
-    if: ${{ needs.data.outputs.deliveryPush == 'true' }}
+    if: ${{ needs.data.outputs.deliveryPush == 'true'  && needs.data.outputs.isLibrary != 'true' }}
     runs-on: ubuntu-latest
     steps:
       - name: Output
@@ -259,7 +259,7 @@ jobs:
     needs:
       - data
       - delivery-to-env
-    if: ${{ needs.data.outputs.isEnabled == 'true' && needs.data.outputs.hasQualifier == 'true'  }}
+    if: ${{ needs.data.outputs.isEnabled == 'true' && needs.data.outputs.hasQualifier == 'true'  && needs.data.outputs.isLibrary != 'true' }}
     uses: ./.github/workflows/code-version.yml
     with:
       deployment_name: ${{ needs.data.outputs.deploymentName }}
@@ -324,7 +324,7 @@ jobs:
       - build
       - deployment-process
     uses: ${{ github.repository_owner }}/base-app-template/.github/workflows/deploy-apis.yml@v3
-    if: ${{ needs.data.outputs.isEnabled == 'true' && needs.data.outputs.apisEnabled == 'true' && needs.data.outputs.hasQualifier != 'true' }}
+    if: ${{ needs.data.outputs.isEnabled == 'true' && needs.data.outputs.apisEnabled == 'true' && needs.data.outputs.hasQualifier != 'true'  && needs.data.outputs.isLibrary != 'true' }}
     with:
       release_version: ${{ needs.build.outputs.semver }}
       release_name: ${{ needs.data.outputs.targetName }}
@@ -351,7 +351,7 @@ jobs:
       - data
       - delivery-to-env
     uses: ${{ github.repository_owner }}/base-app-template/.github/workflows/deploy-apis.yml@v3
-    if: ${{ needs.data.outputs.isEnabled == 'true' && needs.data.outputs.apisEnabled == 'true' }}
+    if: ${{ needs.data.outputs.isEnabled == 'true' && needs.data.outputs.apisEnabled == 'true' && needs.data.outputs.isLibrary != 'true' }}
     with:
       release_version: ${{ needs.build.outputs.semver }}
       release_name: ${{ needs.data.outputs.targetName }}

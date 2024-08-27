@@ -4,7 +4,7 @@
 #            Distributed Under Apache v2.0 License
 #
 pipeline:
-  - docker
+  - docker # Comment in case of library
 #  - helm
 #  - zip
 zipGlobs:
@@ -86,7 +86,8 @@ config:
 #   dependencyTrack:
 #     enabled: false
 #     type: Library
-#
+#   # Set if this is a library project
+#   isLibrary: true
 
 ## CD pipeline configuration uncomment and configure accordingly to enable
 cd:

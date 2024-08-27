@@ -149,8 +149,9 @@ jobs:
       - data
       - build-data
     if: needs.data.outputs.cloud == 'AZURE' && needs.build-data.outputs.has_preview
-    uses: ${{ github.repository_owner }}/base-app-template/.github/workflows/cleanup-preview-azure.yml@v3
+    uses: ${{ github.repository_owner }}/base-app-template/.github/workflows/preview-azure.yml@v3
     with:
+      destroy: true
       semver: 0.1.0-SNAPSHOT-PR${{ github.event.pull_request.number }}-${{ github.run_number }}
       ref: ${{ github.head_ref }}
       pr_name: pr${{ github.event.pull_request.number }}
@@ -161,6 +162,7 @@ jobs:
       BOT_EMAIL: ${{ vars.BOT_EMAIL }}
       AZ_AKS_CLUSTER_NAME: ${{ vars.PREVIEW_AZURE_AKS_CLUSTER_NAME }}
       AZ_AKS_RESOURCE_GROUP: ${{ vars.PREVIEW_AZURE_RESOURCE_GROUP }}
+      RANCHER_PROJECT_ID: ${{ vars.PREVIEW_RANCHER_PROJECT_ID }}
     secrets:
       BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
       AZURE_SERVICE_ID: ${{ secrets.PREVIEW_AZURE_SERVICE_ID }}
@@ -172,8 +174,9 @@ jobs:
       - data
       - build-data
     if: needs.data.outputs.cloud == 'AWS' && needs.build-data.outputs.has_preview
-    uses: ${{ github.repository_owner }}/base-app-template/.github/workflows/cleanup-preview-aws.yml@v3
+    uses: ${{ github.repository_owner }}/base-app-template/.github/workflows/preview-aws.yml@v3
     with:
+      destroy: true
       semver: 0.1.0-SNAPSHOT-PR${{ github.event.pull_request.number }}-${{ github.run_number }}
       ref: ${{ github.head_ref }}
       pr_name: pr${{ github.event.pull_request.number }}
@@ -185,6 +188,8 @@ jobs:
       TARGET_CLOUD: ${{ needs.data.outputs.cloud }}
       AWS_EKS_CLUSTER_NAME: ${{ vars.PREVIEW_AWS_EKS_CLUSTER_NAME }}
       AWS_REGION: ${{ vars.PREVIEW_AWS_REGION }}
+      AWS_STS_ROLE_ARN: ${{ vars.PREVIEW_AWS_STS_ROLE_ARN }}
+      RANCHER_PROJECT_ID: ${{ vars.PREVIEW_RANCHER_PROJECT_ID }}
     secrets:
       BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
       AWS_ACCESS_KEY_ID: ${{ secrets.PREVIEW_AWS_ACCESS_KEY_ID }}
