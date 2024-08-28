@@ -7,6 +7,7 @@ namespace: NAMESPACE
 config_map:
   enabled:  false
   files_path: values/configmaps
+  mount_point: /app/configmap
 #helm_repo_url: oci://HELM_REPO_URL|https://HELM_REPO_URL
 #helm_chart_name: CHART_NAME
 #helm_chart_path: CHART_PATH
