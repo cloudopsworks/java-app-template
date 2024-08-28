@@ -349,7 +349,7 @@ jobs:
   deploy-apis-only:
     needs:
       - data
-      - delivery-to-env
+      - deploy-only
     uses: ${{ github.repository_owner }}/base-app-template/.github/workflows/deploy-apis.yml@v3
     if: ${{ needs.data.outputs.isEnabled == 'true' && needs.data.outputs.apisEnabled == 'true' && needs.data.outputs.isLibrary != 'true' }}
     with:
