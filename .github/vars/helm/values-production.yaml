@@ -14,11 +14,12 @@ ingress:
   className: nginx
   rules:
     - host: PROD-URL
-      paths:
-        - path: /
-          pathType: Prefix
-          backend:
-            service:
-              name: PROJECT_NAME-helm
-              port:
-                number: 80
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: PROJECT_NAME-helm
+                port:
+                  number: 80
