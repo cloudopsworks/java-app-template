@@ -92,7 +92,17 @@ beanstalk:
   #      to_port: 8443
   #      protocol: HTTPS
   #      backend_protocol: HTTPS
-  #      health_http_status: "200-401"
+  #      health_check: # for custom target group
+  #        enabled: true
+  #        protocol: HTTPS
+  #        port: 8443 | traffic-port
+  #        matcher: "200-302"
+  #        path: "/"
+  #        unhealthy_threshold: 2
+  #        healthy_threshold: 2
+  #        timeout: 5
+  #        interval: 30
+
 
   ##
   # Optional variable for adding extra tags to the environment
@@ -109,12 +119,27 @@ beanstalk:
   #      resource: ""
   #      value: "<VALUE>"
   ##
+  # Enable custom shared Rules where below rule mappings mandate over elastic beanstalk configuration.
+  #custom_shared_rules: true
+  ##
   # Optional Variable for mapping rules for shared Load Balancer
   rule_mappings: []
 #    - name: NAME
-#      host: host.address
+#      process: port_mapping_process
+#      host: host.address.com,host.address2.com
 #      path: /path
 #      priority: 100
+#      path_patterns:
+#        - /path
+#      query_strings:
+#        - query1=value1
+#        - query2=value2
+#      http_headers:
+#        - name: HEADERNAME
+#          values: ["value1", "valuepattern*"]
+#      source_ips:
+#        - IP1
+#        - IP2
 tags: {}
 # TAG1: value1
 # TAG2: value2
