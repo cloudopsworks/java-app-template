@@ -20,7 +20,7 @@ endif
 
 # Modify pom.xml to change the project name with the $(PROJECT) variable
 ## Code Initialization for Node Project
-code/init: charts/init packages/install/gitversion packages/install/gh
+code/init: packages/install/gitversion packages/install/gh
 	$(call assert-set,GITVERSION)
 	$(call assert-set,GH)
 	$(eval $@_OWNER := $(shell $(GH) repo view --json 'name,owner' -q '.owner.login'))
