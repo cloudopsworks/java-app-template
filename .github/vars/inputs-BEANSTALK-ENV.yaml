@@ -83,26 +83,28 @@ beanstalk:
   ##
   # Optional variable for mapping ports to backend ports:
   port_mappings: []
-  #    - name: default
-  #      from_port: 80
-  #      to_port: 8081
-  #      protocol: HTTP
-  #    - name: port443
-  #      from_port: 443
-  #      to_port: 8443
-  #      protocol: HTTPS
-  #      backend_protocol: HTTPS
-  #      health_check: # for custom target group
-  #        enabled: true
-  #        protocol: HTTPS
-  #        port: 8443 | traffic-port
-  #        matcher: "200-302"
-  #        path: "/"
-  #        unhealthy_threshold: 2
-  #        healthy_threshold: 2
-  #        timeout: 5
-  #        interval: 30
-
+#    - name: default
+#      from_port: 80
+#      to_port: 8081
+#      protocol: HTTP
+#    - name: port443
+#      from_port: 443
+#      to_port: 8443
+#      protocol: HTTPS
+#      backend_protocol: HTTPS
+#      health_check: # for custom target group
+#        enabled: true
+#        protocol: HTTPS
+#        port: 8443 | traffic-port
+#        matcher: "200-302"
+#        path: "/"
+#        unhealthy_threshold: 2
+#        healthy_threshold: 2
+#        timeout: 5
+#        interval: 30
+#      # Rules are required if custom_shared_rules=false or not set
+#      rules:
+#        - RULENAME
 
   ##
   # Optional variable for adding extra tags to the environment
@@ -124,7 +126,7 @@ beanstalk:
   ##
   # Optional Variable for mapping rules for shared Load Balancer
   rule_mappings: []
-#    - name: NAME
+#    - name: RULENAME
 #      process: port_mapping_process
 #      host: host.address.com,host.address2.com
 #      path: /path
