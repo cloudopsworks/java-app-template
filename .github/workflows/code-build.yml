@@ -218,6 +218,9 @@ jobs:
       # Versioning SET
       - name: Version SET
         run: make version
+        env:
+          GITHUB_ACTOR: ${{ vars.BOT_USER }}
+          GITHUB_TOKEN: ${{ secrets.BOT_TOKEN }}
 
       - name: Version Capture
         id: semver
