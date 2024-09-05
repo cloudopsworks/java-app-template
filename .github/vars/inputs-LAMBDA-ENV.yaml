@@ -111,6 +111,32 @@ lambda:
   #      - subnet-1234567890abcdef0
 
   ##
+  # Optional: logging config
+  #logging:
+  #  application_log_level: "INFO"
+  #  log_format: JSON | Text
+  #  system_log_level: INFO | DEBUG | ERROR
+
+  ##
+  # Optional: Xray tracing enable
+  #tracing:
+  #  enabled: true
+  #  mode: Active | PassThrough
+
+  ##
+  # Optional: Change default lambda ephemeral storage
+  #ephemeral_storage:
+  #  enabled: true
+  #  size: 1024 # Default is 512
+
+  ##
+  # Optional: EFS configuration
+  #efs:
+  #  enabled: true
+  #  arn: arn:aws:elasticfilesystem:us-east-1:123456789012:file-system/fs-12345678
+  #  local_mount_path: /mnt/efs
+  
+  ##
   # Optional: triggers notifications for the lambda function.
   triggers: {}
   #  s3:
