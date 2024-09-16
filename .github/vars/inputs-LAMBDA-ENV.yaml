@@ -104,6 +104,7 @@ lambda:
   # VPC configuration for the Lambda function
   vpc:
     enabled: false
+    create_security_group: false
     security_groups: []
     #      - sg-1234567890abcdef0
     #      - sg-1234567890abcdef1
