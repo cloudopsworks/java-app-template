@@ -30,7 +30,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: ${{ github.ref }}
-          token: '${{ github.BOT_TOKEN }}'
+          token: '${{ secrets.BOT_TOKEN }}'
 
       # Search and replace in files the pattern for {{REPO_OWNER}}/base-app-template and replace with actual owner repo
       # shell will need to escape the github templating ${{ and }} in order to make sed work
