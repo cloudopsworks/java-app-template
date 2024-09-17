@@ -1,0 +1,36 @@
+##
+# (c) 2024 - Cloud Ops Works LLC - https://cloudops.works/
+#            On GitHub: https://github.com/cloudopsworks
+#            Distributed Under Apache v2.0 License
+#
+name: Initial Setup
+on:
+  create:
+
+concurrency: initial-setup-${{ github.repository }}-${{ github.ref }}
+
+permissions:
+  contents: write
+  packages: write
+  statuses: write
+  pull-requests: write
+  issues: write
+  checks: write
+
+jobs:
+  initial-setup:
+    if: ${{ github.ref_type == 'branch' && ( github.ref_name == 'main' || github.ref_name == 'master' ) }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+
+      # Search and replace in files the pattern for ${{ github.repository_owner }}/base-app-template and replace with actual owner repo
+      # shell will need to escape the github templating ${{ and }} in order to make sed work
+      - name: Search and replace in files
+        run: |
+          find . -type f -name '*.yml' -exec sed -i 's/\${{ github.repository_owner }}\/base-app-template/${{ github.repository_owner }}\/base-app-template/g' {} \;
+          
+          
