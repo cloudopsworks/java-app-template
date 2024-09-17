@@ -27,10 +27,10 @@ jobs:
         with:
           ref: ${{ github.ref }}
 
-      # Search and replace in files the pattern for ${{ github.repository_owner }}/base-app-template and replace with actual owner repo
+      # Search and replace in files the pattern for {{REPO_OWNER}}/base-app-template and replace with actual owner repo
       # shell will need to escape the github templating ${{ and }} in order to make sed work
       - name: Search and replace in files
         run: |
-          find .github/workflows -type f -name '*.yml' -print -exec sed -i 's|\$\{\{ github.repository_owner \}\}/base-app-template|${{ github.repository_owner }}/base-app-template|g' {} \;
+          find .github/workflows -type f -name '*.yml' -print -exec sed -i 's|{{REPO_OWNER}}/base-app-template|${{ github.repository_owner }}/base-app-template|g' {} \;
           
           
