@@ -6,6 +6,10 @@
 name: Initial Setup
 on:
   create:
+  push:
+    branches:
+      - 'master'
+      - 'main'
 
 concurrency: initial-setup-${{ github.repository }}-${{ github.ref }}
 
