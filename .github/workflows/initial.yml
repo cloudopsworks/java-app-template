@@ -38,6 +38,7 @@ jobs:
       # shell will need to escape the github templating ${{ and }} in order to make sed work
       - name: Search and replace in files
         run: |
+          echo "EVENT: ${{ github.event_name }}"
           find .github/workflows/.template -type f -name '*.yml' -print -exec sed -i 's|{{REPO_OWNER}}/base-app-template|${{ github.repository_owner }}/base-app-template|g' {} \;
           cp .github/workflows/.template/*.yml .github/workflows
 
