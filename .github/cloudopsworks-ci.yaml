@@ -96,7 +96,7 @@ cd:
   # Cloud deployment type depends on the target cloud
   cloud_type: elasticbeanstalk | eks | lambda | aks | webapp | function | gke | function
   # Indicate that the environment makes automatic merges and deploys on lower environments
-  automatic: true
+  automatic: false
   # Indicate that the environment will use delivery push to designed environment
   legacyDeliveryPush: false
   # Indicate the Runner that will be used for the deployment - usually will be a hosted runner
@@ -133,13 +133,13 @@ cd:
       #  var2: value2
       #reviewers: false # defaults to true
       #legacyDeliveryPush: true
-      env: production
+      env: prod
       #targetName: prod-target
-      targets:
-        my-target:
-          env: prod-my-target
-          targetName: prod-my-target
-          #legacyDeliveryPush: true
+#      targets:
+#        my-target:
+#          env: prod-my-target
+#          targetName: prod-my-target
+#          #legacyDeliveryPush: true
     test:
       #variables:
       #  var1: value1
@@ -157,17 +157,14 @@ cd:
       #enabled: false
       env: demo
       #targetName: demo-target
-      targets:
-        my-target:
-          env: demo-my-target
-          targetName: demo-my-target
-          #legacyDeliveryPush: true
+#      targets:
+#        my-target:
+#          env: demo-my-target
+#          targetName: demo-my-target
+#          #legacyDeliveryPush: true
     hotfix:
       env: hotfix
       #targetName: hotfix-target
-    pull_request:
-      env: pull_request
-      #targetName: pr-target
     support:
       - match: 1.5.*
         env: demo

@@ -10,8 +10,8 @@ on:
     branches:
       - 'master'
       - 'main'
-    paths-ignore:
-      - '.github/workflows/**'
+    paths:
+      - '.github/workflows/.template/**'
 
 concurrency: initial-setup-${{ github.repository }}-${{ github.ref }}
 
