@@ -6,6 +6,12 @@
 name: Initial Setup
 on:
   create:
+  push:
+    branches:
+      - 'master'
+      - 'main'
+    paths-ignore:
+      - '.github/workflows/**'
 
 concurrency: initial-setup-${{ github.repository }}-${{ github.ref }}
 
@@ -19,18 +25,27 @@ permissions:
 
 jobs:
   initial-setup:
-    if: ${{ github.ref_type == 'branch' && ( github.ref_name == 'main' || github.ref_name == 'master' ) }}
+    if: ${{ github.ref_type == 'branch' && ( startsWith(github.ref, 'refs/heads/master') || startsWith(github.ref, 'refs/heads/main') ) }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           ref: ${{ github.ref }}
+          token: '${{ secrets.BOT_TOKEN }}'
 
-      # Search and replace in files the pattern for ${{ github.repository_owner }}/base-app-template and replace with actual owner repo
+      # Search and replace in files the pattern for {{REPO_OWNER}}/base-app-template and replace with actual owner repo
       # shell will need to escape the github templating ${{ and }} in order to make sed work
       - name: Search and replace in files
         run: |
-          find . -type f -name '*.yml' -exec sed -i 's/\${{ github.repository_owner }}\/base-app-template/${{ github.repository_owner }}\/base-app-template/g' {} \;
-          
+          find .github/workflows/.template -type f -name '*.yml' -print -exec sed -i 's|{{REPO_OWNER}}/base-app-template|${{ github.repository_owner }}/base-app-template|g' {} \;
+          cp .github/workflows/.template/*.yml .github/workflows
+
+      - name: Commit all initial changes
+        run: |
+          git config --global user.email ${{ vars.BOT_EMAIL }}
+          git config --global user.name ${{ vars.BOT_USER }}
+          git add .
+          git commit -m "chore: Initial setup"
+          git push
           

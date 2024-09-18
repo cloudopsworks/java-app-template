@@ -31,7 +31,7 @@ permissions:
 
 jobs:
   data:
-    uses: ${{ github.repository_owner }}/base-app-template/.github/workflows/cd-data.yml@v3
+    uses: {{REPO_OWNER}}/base-app-template/.github/workflows/cd-data.yml@v3
     secrets:
       token: ${{ secrets.BOT_TOKEN_SCOPED }}
 
@@ -51,7 +51,7 @@ jobs:
     needs:
       - data
       - build-data
-    uses: ${{ github.repository_owner }}/base-app-template/.github/workflows/destroy.yml@v3
+    uses: {{REPO_OWNER}}/base-app-template/.github/workflows/destroy.yml@v3
     with:
       release_version: ${{ needs.build-data.outputs.semver }}
       release_name: ${{ needs.data.outputs.targetName }}

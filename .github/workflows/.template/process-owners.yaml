@@ -20,6 +20,6 @@ concurrency: owners-${{ github.repository }}-${{ github.ref }}
 
 jobs:
   process-owners:
-    uses: ${{ github.repository_owner }}/base-app-template/.github/workflows/process-owners.yml@v3
+    uses: {{REPO_OWNER}}/base-app-template/.github/workflows/process-owners.yml@v3
     secrets:
       token: ${{ secrets.BOT_TOKEN }}

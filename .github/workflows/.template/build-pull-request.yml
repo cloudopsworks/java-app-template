@@ -31,7 +31,7 @@ permissions:
 
 jobs:
   data:
-    uses: ${{ github.repository_owner }}/base-app-template/.github/workflows/cd-data.yml@v3
+    uses: {{REPO_OWNER}}/base-app-template/.github/workflows/cd-data.yml@v3
     secrets:
       token: ${{ secrets.BOT_TOKEN_SCOPED }}
 
@@ -79,7 +79,7 @@ jobs:
       - data
       - build
     if: needs.data.outputs.cloud == 'AZURE' && needs.build.outputs.has_preview == 'true'
-    uses: ${{ github.repository_owner }}/base-app-template/.github/workflows/preview-azure.yml@v3
+    uses: {{REPO_OWNER}}/base-app-template/.github/workflows/preview-azure.yml@v3
     with:
       semver: ${{ needs.build.outputs.semver }}
       ref: ${{ github.head_ref }}
@@ -103,7 +103,7 @@ jobs:
       - data
       - build
     if: needs.data.outputs.cloud == 'AWS' && needs.build.outputs.has_preview == 'true'
-    uses: ${{ github.repository_owner }}/base-app-template/.github/workflows/preview-aws.yml@v3
+    uses: {{REPO_OWNER}}/base-app-template/.github/workflows/preview-aws.yml@v3
     with:
       semver: ${{ needs.build.outputs.semver }}
       ref: ${{ github.head_ref }}
