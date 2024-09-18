@@ -37,7 +37,9 @@ jobs:
       - name: Search and replace in files
         run: |
           find .github/workflows/.template -type f -name '*.yml' -print -exec sed -i 's|{{REPO_OWNER}}/base-app-template|${{ github.repository_owner }}/base-app-template|g' {} \;
+          find .github/workflows/.template -type f -name '*.yaml' -print -exec sed -i 's|{{REPO_OWNER}}/base-app-template|${{ github.repository_owner }}/base-app-template|g' {} \;
           cp .github/workflows/.template/*.yml .github/workflows
+          cp .github/workflows/.template/*.yaml .github/workflows
 
       - name: Remove the initial script that should run once
         run: |
