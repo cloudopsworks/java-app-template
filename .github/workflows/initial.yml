@@ -10,8 +10,6 @@ on:
     branches:
       - 'master'
       - 'main'
-    paths:
-      - '.github/workflows/.template/**'
 
 concurrency: initial-setup-${{ github.repository }}-${{ github.ref }}
 
@@ -40,6 +38,10 @@ jobs:
         run: |
           find .github/workflows/.template -type f -name '*.yml' -print -exec sed -i 's|{{REPO_OWNER}}/base-app-template|${{ github.repository_owner }}/base-app-template|g' {} \;
           cp .github/workflows/.template/*.yml .github/workflows
+
+      - name: Remove the initial script that should run once
+        run: |
+          rm -fr .github/workflows/initial.yml
 
       - name: Commit all initial changes
         run: |
