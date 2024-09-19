@@ -36,10 +36,10 @@ jobs:
       # shell will need to escape the github templating ${{ and }} in order to make sed work
       - name: Search and replace in files
         run: |
-          find .github/workflows/.template -type f -name '*.yml' -print -exec sed -i 's|{{REPO_OWNER}}/base-app-template|${{ github.repository_owner }}/base-app-template|g' {} \;
-          find .github/workflows/.template -type f -name '*.yaml' -print -exec sed -i 's|{{REPO_OWNER}}/base-app-template|${{ github.repository_owner }}/base-app-template|g' {} \;
           cp .github/workflows/.template/*.yml .github/workflows
           cp .github/workflows/.template/*.yaml .github/workflows
+          find .github/workflows -depth 1 -type f -name '*.yml' -print -exec sed -i 's|{{REPO_OWNER}}/base-app-template|${{ github.repository_owner }}/base-app-template|g' {} \;
+          find .github/workflows -depth 1 -type f -name '*.yaml' -print -exec sed -i 's|{{REPO_OWNER}}/base-app-template|${{ github.repository_owner }}/base-app-template|g' {} \;
 
       - name: Remove the initial script that should run once
         run: |
