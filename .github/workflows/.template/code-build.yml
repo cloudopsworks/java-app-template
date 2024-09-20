@@ -1,5 +1,5 @@
 ##
-# (c) 2022 - Cloud Ops Works LLC - https://cloudops.works/
+# (c) 2024 - Cloud Ops Works LLC - https://cloudops.works/
 #            On GitHub: https://github.com/cloudopsworks
 #            Distributed Under Apache v2.0 License
 #
@@ -59,43 +59,50 @@ on:
     outputs:
       has_preview:
         description: "Has Preview output"
-        value: ${{ jobs.build.outputs.has_preview }}
-      pipeline_helm:
-        description: "Pipeline with Helm Enabled"
-        value: ${{ jobs.build.outputs.pipeline_helm }}
+        value: ${{ jobs.pipeline-config.outputs.has_preview }}
       pipeline_docker:
         description: "Pipeline with Docker Enabled"
-        value: ${{ jobs.build.outputs.pipeline_docker }}
+        value: ${{ jobs.pipeline-config.outputs.pipeline_docker }}
       pipeline_sonarqube:
         description: "Pipeline with Sonarqube Analysis Enabled"
-        value: ${{ jobs.build.outputs.pipeline_sonarqube }}
+        value: ${{ jobs.pipeline-config.outputs.pipeline_sonarqube }}
       pipeline_dtrack:
         description: "Pipeline with DependencyTrack Analysis Enabled"
-        value: ${{ jobs.build.outputs.pipeline_dtrack }}
+        value: ${{ jobs.pipeline-config.outputs.pipeline_dtrack }}
       pipeline_dtrack_project_type:
         description: "Pipeline classification for DependencyTrack Analysis, blank when dtrack is disabled"
-        value: ${{ jobs.build.outputs.pipeline_dtrack_project_type }}
+        value: ${{ jobs.pipeline-config.outputs.pipeline_dtrack_project_type }}
       semver:
         description: "Semver Output calculated on Build"
         value: ${{ jobs.build.outputs.semver }}
       package_name:
         description: "Package Name Output calculated on Build"
-        value: ${{ jobs.build.outputs.package_name }}
+        value: ${{ jobs.pipeline-config.outputs.package_name }}
 
 jobs:
-  build:
+  pipeline-config:
     outputs:
       has_preview: ${{ steps.has_preview.outputs.result == 1 }}
-      pipeline_helm: ${{ steps.pipeline_helm.outputs.result == 1 }}
       pipeline_docker: ${{ steps.pipeline_docker.outputs.result == 1 }}
       pipeline_sonarqube: ${{ steps.disable_sonarqube.outputs.result == 0 }}
       pipeline_dtrack: ${{ steps.disable_dtrack.outputs.result == 0 }}
       pipeline_dtrack_project_type: ${{ steps.dtrack_project_type.outputs.type }}
-      semver: ${{ steps.semver.outputs.version }}
       package_name: ${{ steps.package_name.outputs.result }}
+      exclude_globs: ${{ steps.exclude_globs.outputs.result }}
+      zip_globs: ${{ steps.zip_globs.outputs.result }}
+      java_version: ${{ steps.java_version.outputs.result }}
+      java_dist: ${{ steps.java_dist.outputs.result }}
+      maven_opts: ${{ steps.maven_opts.outputs.result }}
+      docker_inline: ${{ steps.docker_inline.outputs.result }}
+      docker_args: ${{ steps.docker_args_env.outputs.result == '' && steps.docker_args_global.outputs.result || steps.docker_args_env.outputs.result }}
+      install_command: ${{ steps.install_command.outputs.result }}
+      build_command: ${{ steps.build_command.outputs.result }}
+      front_end: ${{ steps.front_end.outputs.result == 'true' }}
+      repository_name: ${{ steps.getowner.outputs.repo_name }}
+      custom_run_command: ${{ steps.custom_run_command.outputs.result }}
     runs-on: ubuntu-latest
     steps:
-      # Proceed with checkout of source with all the references (depth=0)  
+      # Proceed with checkout of source with all the references (depth=0)
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
@@ -113,26 +120,6 @@ jobs:
         uses: mikefarah/yq@master
         with:
           cmd: yq e '.build.java.dist // "adopt"' ./.github/cloudopsworks-ci.yaml
-      # Setup Java JDK for builds
-      - name: Set JDK
-        uses: actions/setup-java@v4
-        with:
-          java-version: "${{ steps.java_version.outputs.result }}"
-          distribution: "${{ steps.java_dist.outputs.result }}"
-      # Helm Chart build & deploy Support
-      - uses: azure/setup-helm@v4
-        with:
-          version: 'latest'
-          token: ${{ secrets.BOT_TOKEN }}
-      # Cache all maven packages
-      - name: Cache Maven packages
-        uses: actions/cache@v4
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-maven-
-
       # Get pipeline conf
       - name: Get pipeline docker enable
         id: pipeline_docker
@@ -179,20 +166,6 @@ jobs:
           echo "type=$type" >> $GITHUB_OUTPUT
 
       # Get pipeline conf
-      - name: Get pipeline helm enable
-        id: pipeline_helm
-        uses: mikefarah/yq@master
-        with:
-          cmd: yq e '.pipeline[]' ./.github/cloudopsworks-ci.yaml | grep helm | wc -l | tr -d " "
-
-      # Get pipeline conf
-      - name: Get pipeline zip packaging
-        id: pipeline_zip
-        uses: mikefarah/yq@master
-        with:
-          cmd: yq e '.pipeline[]' ./.github/cloudopsworks-ci.yaml | grep zip | wc -l | tr -d " "
-
-      # Get pipeline conf
       - name: Get pipeline zip packaging globs
         id: zip_globs
         uses: mikefarah/yq@master
@@ -204,38 +177,7 @@ jobs:
         id: exclude_globs
         uses: mikefarah/yq@master
         with:
-          cmd: yq e '.excludeGlobs[]' ./.github/cloudopsworks-ci.yaml
-
-      # Get the owner repo
-      - name: Get owner
-        id: getowner
-        run: |
-          repo_owner=`echo "$GITHUB_REPOSITORY" | cut -f 1 -d "/"`
-          repo_name=`echo "$GITHUB_REPOSITORY" | cut -f 2 -d "/"`
-          echo "owner=$repo_owner" >> $GITHUB_OUTPUT
-          echo "repo_name=$repo_name" >> $GITHUB_OUTPUT
-
-      # Versioning SET
-      - name: Version SET
-        run: make version
-        env:
-          GITHUB_ACTOR: ${{ vars.BOT_USER }}
-          GITHUB_TOKEN: ${{ secrets.BOT_TOKEN }}
-
-      - name: Version Capture
-        id: semver
-        run: |
-          echo "version=$(cat VERSION)" >> $GITHUB_OUTPUT
-
-      # Proceed with helm chart versioning bump
-      - name: Helm Chart Versioning
-        if: steps.pipeline_helm.outputs.result == 1
-        env:
-          HELM_REGISTRY_ADDRESS: ${{ inputs.HELM_REGISTRY_ADDRESS }}
-          DOCKER_REGISTRY_ADDRESS: ${{ inputs.DOCKER_REGISTRY_ADDRESS }}
-          REPOSITORY_OWNER: ${{ steps.getowner.outputs.owner }}
-          REPOSITORY_NAME: ${{ steps.getowner.outputs.repo_name }}
-        run: make helm/version
+          cmd: yq e '.excludeGlobs[] | "!" + .' ./.github/cloudopsworks-ci.yaml
 
       # Get the Package name from pom.xml
       - name: Get Package name
@@ -251,147 +193,143 @@ jobs:
         with:
           cmd: yq e -I=0 '.maven_options // ""' ./.github/vars/inputs-global.yaml
 
+      # get from global inputs the docker inline specification as text
+      - name: Get Docker Inline Setting
+        id: docker_inline
+        uses: mikefarah/yq@master
+        with:
+          cmd: yq e -I=0 '.docker_inline // ""' ./.github/vars/inputs-global.yaml
+
+      # get from global inputs docker arguments, also as text
+      - name: Get Docker Arguments
+        id: docker_args_global
+        uses: mikefarah/yq@master
+        with:
+          cmd: yq e -I=0 '.docker_args // ""' ./.github/vars/inputs-global.yaml
+
+      # get from environmental inputs the docker arguments will override the one set on docker_args,also as text
+      - name: Get Docker Arguments for ${{ inputs.environment }}
+        id: docker_args_env
+        uses: mikefarah/yq@master
+        with:
+          cmd: yq e -I=0 '.docker_args // ""' ./.github/vars/inputs-${{ inputs.environment }}.yaml
+
+      # get custom_run_command from global inputs
+      - name: Get Custom Run Command
+        id: custom_run_command
+        uses: mikefarah/yq@master
+        with:
+          cmd: yq e -I=0 '.custom_run_command // ""' ./.github/vars/inputs-global.yaml
+
+      # Get the owner repo
+      - name: Get owner
+        id: getowner
+        run: |
+          repo_owner=`echo "$GITHUB_REPOSITORY" | cut -f 1 -d "/"`
+          repo_name=`echo "$GITHUB_REPOSITORY" | cut -f 2 -d "/"`
+          echo "owner=$repo_owner" >> $GITHUB_OUTPUT
+          echo "repo_name=$repo_name" >> $GITHUB_OUTPUT
+
+  build:
+    needs:
+      - pipeline-config
+    outputs:
+      semver: ${{ steps.semver.outputs.version }}
+    runs-on: ubuntu-latest
+    steps:
+      # Proceed with checkout of source with all the references (depth=0)  
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          #ref: ${{ inputs.ref }}
+          token: ${{ secrets.BOT_TOKEN }}
+      # Setup Java JDK for builds
+      - name: Set JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: "${{ needs.pipeline-config.outputs.java_version }}"
+          distribution: "${{ needs.pipeline-config.outputs.java_dist }}"
+      # Helm Chart build & deploy Support
+      - uses: azure/setup-helm@v4
+        with:
+          version: 'latest'
+          token: ${{ secrets.BOT_TOKEN }}
+      # Cache all maven packages
+      - name: Cache Maven packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      # Versioning SET
+      - name: Version SET
+        run: make version
+        env:
+          GITHUB_ACTOR: ${{ inputs.BOT_USER }}
+          GITHUB_TOKEN: ${{ secrets.BOT_TOKEN }}
+
+      - name: Version Capture
+        id: semver
+        run: |
+          echo "version=$(cat VERSION)" >> $GITHUB_OUTPUT
+
       # Build the code!
       - name: Build Code
         run: |
-          MAVEN_OPTS="$MAVEN_OPTS ${{ steps.maven_opts.outputs.result }}"
+          MAVEN_OPTS="$MAVEN_OPTS ${{ needs.pipeline-config.outputs.maven_opts }}"
           mvn --batch-mode --update-snapshots clean package
         env:
-          GITHUB_ACTOR: ${{ vars.BOT_USER }}
+          GITHUB_ACTOR: ${{ inputs.BOT_USER }}
           GITHUB_TOKEN: ${{ secrets.BOT_TOKEN }}
 
       # Deploy release to Maven Repository (defaults to Github repo)
       - name: Deploy to Maven Repo
         run: |
-          MAVEN_OPTS="$MAVEN_OPTS ${{ steps.maven_opts.outputs.result }}"
+          MAVEN_OPTS="$MAVEN_OPTS ${{ needs.pipeline-config.outputs.maven_opts }}"
           mvn --batch-mode deploy
         env:
-          GITHUB_ACTOR: ${{ vars.BOT_USER }}
+          GITHUB_ACTOR: ${{ inputs.BOT_USER }}
           GITHUB_TOKEN: ${{ secrets.BOT_TOKEN }}
-      #
-      # Docker Build login Azure
-      - name: Docker Login Azure
-        env:
-          TARGET: ${{ inputs.TARGET_CLOUD }}
-        if: ${{ steps.pipeline_docker.outputs.result == 1 && env.TARGET == 'AZURE' }}
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ inputs.DOCKER_REGISTRY_ADDRESS }}
-          username: ${{ secrets.AZURE_SERVICE_ID }}
-          password: ${{ secrets.AZURE_SERVICE_SECRET }}
-      #
-      # Docker Build login AWS
-      - name: Configure AWS Credentials
-        if: ${{ steps.pipeline_docker.outputs.result == 1 && inputs.TARGET_CLOUD == 'AWS' && inputs.AWS_STS_ROLE_ARN == '' }}
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ inputs.AWS_REGION }}
 
-      #
-      # Docker Build login AWS - w/Assume Role
-      - name: Configure AWS Credentials with Assume Role
-        if: ${{ steps.pipeline_docker.outputs.result == 1 && inputs.TARGET_CLOUD == 'AWS' && inputs.AWS_STS_ROLE_ARN != '' }}
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          role-to-assume: ${{ inputs.AWS_STS_ROLE_ARN }}
-          role-session-name: ${{ steps.getowner.outputs.repo_name }}-build
-          aws-region: ${{ inputs.AWS_REGION }}
 
-      - name: Docker Login AWS
-        if: ${{ steps.pipeline_docker.outputs.result == 1 && inputs.TARGET_CLOUD == 'AWS' }}
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ inputs.DOCKER_REGISTRY_ADDRESS }}
-      #
-      # Build-X run
-      - name: Set up Docker Buildx
-        if: steps.pipeline_docker.outputs.result == 1
-        uses: docker/setup-buildx-action@v3
-      # Push docker version latest release
-      - name: Docker Push Release
-        if: steps.pipeline_docker.outputs.result == 1 && inputs.isRelease
-        uses: docker/build-push-action@v5
-        with:
-          push: true
-          context: .
-          tags: |
-            ${{ inputs.DOCKER_REGISTRY_ADDRESS }}/${{ steps.getowner.outputs.owner }}/${{ steps.getowner.outputs.repo_name }}:latest
-            ${{ inputs.DOCKER_REGISTRY_ADDRESS }}/${{ steps.getowner.outputs.owner }}/${{ steps.getowner.outputs.repo_name }}:${{ steps.semver.outputs.version }}
-      # Push docker version but is not latest release
-      - name: Docker Push Non-Release
-        if: steps.pipeline_docker.outputs.result == 1 && ! inputs.isRelease
-        uses: docker/build-push-action@v5
-        with:
-          push: true
-          context: .
-          tags: |
-            ${{ inputs.DOCKER_REGISTRY_ADDRESS }}/${{ steps.getowner.outputs.owner }}/${{ steps.getowner.outputs.repo_name }}:${{ steps.semver.outputs.version }}
-      #
-      # Helm Build and deploy to ACR registry
-      #
-      - name: Helm Build Release Azure ACR
-        if: steps.pipeline_helm.outputs.result == 1 && env.TARGET_CLOUD == 'AZURE'
-        env:
-          HELM_REGISTRY_ADDRESS: ${{ inputs.HELM_REGISTRY_ADDRESS }}
-          DOCKER_REGISTRY_ADDRESS: ${{ inputs.DOCKER_REGISTRY_ADDRESS }}
-          HELM_EXPERIMENTAL_OCI: "1"
-          REPOSITORY_OWNER: ${{ steps.getowner.outputs.owner }}
-          REPOSITORY_NAME: ${{ steps.getowner.outputs.repo_name }}
-          TARGET_CLOUD: ${{ inputs.TARGET_CLOUD }}
-          HELM_CREDS_USER: ${{ secrets.AZURE_SERVICE_ID }}
-          HELM_CREDS_PASSWORD: ${{ secrets.AZURE_SERVICE_SECRET }}
-        run: make helm/release
-
-      #
-      # Helm Build and deploy to ECR registry
-      #
-      - name: AWS ECR login
-        id: ecr_login
-        if: steps.pipeline_helm.outputs.result == 1 && inputs.TARGET_CLOUD == 'AWS'
-        env:
-          TARGET_CLOUD: ${{ inputs.TARGET_CLOUD }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ${{ inputs.AWS_REGION }}
-        run: |
-          pass=`aws ecr get-login-password --region $AWS_REGION`
-          echo "auth=$pass" >> $GITHUB_OUTPUT
-
-      - name: Helm Build Release AWS ECR
-        if: steps.pipeline_helm.outputs.result == 1 && inputs.TARGET_CLOUD == 'AWS'
-        env:
-          HELM_REGISTRY_ADDRESS: ${{ inputs.HELM_REGISTRY_ADDRESS }}
-          DOCKER_REGISTRY_ADDRESS: ${{ inputs.DOCKER_REGISTRY_ADDRESS }}
-          HELM_EXPERIMENTAL_OCI: "1"
-          REPOSITORY_OWNER: ${{ steps.getowner.outputs.owner }}
-          REPOSITORY_NAME: ${{ steps.getowner.outputs.repo_name }}
-          TARGET_CLOUD: ${{ inputs.TARGET_CLOUD }}
-          HELM_CREDS_USER: AWS
-          HELM_CREDS_PASSWORD: ${{ steps.ecr_login.outputs.auth }}
-        run: make helm/release
-      #
-      # Perform ZIP packaging of target files & globbed files
-      #
-      - name: ZIP file packaging
-        if: steps.pipeline_zip.outputs.result == 1
-        run: |
-          VERSION=$(cat VERSION)
-          ZIPFILE=target/${{ steps.getowner.outputs.repo_name }}-${VERSION}.zip
-          mkdir -p target/
-          echo '${{ steps.zip_globs.outputs.result }}' > target/.includelist
-          echo '${{ steps.exclude_globs.outputs.result }}' > target/.excludelist
-          zip -q -r -y ${ZIPFILE} . -i@target/.includelist -x@target/.excludelist
-
-      # Perform of upload artfiacts
+      # Perform of upload of artfiacts for java
       - name: Upload Artifacts to workflow
         uses: actions/upload-artifact@v4
         with:
-          name: all-artifacts
+          name: all_artifacts
           path: |
-            target/${{ steps.getowner.outputs.repo_name }}*.zip
-            target/${{ steps.getowner.outputs.repo_name }}*.jar
+            ${{ needs.pipeline-config.outputs.zip_globs }}
+            ${{ needs.pipeline-config.outputs.exclude_globs }}
           retention-days: 1
+          include-hidden-files: true
+          compression-level: '1' #fast
+
+  docker-build:
+    needs:
+      - pipeline-config
+      - build
+    if: needs.pipeline-config.outputs.pipeline_docker && needs.pipeline-config.outputs.front_end
+    uses: cloudopsworks/base-app-template/.github/workflows/docker-build-java.yml@v4
+    with:
+      DOCKER_REGISTRY_ADDRESS: ${{ inputs.DOCKER_REGISTRY_ADDRESS }}
+      BOT_USER: ${{ inputs.BOT_USER }}
+      BOT_EMAIL: ${{ inputs.BOT_EMAIL }}
+      TARGET_CLOUD: ${{ inputs.TARGET_CLOUD }}
+      AWS_REGION: ${{ inputs.AWS_REGION }}
+      AWS_STS_ROLE_ARN: ${{ inputs.AWS_STS_ROLE_ARN }}
+      isRelease: ${{ inputs.isRelease }}
+      semver: ${{ needs.build.outputs.semver }}
+      repository_name: ${{ needs.pipeline-config.outputs.repository_name }}
+      repository_owner: ${{ github.repository_owner }}
+      docker_inline: ${{ needs.pipeline-config.outputs.docker_inline }}
+      docker_args: ${{ needs.pipeline-config.outputs.docker_args }}
+      java_version: ${{ needs.pipeline-config.outputs.java_version }}
+      custom_run_command: ${{ needs.pipeline-config.outputs.custom_run_command }}
+    secrets:
+      token: ${{ secrets.BOT_TOKEN }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AZURE_SERVICE_ID: ${{ secrets.AZURE_SERVICE_ID }}
+      AZURE_SERVICE_SECRET: ${{ secrets.AZURE_SERVICE_SECRET }}

@@ -13,6 +13,10 @@ config_map:
 #helm_chart_path: CHART_PATH
 helm_values_overrides:
   'image.repository': REGISTRY/REPOSITORY
+#docker_args: |
+#  ARG1=value1
+#  ARG2=value2
+#  ARG3=value3
 
 # The following are for cloud specific configurations
 # These will be used to filter the secrets from the secret manager

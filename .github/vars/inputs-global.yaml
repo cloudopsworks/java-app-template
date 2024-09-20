@@ -2,6 +2,17 @@ organization_name: "ORG_NAME"
 organization_unit: "ORG_UNIT"
 environment_name: "ENV_NAME"
 repository_owner: "REPO_OWNER" # Required
+#docker_inline: |
+#  # Dockerfile content here
+#  # Example:
+#  # WORKDIR /app
+#  # COPY package*.json ./
+#  # COPY ./mydir ./my dest
+#docker_args: |
+#  ARG1=value1
+#  ARG2=value2
+#  ARG3=value3
+#custom_run_command: java -jar app.jar
 #api_files_dir: "relative-path-to-apidefs"
 # Optional Additional ENV variables
 #maven_options: "-T 1C -Dmaven.wagon.http.retryHandler.count=3"

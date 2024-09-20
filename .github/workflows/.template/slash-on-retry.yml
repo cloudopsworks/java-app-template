@@ -19,6 +19,6 @@ permissions:
 
 jobs:
   promote:
-    uses: {{REPO_OWNER}}/base-app-template/.github/workflows/slash-on-retry-automerge.yml@v3
+    uses: {{REPO_OWNER}}/base-app-template/.github/workflows/slash-on-retry-automerge.yml@v4
     secrets:
       token: ${{ secrets.BOT_TOKEN }}

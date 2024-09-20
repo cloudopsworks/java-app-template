@@ -21,6 +21,6 @@ permissions:
 
 jobs:
   plan:
-    uses: {{REPO_OWNER}}/base-app-template/.github/workflows/on-pull-request.yml@v3
+    uses: {{REPO_OWNER}}/base-app-template/.github/workflows/on-pull-request.yml@v4
     secrets:
       token: ${{ secrets.BOT_TOKEN }}

@@ -39,7 +39,7 @@ jobs:
   promote:
     needs:
       - check-from-code
-    uses: {{REPO_OWNER}}/base-app-template/.github/workflows/slash-on-promote.yml@v3
+    uses: {{REPO_OWNER}}/base-app-template/.github/workflows/slash-on-promote.yml@v4
     with:
       package_name: ${{ needs.check-from-code.outputs.package_name }}
       package_type: MAVEN
