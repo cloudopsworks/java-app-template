@@ -2,17 +2,39 @@ organization_name: "ORG_NAME"
 organization_unit: "ORG_UNIT"
 environment_name: "ENV_NAME"
 repository_owner: "REPO_OWNER" # Required
+## Default Java version is 21, uncomment to build with different JDK, default dist is temurin, uncomment to use different dist
+## Image variant is alpine by default, uncomment to use different image variant for the specified dist
+#java:
+#  version: 17
+#  dist: temurin
+#  image_variant: alpine
+#
+# Set Sonarqube processing to false if want to disable, the tool is enabled by default
+#sonarqube:
+#  enabled: false
+# Set DependencyTrack processing to false if want to disable, the tool is enabled by default
+# type: is one of => Library , Application , Container , Framework , Device , Firmware , File , Operating System
+#       Default type is Application
+#dependencyTrack:
+#  enabled: false
+#  type: Application
+# Set if this is a library project
+#isLibrary: true
+# Optional Additional ENV variables
+#maven_options: "-T 1C -Dmaven.wagon.http.retryHandler.count=3"
+# Dockerfile Inline content that will be merged into the Dockerfile
 #docker_inline: |
 #  # Dockerfile content here
 #  # Example:
 #  # WORKDIR /app
 #  # COPY package*.json ./
 #  # COPY ./mydir ./my dest
+# Docker Arguments that will be passed to Docker Build Process
 #docker_args: |
 #  ARG1=value1
 #  ARG2=value2
 #  ARG3=value3
+# Custom command that will be placed as startup script in dockerfile
 #custom_run_command: java -jar app.jar
+# Path where the API definitions are stored if different of default ./apifiles
 #api_files_dir: "relative-path-to-apidefs"
-# Optional Additional ENV variables
-#maven_options: "-T 1C -Dmaven.wagon.http.retryHandler.count=3"

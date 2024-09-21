@@ -82,22 +82,22 @@ on:
 jobs:
   pipeline-config:
     outputs:
-      has_preview: ${{ steps.has_preview.outputs.result == 1 }}
-      pipeline_docker: ${{ steps.pipeline_docker.outputs.result == 1 }}
-      pipeline_sonarqube: ${{ steps.disable_sonarqube.outputs.result == 0 }}
-      pipeline_dtrack: ${{ steps.disable_dtrack.outputs.result == 0 }}
+      has_preview: ${{ steps.has_preview.outputs.result == 'true' && true || false }}
+      pipeline_docker: ${{ steps.pipeline_docker.outputs.result == 'true' && true || false }}
+      pipeline_sonarqube: ${{ steps.disable_sonarqube.outputs.result == 'true' && true || false }}
+      pipeline_dtrack: ${{ steps.disable_dtrack.outputs.result == 'true' && true || false }}
       pipeline_dtrack_project_type: ${{ steps.dtrack_project_type.outputs.type }}
       package_name: ${{ steps.package_name.outputs.result }}
       exclude_globs: ${{ steps.exclude_globs.outputs.result }}
       zip_globs: ${{ steps.zip_globs.outputs.result }}
       java_version: ${{ steps.java_version.outputs.result }}
       java_dist: ${{ steps.java_dist.outputs.result }}
+      java_image_variant: ${{ steps.java_image_variant.outputs.result }}
       maven_opts: ${{ steps.maven_opts.outputs.result }}
       docker_inline: ${{ steps.docker_inline.outputs.result }}
       docker_args: ${{ steps.docker_args_env.outputs.result == '' && steps.docker_args_global.outputs.result || steps.docker_args_env.outputs.result }}
       install_command: ${{ steps.install_command.outputs.result }}
       build_command: ${{ steps.build_command.outputs.result }}
-      front_end: ${{ steps.front_end.outputs.result == 'true' }}
       repository_name: ${{ steps.getowner.outputs.repo_name }}
       custom_run_command: ${{ steps.custom_run_command.outputs.result }}
     runs-on: ubuntu-latest
@@ -108,18 +108,26 @@ jobs:
           fetch-depth: 0
           #ref: ${{ inputs.ref }}
           token: ${{ secrets.BOT_TOKEN }}
-      # Get pipeline conf java version
+      # Get pipeline conf java version Defaults to 21
       - name: Get pipeline Java version
         id: java_version
         uses: mikefarah/yq@master
         with:
-          cmd: yq e '.build.java.version // "17"' ./.github/cloudopsworks-ci.yaml
-      # Get pipeline conf java dist
+          cmd: yq e '.java.version // "21"' ./.github/vars/inputs-global.yaml
+      # Get pipeline conf java dist defaults to temurin (adopt is deprecated)
       - name: Get pipeline Java dist
         id: java_dist
         uses: mikefarah/yq@master
         with:
-          cmd: yq e '.build.java.dist // "adopt"' ./.github/cloudopsworks-ci.yaml
+          cmd: yq e '.java.dist // "temurin"' ./.github/vars/inputs-global.yaml
+
+      # Get pipeline conf java image variant defaults to alpine
+      - name: Get pipeline Java image variant
+        id: java_image_variant
+        uses: mikefarah/yq@master
+        with:
+          cmd: yq e '.java.image_variant // "alpine"' ./.github/vars/inputs-global.yaml
+
       # Get pipeline conf
       - name: Get pipeline docker enable
         id: pipeline_docker
@@ -132,38 +140,28 @@ jobs:
         id: has_preview
         uses: mikefarah/yq@master
         with:
-          cmd: yq e '.cd.preview.enabled' ./.github/cloudopsworks-ci.yaml | grep true | wc -l | tr -d " "
+          cmd: yq e '.cd.preview.enabled // "false"' ./.github/cloudopsworks-ci.yaml
 
       # Get Sonarqube Configuration is disabled
       - name: Get Pipeline conf Sonarqube is Disabled
         id: disable_sonarqube
         uses: mikefarah/yq@master
         with:
-          cmd: yq e '.build.sonarqube.enabled' ./.github/cloudopsworks-ci.yaml | grep false | wc -l | tr -d " "
+          cmd: yq e '.sonarqube.enabled // "true"' ./.github/vars/inputs-global.yaml
 
       # Get DependencyTrack Configuration is disabled
       - name: Get Pipeline conf DependencyTrack is Disabled
         id: disable_dtrack
         uses: mikefarah/yq@master
         with:
-          cmd: yq e '.build.dependencyTrack.enabled' ./.github/cloudopsworks-ci.yaml | grep false | wc -l | tr -d " "
+          cmd: yq e '.dependencyTrack.enabled // "true"' ./.github/vars/inputs-global.yaml
 
       # Get DependencyTrack project type configuration, default is null
       - name: Get Pipeline conf DependencyTrack Project type
-        id: dtrack_project_type_eval
+        id: dtrack_project_type
         uses: mikefarah/yq@master
         with:
-          cmd: yq e '.build.dependencyTrack.type' ./.github/cloudopsworks-ci.yaml
-
-      # Determine Dependency Track Project Type properly with default
-      - name: Determine Pipeline conf DependencyTrack Project type
-        id: dtrack_project_type
-        run: |
-          type=${{ steps.dtrack_project_type_eval.outputs.result }}
-          if [ "$type" == "null" ] ; then
-            type=Library
-          fi
-          echo "type=$type" >> $GITHUB_OUTPUT
+          cmd: yq e '.dependencyTrack.type // "Application"' ./.github/vars/inputs-global.yaml
 
       # Get pipeline conf
       - name: Get pipeline zip packaging globs
@@ -310,7 +308,7 @@ jobs:
     needs:
       - pipeline-config
       - build
-    if: needs.pipeline-config.outputs.pipeline_docker && needs.pipeline-config.outputs.front_end
+    if: needs.pipeline-config.outputs.pipeline_docker
     uses: cloudopsworks/base-app-template/.github/workflows/docker-build-java.yml@v4
     with:
       DOCKER_REGISTRY_ADDRESS: ${{ inputs.DOCKER_REGISTRY_ADDRESS }}
@@ -326,6 +324,8 @@ jobs:
       docker_inline: ${{ needs.pipeline-config.outputs.docker_inline }}
       docker_args: ${{ needs.pipeline-config.outputs.docker_args }}
       java_version: ${{ needs.pipeline-config.outputs.java_version }}
+      java_dist:  ${{ needs.pipeline-config.outputs.java_dist }}
+      java_image_variant: ${{ needs.pipeline-config.outputs.java_image_variant }}
       custom_run_command: ${{ needs.pipeline-config.outputs.custom_run_command }}
     secrets:
       token: ${{ secrets.BOT_TOKEN }}
