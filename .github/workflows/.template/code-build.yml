@@ -83,7 +83,7 @@ jobs:
   pipeline-config:
     outputs:
       has_preview: ${{ steps.has_preview.outputs.result }} # true | false
-      pipeline_docker: ${{ steps.pipeline_docker.outputs.result }} # true | false
+      pipeline_docker: ${{ steps.pipeline_docker.outputs.result == 1 }} # true | false
       pipeline_sonarqube: ${{ steps.disable_sonarqube.outputs.result }} # true | false
       pipeline_dtrack: ${{ steps.disable_dtrack.outputs.result }} # true | false
       pipeline_dtrack_project_type: ${{ steps.dtrack_project_type.outputs.type }}
