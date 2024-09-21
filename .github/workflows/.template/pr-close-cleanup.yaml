@@ -21,7 +21,7 @@ permissions:
 
 jobs:
   data:
-    uses: {{REPO_OWNER}}/base-app-template/.github/workflows/cd-data.yml@v3
+    uses: {{REPO_OWNER}}/base-app-template/.github/workflows/cd-data.yml@v4
     secrets:
       token: ${{ secrets.BOT_TOKEN_SCOPED }}
 
@@ -149,7 +149,7 @@ jobs:
       - data
       - build-data
     if: needs.data.outputs.cloud == 'AZURE' && needs.build-data.outputs.has_preview
-    uses: {{REPO_OWNER}}/base-app-template/.github/workflows/preview-azure.yml@v3
+    uses: {{REPO_OWNER}}/base-app-template/.github/workflows/preview-azure.yml@v4
     with:
       destroy: true
       semver: 0.1.0-SNAPSHOT-PR${{ github.event.pull_request.number }}-${{ github.run_number }}
@@ -174,7 +174,7 @@ jobs:
       - data
       - build-data
     if: needs.data.outputs.cloud == 'AWS' && needs.build-data.outputs.has_preview
-    uses: {{REPO_OWNER}}/base-app-template/.github/workflows/preview-aws.yml@v3
+    uses: {{REPO_OWNER}}/base-app-template/.github/workflows/preview-aws.yml@v4
     with:
       destroy: true
       semver: 0.1.0-SNAPSHOT-PR${{ github.event.pull_request.number }}-${{ github.run_number }}

@@ -11,7 +11,7 @@ startupProbe:
 #  port: 8082
 ingress:
   enabled: true
-  className: nginx
+  ingressClassName: nginx
   rules:
     - host: PROD-URL
       http:

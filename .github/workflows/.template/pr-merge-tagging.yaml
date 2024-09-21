@@ -35,13 +35,13 @@ jobs:
           echo "repo_name=$repo_name" >> $GITHUB_OUTPUT
 
   data:
-    uses: {{REPO_OWNER}}/base-app-template/.github/workflows/cd-data.yml@v3
+    uses: {{REPO_OWNER}}/base-app-template/.github/workflows/cd-data.yml@v4
     secrets:
       token: ${{ secrets.BOT_TOKEN_SCOPED }}
 
   push_tag:
     if: ${{ github.event.pull_request.merged == true && ( github.base_ref == 'master' || github.base_ref == 'main' || startsWith(github.base_ref,'support/') ) }}
-    uses: {{REPO_OWNER}}/base-app-template/.github/workflows/gitflow-push-tag.yml@v3
+    uses: {{REPO_OWNER}}/base-app-template/.github/workflows/gitflow-push-tag.yml@v4
     secrets:
       token: ${{ secrets.BOT_TOKEN }}
     with:
