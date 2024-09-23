@@ -3,6 +3,7 @@ TRONADOR_AUTO_INIT := true
 
 GITVERSION ?= $(INSTALL_PATH)/gitversion
 GH ?= $(INSTALL_PATH)/gh
+YQ ?= $(INSTALL_PATH)/yq
 
 -include $(shell curl -sSL -o .tronador "https://cowk.io/acc"; echo .tronador)
 
@@ -20,14 +21,10 @@ endif
 
 # Modify pom.xml to change the project name with the $(PROJECT) variable
 ## Code Initialization for Node Project
-code/init: packages/install/gitversion packages/install/gh
+code/init: packages/install/gitversion packages/install/gh packages/install/yq
 	$(call assert-set,GITVERSION)
 	$(call assert-set,GH)
+	$(call assert-set,YQ)
 	$(eval $@_OWNER := $(shell $(GH) repo view --json 'name,owner' -q '.owner.login'))
-ifeq ($(OS),darwin)
-	@sed -i '' -e "s/<artifactId>.*<\/artifactId>/<artifactId>$(PROJECT)<\/artifactId>/g" pom.xml
-	@sed -i '' -e "s/<version>.*<\/version>/<version>$(shell $(GITVERSION) -output json -showvariable SemVer | tr '+' '-')-SNAPSHOT<\/version>/g" pom.xml
-else ifeq ($(OS),linux)
-	@sed -i -e "s/<artifactId>.*<\/artifactId>/<artifactId>$(PROJECT)<\/artifactId>/g" pom.xml
-	@sed -i -e "s/<version>.*<\/version>/<version>$(shell $(GITVERSION) -output json -showvariable SemVer | tr '+' '-')-SNAPSHOT<\/version>/g" pom.xml
-endif
+	@$(YQ) eval -i '.project.artifactId = "$(PROJECT)"' pom.xml
+	@$(YQ) eval -i '.project.version = "$(shell $(GITVERSION) -output json -showvariable SemVer | tr '+' '-')-SNAPSHOT' pom.xml
