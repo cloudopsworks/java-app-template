@@ -27,4 +27,4 @@ code/init: packages/install/gitversion packages/install/gh packages/install/yq
 	$(call assert-set,YQ)
 	$(eval $@_OWNER := $(shell $(GH) repo view --json 'name,owner' -q '.owner.login'))
 	@$(YQ) eval -i '.project.artifactId = "$(PROJECT)"' pom.xml
-	@$(YQ) eval -i '.project.version = "$(shell $(GITVERSION) -output json -showvariable SemVer | tr '+' '-')-SNAPSHOT"' pom.xml
+	@$(YQ) eval -i '.project.version = "$(shell $(GITVERSION) -output json -showvariable MajorMinorPatch | tr '+' '-')-SNAPSHOT"' pom.xml
