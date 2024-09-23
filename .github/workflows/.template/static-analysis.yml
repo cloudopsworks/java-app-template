@@ -24,8 +24,6 @@ on:
         required: true
 
 jobs:
-  data:
-
   sonarqube:
     runs-on: ubuntu-latest
     steps:
