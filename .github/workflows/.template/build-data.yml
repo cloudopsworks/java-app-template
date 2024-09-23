@@ -1,5 +1,5 @@
 ##
-# (c) 2022 - Cloud Ops Works LLC - https://cloudops.works/
+# (c) 2024 - Cloud Ops Works LLC - https://cloudops.works/
 #            On GitHub: https://github.com/cloudopsworks
 #            Distributed Under Apache v2.0 License
 #
@@ -51,13 +51,13 @@ jobs:
         id: java_version
         uses: mikefarah/yq@master
         with:
-          cmd: yq e '.build.java.version // "17"' ./.github/cloudopsworks-ci.yaml
+          cmd: yq e '.java.version // "21"' ./.github/vars/inputs-global.yaml
       # Get pipeline conf java dist
       - name: Get pipeline Java dist
         id: java_dist
         uses: mikefarah/yq@master
         with:
-          cmd: yq e '.build.java.dist // "adopt"' ./.github/cloudopsworks-ci.yaml
+          cmd: yq e '.java.dist // "temurin"' ./.github/vars/inputs-global.yaml
       # Setup Java JDK for builds
       - name: Set JDK
         uses: actions/setup-java@v4
