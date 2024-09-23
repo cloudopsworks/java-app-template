@@ -45,6 +45,10 @@ jobs:
         run: |
           rm -fr .github/workflows/initial.yml
 
+      - name: Run Make code/init
+        run: |
+          make code/init
+
       - name: Commit all initial changes
         run: |
           git config --global user.email ${{ vars.BOT_EMAIL }}
