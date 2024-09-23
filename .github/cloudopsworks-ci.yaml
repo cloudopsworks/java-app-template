@@ -21,6 +21,7 @@ excludeGlobs:
   - cloudopsworks-ci*
   - skafold*
   - original-*.jar
+  - tronador/*
 
 # Repo & CD Configurations
 # Some of them previously managed in OWNERS file
