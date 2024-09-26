@@ -67,8 +67,8 @@ jobs:
     uses: {{REPO_OWNER}}/base-app-template/.github/workflows/create-release.yml@v4
     if: ${{ needs.data.outputs.hasQualifier != 'true' && startsWith(github.ref,'refs/tags/') }}
     with:
-      ref_name: v${{ needs.build.outputs.semver }}
-      release-tag: v${{ needs.build.outputs.semver }}
+      ref_name: ${{ needs.build.outputs.semver }}
+      release-tag: ${{ needs.build.outputs.semver }}
       pre-release: ${{ needs.data.outputs.isPreRelease == 'true' }}
       files-globs: |
         *.zip
