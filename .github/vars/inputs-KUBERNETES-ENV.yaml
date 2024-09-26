@@ -28,12 +28,15 @@ helm_values_overrides:
 #  pod_identity:
 #    enabled: true
 #    identity_name: IDENTITY_NAME
+#
 # For AWS
 #aws:
+#  region: AWS_REGION
 #  secrets_path_filter: /secrets
 #  pod_identity:
 #    enabled: true
 #    iam_role_name: ROLE_NAME
+#
 # For GCP
 #gcp:
 #  secrets_path_filter: /secrets
