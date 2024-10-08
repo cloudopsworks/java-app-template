@@ -325,7 +325,7 @@ jobs:
     needs:
       - pipeline-config
       - build
-    if: needs.pipeline-config.outputs.has_preview == 'true' || ${{ inputs.isContainerized }}
+    if: needs.pipeline-config.outputs.has_preview == 'true' || inputs.isContainerized
     uses: cloudopsworks/base-app-template/.github/workflows/docker-build-java.yml@develop
     with:
       DOCKER_REGISTRY_ADDRESS: ${{ inputs.DOCKER_REGISTRY_ADDRESS }}
