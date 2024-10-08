@@ -71,16 +71,8 @@ config:
 
 ## CD pipeline configuration uncomment and configure accordingly to enable
 cd:
-  # Target Cloud
-  cloud: aws | azure | gcp
-  # Cloud deployment type depends on the target cloud
-  cloud_type: elasticbeanstalk | eks | lambda | aks | webapp | function | gke | function
   # Indicate that the environment makes automatic merges and deploys on lower environments
   automatic: false
-  # Indicate that the environment will use delivery push to designed environment
-  legacyDeliveryPush: false
-  # Indicate the Runner that will be used for the deployment - usually will be a hosted runner
-  # runner_set: "arc-runner-set"
 
   # These deployment environments are fixed by the GitFlow workflow
   # targetName are optional for most deployments but are required for support branches.
@@ -152,9 +144,3 @@ cd:
       - match: 1.3.*
         env: demo2
         targetName: demo2
-  preview:
-    enabled: false
-    kubernetes: true
-    domain: example.com
-  apis:
-    enabled: false

@@ -32,7 +32,7 @@ permissions:
 
 jobs:
   data:
-    uses: {{REPO_OWNER}}/base-app-template/.github/workflows/cd-data.yml@v4
+    uses: {{REPO_OWNER}}/base-app-template/.github/workflows/cd-data.yml@develop
     secrets:
       token: ${{ secrets.BOT_TOKEN_SCOPED }}
 
@@ -64,7 +64,7 @@ jobs:
     needs:
       - data
       - build
-    uses: {{REPO_OWNER}}/base-app-template/.github/workflows/create-release.yml@v4
+    uses: {{REPO_OWNER}}/base-app-template/.github/workflows/create-release.yml@develop
     if: ${{ needs.data.outputs.hasQualifier != 'true' && startsWith(github.ref,'refs/tags/') }}
     with:
       ref_name: ${{ needs.build.outputs.semver }}
@@ -81,7 +81,7 @@ jobs:
       - data
       - build
       - release
-    uses: {{REPO_OWNER}}/base-app-template/.github/workflows/clean-old-packages.yml@v4
+    uses: {{REPO_OWNER}}/base-app-template/.github/workflows/clean-old-packages.yml@develop
     if: ${{ needs.data.outputs.hasQualifier != 'true' }}
     with:
       package_name: ${{ needs.build.outputs.package_name }}
@@ -149,7 +149,7 @@ jobs:
       - build
       - release
       - deployment-process
-    uses: {{REPO_OWNER}}/base-app-template/.github/workflows/deploy.yml@v4
+    uses: {{REPO_OWNER}}/base-app-template/.github/workflows/deploy.yml@develop
     if: ${{ needs.data.outputs.isEnabled == 'true' && needs.data.outputs.hasQualifier != 'true' }}
     with:
       release_version: ${{ needs.build.outputs.semver }}
@@ -179,7 +179,7 @@ jobs:
       - data
       - build
       - deployment-process
-    uses: {{REPO_OWNER}}/base-app-template/.github/workflows/deploy.yml@v4
+    uses: {{REPO_OWNER}}/base-app-template/.github/workflows/deploy.yml@develop
     if: ${{ needs.data.outputs.isEnabled == 'true' && ( startsWith(github.ref,'refs/heads/release/') || startsWith(github.ref,'refs/heads/develop') || startsWith(github.ref,'refs/heads/support/') ) }}
     with:
       release_version: ${{ needs.build.outputs.semver }}
@@ -221,7 +221,7 @@ jobs:
       - data
       - deploy-only
     if: ${{ needs.data.outputs.isEnabled == 'true' && needs.data.outputs.hasQualifier == 'true' }}
-    uses: {{REPO_OWNER}}/base-app-template/.github/workflows/deploy.yml@v4
+    uses: {{REPO_OWNER}}/base-app-template/.github/workflows/deploy.yml@develop
     with:
       release_version: ${{ needs.version-delivery.outputs.semver }}
       release_name: ${{ needs.data.outputs.targetName }}
@@ -245,85 +245,13 @@ jobs:
       AZURE_SERVICE_ID: ${{ secrets.AZURE_SERVICE_ID }}
       AZURE_SERVICE_SECRET: ${{ secrets.AZURE_SERVICE_SECRET }}
 
-  # Legacy Delivery to Environment support
-  delivery-to-env:
-    needs:
-      - data
-    if: ${{ needs.data.outputs.deliveryPush == 'true'  && needs.data.outputs.isLibrary != 'true' }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Output
-        run: 'echo "Delivery to legacy environment: ${{ needs.data.outputs.environment }}"'
-
-  version-delivery:
-    needs:
-      - data
-      - delivery-to-env
-    if: ${{ needs.data.outputs.isEnabled == 'true' && needs.data.outputs.hasQualifier == 'true'  && needs.data.outputs.isLibrary != 'true' }}
-    uses: ./.github/workflows/code-version.yml
-    with:
-      deployment_name: ${{ needs.data.outputs.deploymentName }}
-    secrets:
-      token: ${{ secrets.BOT_TOKEN }}
-
-  delivery-only:
-    needs:
-      - data
-      - version-delivery
-    if: ${{ needs.data.outputs.isEnabled == 'true' && needs.data.outputs.hasQualifier == 'true' }}
-    uses: {{REPO_OWNER}}/base-app-template/.github/workflows/delivery-push.yml@v4
-    with:
-      release_version: ${{ needs.version-delivery.outputs.semver }}
-      release_name: ${{ needs.data.outputs.targetName }}
-      environment: ${{ needs.data.outputs.environment }}
-      package_name: ${{ needs.version-delivery.outputs.package_name }}
-      package_type: MAVEN
-      deployment_name: ${{ needs.data.outputs.deploymentName }}
-    secrets:
-      token: ${{ secrets.BOT_TOKEN }}
-
-  delivery-release:
-    needs:
-      - data
-      - build
-      - release
-      - delivery-to-env
-    uses: {{REPO_OWNER}}/base-app-template/.github/workflows/delivery-push.yml@v4
-    if: ${{ needs.data.outputs.isEnabled == 'true' && needs.data.outputs.hasQualifier != 'true' }}
-    with:
-      release_version: ${{ needs.build.outputs.semver }}
-      release_name: ${{ needs.data.outputs.targetName }}
-      environment: ${{ needs.data.outputs.environment }}
-      package_name: ${{ needs.build.outputs.package_name }}
-      package_type: MAVEN
-      deployment_name: ${{ needs.data.outputs.deploymentName }}
-    secrets:
-      token: ${{ secrets.BOT_TOKEN }}
-
-  delivery-prerelease:
-    needs:
-      - data
-      - build
-      - delivery-to-env
-    uses: {{REPO_OWNER}}/base-app-template/.github/workflows/delivery-push.yml@v4
-    if: ${{ needs.data.outputs.isEnabled == 'true' && ( startsWith(github.ref,'refs/heads/release/') || startsWith(github.ref,'refs/heads/develop') || startsWith(github.ref,'refs/heads/support/') ) }}
-    with:
-      release_version: ${{ needs.build.outputs.semver }}
-      release_name: ${{ needs.data.outputs.targetName }}
-      environment: ${{ needs.data.outputs.environment }}
-      package_name: ${{ needs.build.outputs.package_name }}
-      package_type: MAVEN
-      deployment_name: ${{ needs.data.outputs.deploymentName }}
-    secrets:
-      token: ${{ secrets.BOT_TOKEN }}
-
   # Deploy after build APIs
   deploy-apis:
     needs:
       - data
       - build
       - deployment-process
-    uses: {{REPO_OWNER}}/base-app-template/.github/workflows/deploy-apis.yml@v4
+    uses: {{REPO_OWNER}}/base-app-template/.github/workflows/deploy-apis.yml@develop
     if: ${{ needs.data.outputs.isEnabled == 'true' && needs.data.outputs.apisEnabled == 'true' && needs.data.outputs.hasQualifier != 'true'  && needs.data.outputs.isLibrary != 'true' }}
     with:
       release_version: ${{ needs.build.outputs.semver }}
@@ -350,7 +278,7 @@ jobs:
     needs:
       - data
       - deploy-only
-    uses: {{REPO_OWNER}}/base-app-template/.github/workflows/deploy-apis.yml@v4
+    uses: {{REPO_OWNER}}/base-app-template/.github/workflows/deploy-apis.yml@develop
     if: ${{ needs.data.outputs.isEnabled == 'true' && needs.data.outputs.apisEnabled == 'true' && needs.data.outputs.isLibrary != 'true' }}
     with:
       release_version: ${{ needs.build.outputs.semver }}

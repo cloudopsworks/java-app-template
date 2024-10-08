@@ -128,19 +128,19 @@ jobs:
         with:
           cmd: yq e '.java.image_variant // "alpine"' ./.github/vars/inputs-global.yaml
 
-      # Get pipeline conf
-      - name: Get pipeline docker enable
-        id: pipeline_docker
-        uses: mikefarah/yq@master
-        with:
-          cmd: yq e '.pipeline[]' ./.github/cloudopsworks-ci.yaml | grep docker | wc -l | tr -d " "
-
-      # Get pipeline conf
+      # Get preview enabled
       - name: Get pipeline preview enabled
         id: has_preview
         uses: mikefarah/yq@master
         with:
-          cmd: yq e '.cd.preview.enabled // "false"' ./.github/cloudopsworks-ci.yaml
+          cmd: yq e '.preview.enabled // "false"' ./.github/vars/inputs-global.yaml
+
+      # Get if this is a library project
+      - name: Get pipeline preview enabled
+        id: is_library
+        uses: mikefarah/yq@master
+        with:
+          cmd: yq e '.isLibrary // "false"' ./.github/vars/inputs-global.yaml
 
       # Get Sonarqube Configuration is disabled
       - name: Get Pipeline conf Sonarqube is Disabled
@@ -247,11 +247,6 @@ jobs:
         with:
           java-version: "${{ needs.pipeline-config.outputs.java_version }}"
           distribution: "${{ needs.pipeline-config.outputs.java_dist }}"
-      # Helm Chart build & deploy Support
-      - uses: azure/setup-helm@v4
-        with:
-          version: 'latest'
-          token: ${{ secrets.BOT_TOKEN }}
       # Cache all maven packages
       - name: Cache Maven packages
         uses: actions/cache@v4
@@ -284,13 +279,13 @@ jobs:
 
       # Deploy release to Maven Repository (defaults to Github repo)
       - name: Deploy to Maven Repo
+        if: ${{ steps.is_library.outputs.result == 'true' }}
         run: |
           MAVEN_OPTS="$MAVEN_OPTS ${{ needs.pipeline-config.outputs.maven_opts }}"
           mvn --batch-mode deploy
         env:
           GITHUB_ACTOR: ${{ inputs.BOT_USER }}
           GITHUB_TOKEN: ${{ secrets.BOT_TOKEN }}
-
 
       # Perform of upload of artfiacts for java
       - name: Upload Artifacts to workflow
@@ -309,7 +304,7 @@ jobs:
       - pipeline-config
       - build
     if: needs.pipeline-config.outputs.pipeline_docker == 'true'
-    uses: cloudopsworks/base-app-template/.github/workflows/docker-build-java.yml@v4
+    uses: cloudopsworks/base-app-template/.github/workflows/docker-build-java.yml@develop
     with:
       DOCKER_REGISTRY_ADDRESS: ${{ inputs.DOCKER_REGISTRY_ADDRESS }}
       BOT_USER: ${{ inputs.BOT_USER }}

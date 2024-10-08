@@ -21,7 +21,7 @@ permissions:
 
 jobs:
   data:
-    uses: {{REPO_OWNER}}/base-app-template/.github/workflows/cd-data.yml@v4
+    uses: {{REPO_OWNER}}/base-app-template/.github/workflows/cd-data.yml@develop
     secrets:
       token: ${{ secrets.BOT_TOKEN_SCOPED }}
 
@@ -46,11 +46,10 @@ jobs:
       - project_data
     runs-on: ubuntu-latest
     outputs:
-      has_preview: ${{ steps.has_preview.outputs.result == 1 }}
-      pipeline_helm: ${{ steps.pipeline_helm.outputs.result == 1 }}
-      pipeline_docker: ${{ steps.pipeline_docker.outputs.result == 1 }}
-      pipeline_sonarqube: ${{ steps.disable_sonarqube.outputs.result == 0 }}
-      pipeline_dtrack: ${{ steps.disable_dtrack.outputs.result == 0 }}
+      has_preview: ${{ steps.has_preview.outputs.result }}
+      pipeline_helm: ${{ steps.pipeline_helm.outputs.result }}
+      pipeline_sonarqube: ${{ steps.disable_sonarqube.outputs.result }}
+      pipeline_dtrack: ${{ steps.disable_dtrack.outputs.result }}
       pipeline_dtrack_project_type: ${{ steps.dtrack_project_type.outputs.type }}
     steps:
       # Proceed with checkout of source with all the references (depth=0)
@@ -71,64 +70,34 @@ jobs:
         uses: mikefarah/yq@master
         with:
           cmd: yq e '.java.dist // "temurin"' ./.github/vars/inputs-global.yaml
-      # Get pipeline conf
-      - name: Get pipeline docker enable
-        id: pipeline_docker
-        uses: mikefarah/yq@master
-        with:
-          cmd: yq e '.pipeline[]' ./.github/cloudopsworks-ci.yaml | grep docker | wc -l | tr -d " "
 
       # Get pipeline conf
       - name: Get pipeline preview enabled
         id: has_preview
         uses: mikefarah/yq@master
         with:
-          cmd: yq e '.cd.preview.enabled' ./.github/cloudopsworks-ci.yaml | grep true | wc -l | tr -d " "
+          cmd: yq e '.preview.enabled // "false"' ./.github/vars/inputs-global.yaml
 
       # Get Sonarqube Configuration is disabled
       - name: Get Pipeline conf Sonarqube is Disabled
         id: disable_sonarqube
         uses: mikefarah/yq@master
         with:
-          cmd: yq e '.build.sonarqube.enabled' ./.github/cloudopsworks-ci.yaml | grep false | wc -l | tr -d " "
+          cmd: yq e '.sonarqube.enabled // "true"' ./.github/vars/inputs-global.yaml
 
       # Get DependencyTrack Configuration is disabled
       - name: Get Pipeline conf DependencyTrack is Disabled
         id: disable_dtrack
         uses: mikefarah/yq@master
         with:
-          cmd: yq e '.build.dependencyTrack.enabled' ./.github/cloudopsworks-ci.yaml | grep false | wc -l | tr -d " "
+          cmd: yq e '.dependencyTrack.enabled // "true"' ./.github/vars/inputs-global.yaml
 
       # Get DependencyTrack project type configuration, default is null
       - name: Get Pipeline conf DependencyTrack Project type
-        id: dtrack_project_type_eval
-        uses: mikefarah/yq@master
-        with:
-          cmd: yq e '.build.dependencyTrack.type' ./.github/cloudopsworks-ci.yaml
-
-      # Determine Dependency Track Project Type properly with default
-      - name: Determine Pipeline conf DependencyTrack Project type
         id: dtrack_project_type
-        run: |
-          type=${{ steps.dtrack_project_type_eval.outputs.result }}
-          if [ "$type" == "null" ] ; then
-            type=Library
-          fi
-          echo "type=$type" >> $GITHUB_OUTPUT
-
-      # Get pipeline conf
-      - name: Get pipeline helm enable
-        id: pipeline_helm
         uses: mikefarah/yq@master
         with:
-          cmd: yq e '.pipeline[]' ./.github/cloudopsworks-ci.yaml | grep helm | wc -l | tr -d " "
-
-      # Get pipeline conf
-      - name: Get pipeline zip packaging
-        id: pipeline_zip
-        uses: mikefarah/yq@master
-        with:
-          cmd: yq e '.pipeline[]' ./.github/cloudopsworks-ci.yaml | grep zip | wc -l | tr -d " "
+          cmd: yq e '.dependencyTrack.type // "Application"' ./.github/vars/inputs-global.yaml
 
       # Get pipeline conf
       - name: Get pipeline zip packaging globs
@@ -149,7 +118,7 @@ jobs:
       - data
       - build-data
     if: needs.data.outputs.cloud == 'AZURE' && needs.build-data.outputs.has_preview
-    uses: {{REPO_OWNER}}/base-app-template/.github/workflows/preview-azure.yml@v4
+    uses: {{REPO_OWNER}}/base-app-template/.github/workflows/preview-azure.yml@develop
     with:
       destroy: true
       semver: 0.1.0-SNAPSHOT-PR${{ github.event.pull_request.number }}-${{ github.run_number }}
@@ -174,7 +143,7 @@ jobs:
       - data
       - build-data
     if: needs.data.outputs.cloud == 'AWS' && needs.build-data.outputs.has_preview
-    uses: {{REPO_OWNER}}/base-app-template/.github/workflows/preview-aws.yml@v4
+    uses: {{REPO_OWNER}}/base-app-template/.github/workflows/preview-aws.yml@develop
     with:
       destroy: true
       semver: 0.1.0-SNAPSHOT-PR${{ github.event.pull_request.number }}-${{ github.run_number }}
