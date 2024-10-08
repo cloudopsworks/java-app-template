@@ -172,14 +172,14 @@ jobs:
 
       # Get Snyk Configuration is enabled
       - name: Get Pipeline conf Snyk is Disabled
-        id: sonarqube_enabled
+        id: snyk_enabled
         uses: mikefarah/yq@master
         with:
           cmd: yq e '.snyk.enabled and true' ./.github/vars/inputs-global.yaml
 
       # Get Semgrep Configuration is disabled
       - name: Get Pipeline conf Semgrep is Disabled
-        id: sonarqube_enabled
+        id: semgrep_enabled
         uses: mikefarah/yq@master
         with:
           cmd: yq e '.semgrep.enabled and true' ./.github/vars/inputs-global.yaml
