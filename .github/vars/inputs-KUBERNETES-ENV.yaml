@@ -23,6 +23,7 @@ helm_values_overrides:
 # and created as secrets in the Kubernetes cluster, then inyected as environment variables
 # For Azure:
 #azure:
+#  resource_group: RESOURCE_GROUP
 #  keyvayult_name: KEYVAULT_NAME
 #  keyvault_secret_filter: KEYVAULT_SECRET_FILTER
 #  pod_identity:
@@ -32,6 +33,7 @@ helm_values_overrides:
 # For AWS
 #aws:
 #  region: AWS_REGION
+#  sts_role_arn: AWS_STS_ROLE_ARN
 #  secrets_path_filter: /secrets
 #  pod_identity:
 #    enabled: true

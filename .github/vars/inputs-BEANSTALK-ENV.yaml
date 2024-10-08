@@ -2,6 +2,9 @@ environment: "dev|uat|prod|demo"
 runner_set: "RUNNER-ENV"
 versions_bucket: "VERSIONS_BUCKET"
 #logs_bucket: "LOGS_BUCKET"
+aws:
+  region: "AWS_REGION"
+  sts_role_arn: "AWS_STS_ROLE_ARN"
 dns:
   enabled: true
   private_zone: false
