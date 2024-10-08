@@ -43,6 +43,7 @@ jobs:
     if: ${{ needs.data.outputs.hasQualifier != 'true' }}
     with:
       buildEnvironment: ${{ needs.data.outputs.deploymentName }}
+      isContainerized: ${{ needs.data.outputs.cloud_type == 'eks' || needs.data.outputs.cloud_type == 'aks' || needs.data.outputs.cloud_type == 'gke' || needs.data.outputs.cloud_type == 'kubernetes' }}
       environment: ${{ needs.data.outputs.environment }}
       targetName: ${{ needs.data.outputs.targetName }}
       isRelease: ${{ needs.data.outputs.isRelease == 'true' }}

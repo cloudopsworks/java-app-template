@@ -60,6 +60,7 @@ jobs:
       environment: ${{ needs.data.outputs.environment }}
       targetName: ${{ needs.data.outputs.targetName }}
       isRelease: false
+      isContainerized: ${{ needs.data.outputs.cloud_type == 'eks' || needs.data.outputs.cloud_type == 'aks' || needs.data.outputs.cloud_type == 'gke' || needs.data.outputs.cloud_type == 'kubernetes' }}
       DOCKER_REGISTRY_ADDRESS: ${{ needs.data.outputs.dockerRegistry != '' && needs.data.outputs.dockerRegistry || vars.DOCKER_REGISTRY_ADDRESS }}
       HELM_REGISTRY_ADDRESS: ${{ needs.data.outputs.helmRegistry != '' && needs.data.outputs.helmRegistry || vars.HELM_REGISTRY_ADDRESS }}
       BOT_USER: ${{ vars.BOT_USER }}

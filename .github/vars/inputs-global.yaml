@@ -69,6 +69,6 @@ repository_owner: "REPO_OWNER" # Required
 # Target Cloud
 cloud: aws | azure | gcp
 # Cloud deployment type depends on the target cloud
-cloud_type: elasticbeanstalk | eks | lambda | aks | webapp | function | gke | function
+cloud_type: elasticbeanstalk | eks | lambda | aks | webapp | function | gke | function | kubernetes
 # Indicate the Runner that will be used for the deployment - usually will be a hosted runner
 # runner_set: "arc-runner-set"

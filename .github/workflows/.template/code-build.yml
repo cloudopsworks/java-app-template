@@ -21,6 +21,10 @@ on:
       isRelease:
         required: true
         type: boolean
+      isContainerized:
+        required: false
+        type: boolean
+        default: false
       DOCKER_REGISTRY_ADDRESS:
         required: true
         type: string
@@ -60,9 +64,6 @@ on:
       has_preview:
         description: "Has Preview output"
         value: ${{ jobs.pipeline-config.outputs.has_preview }}
-      pipeline_docker:
-        description: "Pipeline with Docker Enabled"
-        value: ${{ jobs.pipeline-config.outputs.pipeline_docker }}
       pipeline_sonarqube:
         description: "Pipeline with Sonarqube Analysis Enabled"
         value: ${{ jobs.pipeline-config.outputs.pipeline_sonarqube }}
@@ -324,7 +325,7 @@ jobs:
     needs:
       - pipeline-config
       - build
-    if: needs.pipeline-config.outputs.pipeline_docker == 'true'
+    if: needs.pipeline-config.outputs.has_preview == 'true' || ${{ inputs.isContainerized }}
     uses: cloudopsworks/base-app-template/.github/workflows/docker-build-java.yml@develop
     with:
       DOCKER_REGISTRY_ADDRESS: ${{ inputs.DOCKER_REGISTRY_ADDRESS }}
