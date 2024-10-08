@@ -72,6 +72,12 @@ on:
       pipeline_dtrack_project_type:
         description: "Pipeline classification for DependencyTrack Analysis, blank when dtrack is disabled"
         value: ${{ jobs.pipeline-config.outputs.pipeline_dtrack_project_type }}
+      pipeline_snyk:
+        description: "Pipeline with Snyk Analysis Enabled"
+        value: ${{ jobs.pipeline-config.outputs.pipeline_snyk }}
+      pipeline_semgrep:
+        description: "Pipeline with Semgrep Analysis Enabled"
+        value: ${{ jobs.pipeline-config.outputs.pipeline_semgrep }}
       semver:
         description: "Semver Output calculated on Build"
         value: ${{ jobs.build.outputs.semver }}
@@ -83,9 +89,10 @@ jobs:
   pipeline-config:
     outputs:
       has_preview: ${{ steps.has_preview.outputs.result }} # true | false
-      pipeline_docker: ${{ steps.pipeline_docker.outputs.result == 1 }} # true | false
-      pipeline_sonarqube: ${{ steps.disable_sonarqube.outputs.result }} # true | false
-      pipeline_dtrack: ${{ steps.disable_dtrack.outputs.result }} # true | false
+      pipeline_sonarqube: ${{ steps.sonarqube_enabled.outputs.result }} # true | false
+      pipeline_dtrack: ${{ steps.dtrack_enabled.outputs.result }} # true | false
+      pipeline_snyk: ${{ steps.snyk_enabled.outputs.result }} # true | false
+      pipeline_semgrep: ${{ steps.semgrep_enabled.outputs.result }} # true | false
       pipeline_dtrack_project_type: ${{ steps.dtrack_project_type.outputs.type }}
       package_name: ${{ steps.package_name.outputs.result }}
       exclude_globs: ${{ steps.exclude_globs.outputs.result }}
@@ -140,21 +147,21 @@ jobs:
         id: is_library
         uses: mikefarah/yq@master
         with:
-          cmd: yq e '.isLibrary // "false"' ./.github/vars/inputs-global.yaml
+          cmd: yq e '.isLibrary and true' ./.github/vars/inputs-global.yaml
 
       # Get Sonarqube Configuration is disabled
       - name: Get Pipeline conf Sonarqube is Disabled
-        id: disable_sonarqube
+        id: sonarqube_enabled
         uses: mikefarah/yq@master
         with:
-          cmd: yq e '.sonarqube.enabled // "true"' ./.github/vars/inputs-global.yaml
+          cmd: yq e '.sonarqube.enabled and true' ./.github/vars/inputs-global.yaml
 
       # Get DependencyTrack Configuration is disabled
       - name: Get Pipeline conf DependencyTrack is Disabled
-        id: disable_dtrack
+        id: dtrack_enabled
         uses: mikefarah/yq@master
         with:
-          cmd: yq e '.dependencyTrack.enabled // "true"' ./.github/vars/inputs-global.yaml
+          cmd: yq e '.dependencyTrack.enabled and true' ./.github/vars/inputs-global.yaml
 
       # Get DependencyTrack project type configuration, default is null
       - name: Get Pipeline conf DependencyTrack Project type
@@ -162,6 +169,20 @@ jobs:
         uses: mikefarah/yq@master
         with:
           cmd: yq e '.dependencyTrack.type // "Application"' ./.github/vars/inputs-global.yaml
+
+      # Get Snyk Configuration is enabled
+      - name: Get Pipeline conf Snyk is Disabled
+        id: sonarqube_enabled
+        uses: mikefarah/yq@master
+        with:
+          cmd: yq e '.snyk.enabled and true' ./.github/vars/inputs-global.yaml
+
+      # Get Semgrep Configuration is disabled
+      - name: Get Pipeline conf Semgrep is Disabled
+        id: sonarqube_enabled
+        uses: mikefarah/yq@master
+        with:
+          cmd: yq e '.semgrep.enabled and true' ./.github/vars/inputs-global.yaml
 
       # Get pipeline conf
       - name: Get pipeline zip packaging globs

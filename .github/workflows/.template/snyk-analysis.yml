@@ -13,18 +13,18 @@ on:
       semver:
         required: false
         type: string
-      sonarqubeUrl:
+      snyk_url:
         required: true
         type: string
 
     secrets:
-      BOT_TOKEN:
+      token:
         required: true
-      sonarqubeToken:
+      snyk_token:
         required: true
 
 jobs:
-  sonarqube:
+  snyk:
     runs-on: ubuntu-latest
     steps:
       # Proceed with checkout of source with all the references (depth=0)  
@@ -78,25 +78,25 @@ jobs:
       - name: Run Versioning setup
         run: make version
 
-      # Test the code!
-      - name: Static Test Code
-        env:
-          JAVA_OPTIONS: "-XX:+UnlockExperimentalVMOptions -Dsun.zip.disableMemoryMapping=true -XX:+UseParallelGC -XX:MinHeapFreeRatio=5 -XX:MaxHeapFreeRatio=10 -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -Xms128m -Xmx2048m"
-          SONARQUBE_URL: ${{ inputs.sonarqubeUrl }}
-          SONARQUBE_TOKEN: ${{ secrets.sonarqubeToken }}
-        run: |
-          mvn --batch-mode verify
-      - name: Sonar Scan
-        uses: sonarsource/sonarqube-scan-action@v2
-        env:
-          SONAR_TOKEN: ${{ secrets.sonarqubeToken }}
-          SONAR_HOST_URL: ${{ inputs.sonarqubeUrl }}
-        with:
-          projectBaseDir: .
-          args: >
-            -Dsonar.projectKey=${{ steps.package_key.outputs.result }}
-            -Dsonar.projectVersion=${{ inputs.semver }}
-            -Dsonar.sources=src/main/java
-            -Dsonar.java.binaries=target/classes
-            -Dsonar.language=java
-#            -Dsonar.branch.name=${{ github.ref }}
+#      # Test the code!
+#      - name: Static Test Code
+#        env:
+#          JAVA_OPTIONS: "-XX:+UnlockExperimentalVMOptions -Dsun.zip.disableMemoryMapping=true -XX:+UseParallelGC -XX:MinHeapFreeRatio=5 -XX:MaxHeapFreeRatio=10 -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -Xms128m -Xmx2048m"
+#          SONARQUBE_URL: ${{ inputs.sonarqubeUrl }}
+#          SONARQUBE_TOKEN: ${{ secrets.sonarqubeToken }}
+#        run: |
+#          mvn --batch-mode verify
+#      - name: Sonar Scan
+#        uses: sonarsource/sonarqube-scan-action@v2
+#        env:
+#          SONAR_TOKEN: ${{ secrets.sonarqubeToken }}
+#          SONAR_HOST_URL: ${{ inputs.sonarqubeUrl }}
+#        with:
+#          projectBaseDir: .
+#          args: >
+#            -Dsonar.projectKey=${{ steps.package_key.outputs.result }}
+#            -Dsonar.projectVersion=${{ inputs.semver }}
+#            -Dsonar.sources=src/main/java
+#            -Dsonar.java.binaries=target/classes
+#            -Dsonar.language=java
+##            -Dsonar.branch.name=${{ github.ref }}

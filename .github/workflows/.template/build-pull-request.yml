@@ -123,16 +123,44 @@ jobs:
       AWS_ACCESS_KEY_ID: ${{ secrets.PREVIEW_AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.PREVIEW_AWS_SECRET_ACCESS_KEY }}
 
-  static-analysis:
+  snyk-analysis:
+    needs:
+      - data
+      - build
+    if: ${{ needs.build.outputs.pipeline_snyk == 'true' && needs.data.outputs.hasQualifier != 'true' }}
+    uses: ./.github/workflows/snyk-analysis.yml
+    with:
+      ref: ${{ github.head_ref }}
+      semver: ${{ needs.build.outputs.semver }}
+      snyk_url: ${{ vars.SNYK_URL }}
+    secrets:
+      token: ${{ secrets.BOT_TOKEN }}
+      snyk_token: ${{ secrets.SNYK_TOKEN }}
+
+  semgrep-analysis:
+    needs:
+      - data
+      - build
+    if: ${{ needs.build.outputs.pipeline_semgrep == 'true' && needs.data.outputs.hasQualifier != 'true' }}
+    uses: ./.github/workflows/semgrep-analysis.yml
+    with:
+      ref: ${{ github.head_ref }}
+      semver: ${{ needs.build.outputs.semver }}
+      semgrep_url: ${{ vars.SEMGREP_URL }}
+    secrets:
+      token: ${{ secrets.BOT_TOKEN }}
+      semgrep_token: ${{ secrets.SEMGREP_TOKEN }}
+
+  sonar-analysis:
     needs:
       - build
     if: needs.build.outputs.pipeline_sonarqube == 'true'
-    uses: ./.github/workflows/static-analysis.yml
+    uses: ./.github/workflows/sonar-analysis.yml
     with:
       ref: ${{ github.head_ref }}
       sonarqubeUrl: ${{ vars.SONARQUBE_URL }}
     secrets:
-      BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+      token: ${{ secrets.BOT_TOKEN }}
       sonarqubeToken: ${{ secrets.SONARQUBE_TOKEN }}
 
   dependency-track:
