@@ -16,6 +16,9 @@ on:
       sonarqubeUrl:
         required: true
         type: string
+      source_artifacts:
+        required: true
+        type: string
 
     secrets:
       token:
