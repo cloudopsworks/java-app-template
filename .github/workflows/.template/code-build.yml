@@ -88,8 +88,12 @@ on:
       artifacts_name:
         description: "Artifacts Name Output calculated on Build"
         value: ${{ jobs.pipeline-config.outputs.artifacts_name }}
+      source_artifacts_name:
+        description: "Source Artifacts Name Output calculated on Build"
+        value: ${{ jobs.pipeline-config.outputs.source_artifacts_name }}
 env:
   artifacts_name: all_artifacts
+  sources_artifacts_name: all_sources
 jobs:
   pipeline-config:
     outputs:
@@ -113,6 +117,7 @@ jobs:
       repository_name: ${{ steps.getowner.outputs.repo_name }}
       custom_run_command: ${{ steps.custom_run_command.outputs.result }}
       artifacts_name: ${{ env.artifacts_name }}
+      source_artifacts_name: ${{ env.sources_artifacts_name }}
     runs-on: ubuntu-latest
     steps:
       # Proceed with checkout of source with all the references (depth=0)
@@ -325,6 +330,15 @@ jobs:
           retention-days: 1
           include-hidden-files: true
           compression-level: '1' #fast
+
+      # Perform of upload of sources
+      - name: Upload Sources to workflow
+        uses: actions/upload-artifact@v4
+        path: |
+          .
+          !target/**
+        with:
+          name: ${{ env.sources_artifacts_name }}
 
   docker-build:
     needs:

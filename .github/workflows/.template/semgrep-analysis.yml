@@ -24,13 +24,11 @@ on:
         required: true
 
 jobs:
-  semgrep:
+  prepare-scan:
     runs-on: ubuntu-latest
-    container:
-      image: semgrep/semgrep
     if: (github.actor != 'dependabot[bot]')
     steps:
-      # Proceed with checkout of source with all the references (depth=0)  
+      # Proceed with checkout of source with all the references (depth=0)
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
@@ -80,6 +78,15 @@ jobs:
       # Run versioning to tag the source
       - name: Run Versioning setup
         run: mvn --batch-mode versions:set -DnewVersion=$(echo "${{ inputs.semver }}" | sed 's/^v//')
+
+      # Upload artifacts to
+
+  semgrep:
+    runs-on: ubuntu-latest
+    container:
+      image: semgrep/semgrep
+    if: (github.actor != 'dependabot[bot]')
+    steps:
 
       # Scan the code with semgrep
       - name: Semgrep Scan
