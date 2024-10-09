@@ -100,6 +100,7 @@ jobs:
       ref: ${{ github.head_ref }}
       semver: ${{ needs.build.outputs.semver }}
       snyk_url: ${{ vars.SNYK_URL }}
+      sources_artifacts: ${{ needs.build.outputs.sources_artifacts }}
     secrets:
       token: ${{ secrets.BOT_TOKEN }}
       snyk_token: ${{ secrets.SNYK_TOKEN }}
