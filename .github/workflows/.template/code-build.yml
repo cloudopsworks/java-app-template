@@ -334,11 +334,14 @@ jobs:
       # Perform of upload of sources
       - name: Upload Sources to workflow
         uses: actions/upload-artifact@v4
-        path: |
-          .
-          !target/**
         with:
           name: ${{ env.sources_artifacts_name }}
+          path: |
+            **
+            !target/**
+          retention-days: 1
+          include-hidden-files: true
+          compression-level: '1' #fast
 
   docker-build:
     needs:
