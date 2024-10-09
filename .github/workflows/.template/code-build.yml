@@ -339,8 +339,7 @@ jobs:
           path: |
             **
             !target/**
-            !.git/**
-            !.github/**
+            ${{ needs.pipeline-config.outputs.exclude_globs }}
           retention-days: 1
           include-hidden-files: true
           compression-level: '1' #fast
