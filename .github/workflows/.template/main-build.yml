@@ -187,6 +187,7 @@ jobs:
       AWS_REGION: ${{ needs.data.outputs.awsRegion != '' && needs.data.outputs.awsRegion || vars.DEPLOYMENT_AWS_REGION }}
       STS_ROLE_ARN: ${{ needs.data.outputs.awsStsRoleArn != '' && needs.data.outputs.awsStsRoleArn || vars.DEPLOYMENT_AWS_STS_ROLE_ARN }}
       AZURE_RG: ${{ needs.data.outputs.azureResourceGroup != '' && needs.data.outputs.azureResourceGroup || vars.DEPLOYMENT_AZURE_RG }}
+      download_artifacts: ${{ needs.build.outputs.artifacts_name }}
     secrets:
       token: ${{ secrets.BOT_TOKEN }}
       AWS_ACCESS_KEY_ID: ${{ secrets.TF_AWS_ACCESS_KEY_ID }}
@@ -218,6 +219,7 @@ jobs:
       AWS_REGION: ${{ needs.data.outputs.awsRegion != '' && needs.data.outputs.awsRegion || vars.DEPLOYMENT_AWS_REGION }}
       STS_ROLE_ARN: ${{ needs.data.outputs.awsStsRoleArn != '' && needs.data.outputs.awsStsRoleArn || vars.DEPLOYMENT_AWS_STS_ROLE_ARN }}
       AZURE_RG: ${{ needs.data.outputs.azureResourceGroup != '' && needs.data.outputs.azureResourceGroup || vars.DEPLOYMENT_AZURE_RG }}
+      download_artifacts: ${{ needs.build.outputs.artifacts_name }}
     secrets:
       token: ${{ secrets.BOT_TOKEN }}
       AWS_ACCESS_KEY_ID: ${{ secrets.TF_AWS_ACCESS_KEY_ID }}
