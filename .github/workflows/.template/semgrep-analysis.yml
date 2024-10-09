@@ -16,7 +16,7 @@ on:
       semgrep_url:
         required: true
         type: string
-      sources_artifacts:
+      source_artifacts:
         required: true
         type: string
 
@@ -37,7 +37,7 @@ jobs:
       - name: Download sources
         uses: actions/download-artifact@v4
         with:
-          name: ${{ inputs.sources_artifacts }}
+          name: ${{ inputs.source_artifacts }}
 
       # Scan the code with semgrep
       - name: Semgrep Scan
