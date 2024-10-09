@@ -339,6 +339,8 @@ jobs:
           path: |
             **
             !target/**
+            !.git/**
+            !.github/**
           retention-days: 1
           include-hidden-files: true
           compression-level: '1' #fast
