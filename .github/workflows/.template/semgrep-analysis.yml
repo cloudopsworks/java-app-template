@@ -79,7 +79,7 @@ jobs:
 
       # Run versioning to tag the source
       - name: Run Versioning setup
-        run: make version
+        run: mvn --batch-mode versions:set -DnewVersion=$(echo "${{ inputs.semver }}" | sed 's/^v//')
 
       # Scan the code with semgrep
       - name: Semgrep Scan
