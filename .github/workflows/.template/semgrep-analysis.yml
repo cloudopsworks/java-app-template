@@ -16,6 +16,9 @@ on:
       semgrep_url:
         required: true
         type: string
+      sources_artifacts:
+        required: true
+        type: string
 
     secrets:
       token:
@@ -24,69 +27,17 @@ on:
         required: true
 
 jobs:
-  prepare-scan:
-    runs-on: ubuntu-latest
-    if: (github.actor != 'dependabot[bot]')
-    steps:
-      # Proceed with checkout of source with all the references (depth=0)
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          token: ${{ secrets.token }}
-          ref: ${{ inputs.ref }}
-      # Get pipeline conf java version
-      - name: Get pipeline node version
-        id: java_version
-        uses: mikefarah/yq@master
-        with:
-          cmd: yq e '.java.version // "21"' ./.github/vars/inputs-global.yaml
-      # Get pipeline conf node dist
-      - name: Get pipeline java dist
-        id: java_dist
-        uses: mikefarah/yq@master
-        with:
-          cmd: yq e '.java.dist // "temurin"' ./.github/vars/inputs-global.yaml
-      # Setup Java JDK for builds
-      - name: Set JDK
-        uses: actions/setup-java@v4
-        with:
-          java-version: "${{ steps.java_version.outputs.result }}"
-          distribution: "${{ steps.java_dist.outputs.result }}"
-      # Cache all maven packages
-      - name: Cache Maven packages
-        uses: actions/cache@v4
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-maven-
-
-      # Get the Package key from pom.xml
-      - name: Get Package name
-        id: package_key
-        uses: mikefarah/yq@master
-        with:
-          cmd: yq e -oy '.project.groupId + ":" + .project.artifactId' pom.xml
-
-      # Get the Package name from pom.xml
-      - name: Get Package Description
-        id: package_name
-        uses: mikefarah/yq@master
-        with:
-          cmd: yq e -oy '.project.name' pom.xml
-
-      # Run versioning to tag the source
-      - name: Run Versioning setup
-        run: mvn --batch-mode versions:set -DnewVersion=$(echo "${{ inputs.semver }}" | sed 's/^v//')
-
-      # Upload artifacts to
-
   semgrep:
     runs-on: ubuntu-latest
     container:
       image: semgrep/semgrep
     if: (github.actor != 'dependabot[bot]')
     steps:
+      # Proceed with download of artifacts
+      - name: Download sources
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.sources_artifacts }}
 
       # Scan the code with semgrep
       - name: Semgrep Scan

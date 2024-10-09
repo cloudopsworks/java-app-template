@@ -16,6 +16,9 @@ on:
       snyk_url:
         required: true
         type: string
+      sources_artifacts:
+        required: true
+        type: string
 
     secrets:
       token:
