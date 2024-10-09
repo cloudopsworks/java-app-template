@@ -28,9 +28,11 @@ on:
 
 jobs:
   semgrep:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     container:
       image: semgrep/semgrep
+    env:
+      SEMGREP_APP_TOKEN: ${{ secrets.semgrep_token }}
     if: (github.actor != 'dependabot[bot]')
     steps:
       # Proceed with checkout of source with all the references (depth=0)
@@ -48,6 +50,4 @@ jobs:
 
       # Scan the code with semgrep
       - name: Semgrep Scan
-        env:
-          SEMGREP_TOKEN: ${{ secrets.semgrep_token }}
         run: semgrep ci
