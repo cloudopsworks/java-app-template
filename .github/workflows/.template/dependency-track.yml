@@ -22,6 +22,9 @@ on:
       dependencyTrackUrl:
         required: true
         type: string
+      source_artifacts:
+        required: true
+        type: string
 
     secrets:
       BOT_TOKEN:
