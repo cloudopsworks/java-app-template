@@ -90,6 +90,7 @@ jobs:
       HELM_REGISTRY_ADDRESS: ${{ needs.data.outputs.helmRegistry != '' && needs.data.outputs.helmRegistry || vars.HELM_REGISTRY_ADDRESS }}
       BOT_USER: ${{ vars.BOT_USER }}
       BOT_EMAIL: ${{ vars.BOT_EMAIL }}
+      TARGET_CLOUD: ${{ needs.data.outputs.cloud }}
       AZ_AKS_CLUSTER_NAME: ${{ vars.PREVIEW_AZURE_AKS_CLUSTER_NAME }}
       AZ_AKS_RESOURCE_GROUP: ${{ vars.PREVIEW_AZURE_RESOURCE_GROUP }}
       RANCHER_PROJECT_ID: ${{ vars.PREVIEW_RANCHER_PROJECT_ID }}
