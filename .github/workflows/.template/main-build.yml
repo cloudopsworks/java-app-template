@@ -37,7 +37,7 @@ jobs:
     uses: {{REPO_OWNER}}/base-app-template/.github/workflows/cd-data.yml@develop
     if: |
       github.event_name == 'create' && 
-      (startsWith(github.ref, 'refs/heads/support/') || startsWith(github.ref, 'refs/heads/releases/')) ||
+      (startsWith(github.event.ref, 'refs/heads/support/') || startsWith(github.event.ref, 'refs/heads/releases/')) ||
       github.event_name == 'push'
     secrets:
       token: ${{ secrets.BOT_TOKEN_SCOPED }}
@@ -48,7 +48,7 @@ jobs:
     uses: ./.github/workflows/code-build.yml
     if: |
       github.event_name == 'create' && 
-      (startsWith(github.ref, 'refs/heads/support/') || startsWith(github.ref, 'refs/heads/releases/')) ||
+      (startsWith(github.event.ref, 'refs/heads/support/') || startsWith(github.event.ref, 'refs/heads/releases/')) ||
       github.event_name == 'push'
     with:
       buildEnvironment: ${{ needs.data.outputs.deploymentName }}
