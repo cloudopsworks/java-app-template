@@ -40,7 +40,6 @@ jobs:
     needs:
       - data
     uses: ./.github/workflows/code-build.yml
-    if: ${{ needs.data.outputs.hasQualifier != 'true' }}
     with:
       buildEnvironment: ${{ needs.data.outputs.deploymentName }}
       isContainerized: ${{ needs.data.outputs.cloud_type == 'eks' || needs.data.outputs.cloud_type == 'aks' || needs.data.outputs.cloud_type == 'gke' || needs.data.outputs.cloud_type == 'kubernetes' }}
@@ -66,7 +65,7 @@ jobs:
       - data
       - build
     uses: {{REPO_OWNER}}/base-app-template/.github/workflows/create-release.yml@develop
-    if: ${{ needs.data.outputs.hasQualifier != 'true' && startsWith(github.ref,'refs/tags/') }}
+    if: ${{ startsWith(github.ref,'refs/tags/') }}
     with:
       ref_name: ${{ needs.build.outputs.semver }}
       release-tag: ${{ needs.build.outputs.semver }}
@@ -83,7 +82,7 @@ jobs:
       - build
       - release
     uses: {{REPO_OWNER}}/base-app-template/.github/workflows/clean-old-packages.yml@develop
-    if: ${{ needs.data.outputs.hasQualifier != 'true' }}
+    if: ${{ needs.data.outputs.hasQualifier != 'true' && needs.data.outputs.isLibrary == 'true'}}
     with:
       package_name: ${{ needs.build.outputs.package_name }}
       package_type: maven
@@ -173,8 +172,9 @@ jobs:
       - build
       - release
     uses: {{REPO_OWNER}}/base-app-template/.github/workflows/deploy.yml@develop
-    if: ${{ needs.data.outputs.isEnabled == 'true' && needs.data.outputs.hasQualifier != 'true' && needs.data.outputs.isLibrary != 'true' }}
+    if: ${{ needs.data.outputs.isEnabled == 'true' && needs.data.outputs.isLibrary != 'true' }}
     with:
+      is_release: true
       release_version: ${{ needs.build.outputs.semver }}
       release_name: ${{ needs.data.outputs.targetName }}
       environment: ${{ needs.data.outputs.environment }}
@@ -208,54 +208,11 @@ jobs:
     uses: {{REPO_OWNER}}/base-app-template/.github/workflows/deploy.yml@develop
     if: ${{ needs.data.outputs.isEnabled == 'true' && needs.data.outputs.isLibrary != 'true' && ( startsWith(github.ref,'refs/heads/release/') || startsWith(github.ref,'refs/heads/develop') || startsWith(github.ref,'refs/heads/support/') ) }}
     with:
+      is_release: false
       release_version: ${{ needs.build.outputs.semver }}
       release_name: ${{ needs.data.outputs.targetName }}
       environment: ${{ needs.data.outputs.environment }}
       package_name: ${{ needs.build.outputs.package_name }}
-      package_type: MAVEN
-      deployment_name: ${{ needs.data.outputs.deploymentName }}
-      target_cloud: ${{ needs.data.outputs.cloud }}
-      target_cloud_type: ${{ needs.data.outputs.cloudType }}
-      apis_enabled: ${{ needs.data.outputs.apisEnabled == 'true' }}
-      runner_set: ${{ needs.data.outputs.runnerSet != '' && needs.data.outputs.runnerSet || vars.DEPLOYMENT_RUNNER_SET }}
-      DOCKER_REGISTRY_ADDRESS: ${{ needs.data.outputs.dockerRegistry != '' && needs.data.outputs.dockerRegistry || vars.DOCKER_REGISTRY_ADDRESS }}
-      HELM_REGISTRY_ADDRESS: ${{ needs.data.outputs.helmRegistry != '' && needs.data.outputs.helmRegistry || vars.HELM_REGISTRY_ADDRESS }}
-      BOT_USER: ${{ vars.BOT_USER }}
-      BOT_EMAIL: ${{ vars.BOT_EMAIL }}
-      AWS_REGION: ${{ needs.data.outputs.awsRegion != '' && needs.data.outputs.awsRegion || vars.DEPLOYMENT_AWS_REGION }}
-      STS_ROLE_ARN: ${{ needs.data.outputs.awsStsRoleArn != '' && needs.data.outputs.awsStsRoleArn || vars.DEPLOYMENT_AWS_STS_ROLE_ARN }}
-      AZURE_RG: ${{ needs.data.outputs.azureResourceGroup != '' && needs.data.outputs.azureResourceGroup || vars.DEPLOYMENT_AZURE_RG }}
-      download_artifacts: ${{ needs.build.outputs.artifacts_name }}
-      source_artifacts: ${{ needs.build.outputs.source_artifacts_name }}
-    secrets:
-      token: ${{ secrets.BOT_TOKEN }}
-      AWS_ACCESS_KEY_ID: ${{ secrets.TF_AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.TF_AWS_SECRET_ACCESS_KEY }}
-      AZURE_SERVICE_ID: ${{ secrets.AZURE_SERVICE_ID }}
-      AZURE_SERVICE_SECRET: ${{ secrets.AZURE_SERVICE_SECRET }}
-
-  # Deploy only on qualifier setting
-  deploy-only:
-    needs:
-      - data
-    if: ${{ needs.data.outputs.isEnabled == 'true' && needs.data.outputs.hasQualifier == 'true'  && needs.data.outputs.isLibrary != 'true' }}
-    uses: ./.github/workflows/code-version.yml
-    with:
-      deployment_name: ${{ needs.data.outputs.deploymentName }}
-    secrets:
-      token: ${{ secrets.BOT_TOKEN }}
-
-  deploy-version:
-    needs:
-      - data
-      - deploy-only
-    if: ${{ needs.data.outputs.isEnabled == 'true' && needs.data.outputs.hasQualifier == 'true' && needs.data.outputs.isLibrary != 'true' }}
-    uses: {{REPO_OWNER}}/base-app-template/.github/workflows/deploy.yml@develop
-    with:
-      release_version: ${{ needs.version-delivery.outputs.semver }}
-      release_name: ${{ needs.data.outputs.targetName }}
-      environment: ${{ needs.data.outputs.environment }}
-      package_name: ${{ needs.version-delivery.outputs.package_name }}
       package_type: MAVEN
       deployment_name: ${{ needs.data.outputs.deploymentName }}
       target_cloud: ${{ needs.data.outputs.cloud }}
@@ -313,9 +270,9 @@ jobs:
   deploy-apis-only:
     needs:
       - data
-      - deploy-only
+      - build
     uses: {{REPO_OWNER}}/base-app-template/.github/workflows/deploy-apis.yml@develop
-    if: ${{ needs.data.outputs.isEnabled == 'true' && needs.data.outputs.apisEnabled == 'true' && needs.data.outputs.isLibrary != 'true' }}
+    if: ${{ needs.data.outputs.isEnabled == 'true' && needs.data.outputs.apisEnabled == 'true' && needs.data.outputs.hasQualifier == 'true' && needs.data.outputs.isLibrary != 'true' }}
     with:
       release_version: ${{ needs.build.outputs.semver }}
       release_name: ${{ needs.data.outputs.targetName }}
