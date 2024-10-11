@@ -20,8 +20,11 @@ on:
         type: string
         description: Lock ID for the environment
         required: true
-
-
+      qualifier:
+        type: string
+        description: Qualifier for the lock (green/bluee)
+        required: false
+        default: ''
 
 concurrency: build-${{ github.repository }}-${{ github.ref }}
 
@@ -58,6 +61,7 @@ jobs:
     uses: {{REPO_OWNER}}/base-app-template/.github/workflows/iac-unlock.yml@develop
     with:
       lock_id: ${{ inputs.lockId }}
+      qualifier: ${{ inputs.qualifier }}
       release_version: ${{ needs.build-data.outputs.semver }}
       release_name: ${{ needs.data.outputs.targetName }}
       environment: ${{ needs.data.outputs.environment }}

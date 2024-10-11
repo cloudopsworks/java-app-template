@@ -16,8 +16,11 @@ on:
           - release/production
           - test/uat
           - prerelease/demo
-
-
+      qualifier:
+        type: string
+        description: Qualifier for the lock (green/bluee)
+        required: false
+        default: ''
 
 concurrency: build-${{ github.repository }}-${{ github.ref }}
 
@@ -53,6 +56,7 @@ jobs:
       - build-data
     uses: {{REPO_OWNER}}/base-app-template/.github/workflows/iac-destroy.yml@develop
     with:
+      qualifier: ${{ inputs.qualifier }}
       release_version: ${{ needs.build-data.outputs.semver }}
       release_name: ${{ needs.data.outputs.targetName }}
       environment: ${{ needs.data.outputs.environment }}
