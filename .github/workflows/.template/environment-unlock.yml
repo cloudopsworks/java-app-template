@@ -16,6 +16,10 @@ on:
           - release/production
           - test/uat
           - prerelease/demo
+      lockId:
+        type: string
+        description: Lock ID for the environment
+        required: true
 
 
 
@@ -47,12 +51,13 @@ jobs:
     secrets:
       BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
 
-  destroy-environment:
+  unlock-environment:
     needs:
       - data
       - build-data
-    uses: {{REPO_OWNER}}/base-app-template/.github/workflows/destroy.yml@develop
+    uses: {{REPO_OWNER}}/base-app-template/.github/workflows/iac-unlock.yml@develop
     with:
+      lock_id: ${{ inputs.lockId }}
       release_version: ${{ needs.build-data.outputs.semver }}
       release_name: ${{ needs.data.outputs.targetName }}
       environment: ${{ needs.data.outputs.environment }}
