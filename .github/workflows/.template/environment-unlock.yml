@@ -3,7 +3,7 @@
 #            On GitHub: https://github.com/cloudopsworks
 #            Distributed Under Apache v2.0 License
 #
-name: Environment Destruction Process
+name: Environment IAC Unlock Process
 on:
   # Runs only on demand
   workflow_dispatch:
