@@ -38,7 +38,7 @@ jobs:
     if: |
       github.event_name == 'create' && 
       (startsWith(github.ref, 'refs/heads/support/') || startsWith(github.ref, 'refs/heads/release/')) ||
-      github.event_name == 'push'
+      (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
     secrets:
       token: ${{ secrets.BOT_TOKEN_SCOPED }}
 
@@ -49,7 +49,7 @@ jobs:
     if: |
       github.event_name == 'create' && 
       (startsWith(github.ref, 'refs/heads/support/') || startsWith(github.ref, 'refs/heads/release/')) ||
-      github.event_name == 'push'
+      (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
     with:
       buildEnvironment: ${{ needs.data.outputs.deploymentName }}
       isContainerized: ${{ needs.data.outputs.cloud_type == 'eks' || needs.data.outputs.cloud_type == 'aks' || needs.data.outputs.cloud_type == 'gke' || needs.data.outputs.cloud_type == 'kubernetes' }}
