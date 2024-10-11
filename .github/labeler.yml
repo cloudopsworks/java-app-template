@@ -4,7 +4,13 @@
 #            Distributed Under Apache v2.0 License
 #
 release:
-- ./*
+  - base-branch: [ 'main', 'master' ]
+
+feature:
+  - head-branch: [ '^feature' ]
+
+hotfix:
+  - head-branch: [ '^hotfix', '^fix' ]
 
 size-XS:
 - any: [ '*Dockerfile' ]
