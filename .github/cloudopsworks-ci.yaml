@@ -3,8 +3,6 @@
 #            On GitHub: https://github.com/cloudopsworks
 #            Distributed Under Apache v2.0 License
 #
-pipeline:
-  - docker # Comment in case of library
 zipGlobs:
   - target/*.jar
   - conf/**
