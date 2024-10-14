@@ -20,28 +20,16 @@ permissions:
   checks: write
 
 jobs:
-  project_data:
-    runs-on: ubuntu-latest
-    outputs:
-      project_name: ${{ steps.getowner.outputs.repo_name }}
-    steps:
-      # Get the owner repo
-      - name: Get owner
-        id: getowner
-        run: |
-          repo_owner=`echo "$GITHUB_REPOSITORY" | cut -f 1 -d "/"`
-          repo_name=`echo "$GITHUB_REPOSITORY" | cut -f 2 -d "/"`
-          echo "owner=$repo_owner" >> $GITHUB_OUTPUT
-          echo "repo_name=$repo_name" >> $GITHUB_OUTPUT
-
   data:
-    uses: {{REPO_OWNER}}/base-app-template/.github/workflows/cd-data.yml@v4
+    uses: {{REPO_OWNER}}/base-app-template/.github/workflows/cd-data.yml@v5
     secrets:
       token: ${{ secrets.BOT_TOKEN_SCOPED }}
 
   push_tag:
+    needs:
+      - data
     if: ${{ github.event.pull_request.merged == true && ( github.base_ref == 'master' || github.base_ref == 'main' || startsWith(github.base_ref,'support/') ) }}
-    uses: {{REPO_OWNER}}/base-app-template/.github/workflows/gitflow-push-tag.yml@v4
+    uses: {{REPO_OWNER}}/base-app-template/.github/workflows/gitflow-push-tag.yml@v5
     secrets:
       token: ${{ secrets.BOT_TOKEN }}
     with:
@@ -65,7 +53,9 @@ jobs:
 
       - name: Delete local & remote Release
         if: ${{ github.event.pull_request.merged == true && startsWith(github.head_ref, 'release/') && ( github.base_ref == 'master' || github.base_ref == 'main' || startsWith(github.base_ref,'support/') ) }}
-        run: make gitflow/release/purge
+        run: |
+          RELVER=$(echo "${{ github.head_ref }}" | sed -e 's/release\///g')
+          make gitflow/release/purge:$RELVER
 
       - name: Delete local & remote Hotfix
         if: ${{ github.event.pull_request.merged == true && startsWith(github.head_ref, 'hotfix/') && ( github.base_ref == 'master' || github.base_ref == 'main' || startsWith(github.base_ref,'support/') ) }}

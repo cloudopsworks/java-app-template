@@ -1,5 +1,8 @@
 environment: "dev|uat|prod|demo"
 runner_set: "RUNNER-ENV"
+aws:
+  region: "AWS_REGION"
+  sts_role_arn: "AWS_STS_ROLE_ARN"
 lambda:
   arch: x86_64 | arm64
   #  iam:

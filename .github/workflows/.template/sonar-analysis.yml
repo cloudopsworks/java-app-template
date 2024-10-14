@@ -3,7 +3,7 @@
 #            On GitHub: https://github.com/cloudopsworks
 #            Distributed Under Apache v2.0 License
 #
-name: Static Analysis Process
+name: Static Analysis Process - SonarQube
 on:
   workflow_call:
     inputs:
@@ -16,9 +16,12 @@ on:
       sonarqubeUrl:
         required: true
         type: string
+      source_artifacts:
+        required: true
+        type: string
 
     secrets:
-      BOT_TOKEN:
+      token:
         required: true
       sonarqubeToken:
         required: true

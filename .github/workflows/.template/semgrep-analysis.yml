@@ -1,0 +1,53 @@
+##
+# (c) 2024 - Cloud Ops Works LLC - https://cloudops.works/
+#            On GitHub: https://github.com/cloudopsworks
+#            Distributed Under Apache v2.0 License
+#
+name: Static Analysis Process - Semgrep
+on:
+  workflow_call:
+    inputs:
+      ref:
+        required: true
+        type: string
+      semver:
+        required: false
+        type: string
+      semgrep_url:
+        required: true
+        type: string
+      source_artifacts:
+        required: true
+        type: string
+
+    secrets:
+      token:
+        required: true
+      semgrep_token:
+        required: true
+
+jobs:
+  semgrep:
+    runs-on: ubuntu-20.04
+    container:
+      image: semgrep/semgrep
+    env:
+      SEMGREP_APP_TOKEN: ${{ secrets.semgrep_token }}
+    if: (github.actor != 'dependabot[bot]')
+    steps:
+      # Proceed with checkout of source with all the references (depth=0)
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.token }}
+          ref: ${{ inputs.ref }}
+
+      # Proceed with download of artifacts
+      - name: Download sources & Overwrite the existing files
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.source_artifacts }}
+
+      # Scan the code with semgrep
+      - name: Semgrep Scan
+        run: semgrep ci

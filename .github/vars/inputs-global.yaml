@@ -10,15 +10,23 @@ repository_owner: "REPO_OWNER" # Required
 #  dist: temurin
 #  image_variant: alpine
 #
-# Set Sonarqube processing to false if want to disable, the tool is enabled by default
-#sonarqube:
+# Set Snyk processing to true if want to enable, the tool is disabled by default
+#snyk:
 #  enabled: false
+#
+# Set Semgrep processing to true if want to enable, the tool is disabled by default
+#semgrep:
+#  enabled: false
+#
+# Set Sonarqube processing to true if want to enable, the tool is disabled by default
+#sonarqube:
+#  enabled: true
 #
 # Set DependencyTrack processing to false if want to disable, the tool is enabled by default
 # type: is one of => Library , Application , Container , Framework , Device , Firmware , File , Operating System
 #       Default type is Application
 #dependencyTrack:
-#  enabled: false
+#  enabled: true
 #  type: Application
 #
 # Set if this is a library project
@@ -45,3 +53,22 @@ repository_owner: "REPO_OWNER" # Required
 #
 # Optional Additional ENV variables
 #maven_options: "-T 1C -Dmaven.wagon.http.retryHandler.count=3"
+#
+# Preview configuration, if enabled will create a preview environment for each PR
+#preview:
+#  enabled: false
+#  kubernetes: true
+#  domain: example.com
+#
+# API Gateway configuration, if enabled will deploy apis to the environment api gateway
+# configuration is done under .github/vars/apigw/
+#apis:
+#  enabled: false
+#
+## CD pipeline configuration uncomment and configure accordingly to enable
+# Target Cloud
+cloud: aws | azure | gcp
+# Cloud deployment type depends on the target cloud
+cloud_type: elasticbeanstalk | eks | lambda | aks | webapp | function | gke | function | kubernetes
+# Indicate the Runner that will be used for the deployment - usually will be a hosted runner
+# runner_set: "arc-runner-set"
