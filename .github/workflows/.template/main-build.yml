@@ -34,7 +34,7 @@ permissions:
 
 jobs:
   data:
-    uses: {{REPO_OWNER}}/base-app-template/.github/workflows/cd-data.yml@develop
+    uses: {{REPO_OWNER}}/base-app-template/.github/workflows/cd-data.yml@v5
     if: |
       github.event_name == 'create' && 
       (startsWith(github.ref, 'refs/heads/support/') || startsWith(github.ref, 'refs/heads/release/')) ||
@@ -74,7 +74,7 @@ jobs:
     needs:
       - data
       - build
-    uses: {{REPO_OWNER}}/base-app-template/.github/workflows/create-release.yml@develop
+    uses: {{REPO_OWNER}}/base-app-template/.github/workflows/create-release.yml@v5
     if: ${{ startsWith(github.ref,'refs/tags/') }}
     with:
       ref_name: ${{ needs.build.outputs.semver }}
@@ -91,7 +91,7 @@ jobs:
       - data
       - build
       - release
-    uses: {{REPO_OWNER}}/base-app-template/.github/workflows/clean-old-packages.yml@develop
+    uses: {{REPO_OWNER}}/base-app-template/.github/workflows/clean-old-packages.yml@v5
     if: ${{ needs.data.outputs.hasQualifier != 'true' && needs.data.outputs.isLibrary == 'true'}}
     with:
       package_name: ${{ needs.build.outputs.package_name }}
@@ -181,7 +181,7 @@ jobs:
       - data
       - build
       - release
-    uses: {{REPO_OWNER}}/base-app-template/.github/workflows/deploy.yml@develop
+    uses: {{REPO_OWNER}}/base-app-template/.github/workflows/deploy.yml@v5
     if: ${{ needs.data.outputs.isEnabled == 'true' && needs.data.outputs.isLibrary != 'true' }}
     with:
       is_release: true
@@ -215,7 +215,7 @@ jobs:
     needs:
       - data
       - build
-    uses: {{REPO_OWNER}}/base-app-template/.github/workflows/deploy.yml@develop
+    uses: {{REPO_OWNER}}/base-app-template/.github/workflows/deploy.yml@v5
     if: ${{ needs.data.outputs.isEnabled == 'true' && needs.data.outputs.isLibrary != 'true' && ( startsWith(github.ref,'refs/heads/release/') || startsWith(github.ref,'refs/heads/develop') || startsWith(github.ref,'refs/heads/support/') ) }}
     with:
       is_release: false
@@ -250,7 +250,7 @@ jobs:
     needs:
       - data
       - build
-    uses: {{REPO_OWNER}}/base-app-template/.github/workflows/deploy-apis.yml@develop
+    uses: {{REPO_OWNER}}/base-app-template/.github/workflows/deploy-apis.yml@v5
     if: ${{ needs.data.outputs.isEnabled == 'true' && needs.data.outputs.apisEnabled == 'true' && needs.data.outputs.hasQualifier != 'true'  && needs.data.outputs.isLibrary != 'true' }}
     with:
       release_version: ${{ needs.build.outputs.semver }}
@@ -281,7 +281,7 @@ jobs:
     needs:
       - data
       - build
-    uses: {{REPO_OWNER}}/base-app-template/.github/workflows/deploy-apis.yml@develop
+    uses: {{REPO_OWNER}}/base-app-template/.github/workflows/deploy-apis.yml@v5
     if: ${{ needs.data.outputs.isEnabled == 'true' && needs.data.outputs.apisEnabled == 'true' && needs.data.outputs.hasQualifier == 'true' && needs.data.outputs.isLibrary != 'true' }}
     with:
       release_version: ${{ needs.build.outputs.semver }}
