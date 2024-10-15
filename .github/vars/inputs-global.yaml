@@ -45,6 +45,7 @@ repository_owner: "REPO_OWNER" # Required
 #  ARG1=value1
 #  ARG2=value2
 #  ARG3=value3
+#
 # Custom command that will be placed as startup script in dockerfile
 #custom_run_command: java -jar app.jar
 #

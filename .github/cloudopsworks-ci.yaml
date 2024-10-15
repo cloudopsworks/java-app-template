@@ -93,7 +93,6 @@ cd:
       # Sample variables to deploy into different account
       #  DEPLOYMENT_AWS_REGION: us-east-1
       #  DEPLOYMENT_STS_ROLE_ARN: arn:aws:iam::123456789012:role/TerraformAccessRole
-      #legacyDeliveryPush: true
       #enabled: false
       env: dev
       #targetName: dev-target
@@ -102,20 +101,17 @@ cd:
       #  var1: value1
       #  var2: value2
       #reviewers: false # defaults to true
-      #legacyDeliveryPush: true
       env: prod
       #targetName: prod-target
 #      targets:
 #        my-target:
 #          env: prod-my-target
 #          targetName: prod-my-target
-#          #legacyDeliveryPush: true
     test:
       #variables:
       #  var1: value1
       #  var2: value2
       #enabled: false
-      #legacyDeliveryPush: true
       env: uat
       #targetName: uat-target
     prerelease:
@@ -123,7 +119,6 @@ cd:
       #  var1: value1
       #  var2: value2
       #reviewers: false # defaults to true
-      #legacyDeliveryPush: true
       #enabled: false
       env: demo
       #targetName: demo-target
@@ -131,7 +126,6 @@ cd:
 #        my-target:
 #          env: demo-my-target
 #          targetName: demo-my-target
-#          #legacyDeliveryPush: true
     hotfix:
       env: hotfix
       #targetName: hotfix-target

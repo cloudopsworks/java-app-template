@@ -181,5 +181,5 @@ jobs:
       dependencyTrackUrl: ${{ vars.DEPENDENCYTRACK_URL }}
       source_artifacts: ${{ needs.build.outputs.source_artifacts_name }}
     secrets:
-      BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+      token: ${{ secrets.BOT_TOKEN }}
       dependencyTrackToken: ${{ secrets.DEPENDENCYTRACK_TOKEN }}

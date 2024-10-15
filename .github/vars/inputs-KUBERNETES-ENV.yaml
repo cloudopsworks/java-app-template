@@ -13,6 +13,8 @@ config_map:
 #helm_chart_path: CHART_PATH
 helm_values_overrides:
   'image.repository': REGISTRY/REPOSITORY
+#
+# Docker Arguments that will be passed to Docker Build Process
 #docker_args: |
 #  ARG1=value1
 #  ARG2=value2
