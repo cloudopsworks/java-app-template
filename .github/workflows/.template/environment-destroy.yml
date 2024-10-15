@@ -16,6 +16,13 @@ on:
           - release/production
           - test/uat
           - prerelease/demo
+      environment:
+        type: choice
+        description: Environment to destroy
+        options:
+          - dev
+          - uat
+          - prod
       qualifier:
         type: string
         description: Qualifier for the lock (green/bluee)
@@ -59,7 +66,7 @@ jobs:
       qualifier: ${{ inputs.qualifier }}
       release_version: ${{ needs.build-data.outputs.semver }}
       release_name: ${{ needs.data.outputs.targetName }}
-      environment: ${{ needs.data.outputs.environment }}
+      environment: ${{ inputs.environment }}
       package_name: ${{ needs.build-data.outputs.package_name }}
       package_type: MAVEN
       deployment_name: ${{ inputs.destroyedDeploymentName }}
