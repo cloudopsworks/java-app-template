@@ -83,7 +83,9 @@ jobs:
       HELM_REGISTRY_ADDRESS: ${{ needs.data.outputs.helmRegistry != '' && needs.data.outputs.helmRegistry || vars.HELM_REGISTRY_ADDRESS }}
       BOT_USER: ${{ vars.BOT_USER }}
       BOT_EMAIL: ${{ vars.BOT_EMAIL }}
-      AWS_REGION: ${{ vars.DEPLOYMENT_AWS_REGION }}
+      AWS_REGION: ${{ needs.data.outputs.awsRegion != '' && needs.data.outputs.awsRegion || vars.DEPLOYMENT_AWS_REGION }}
+      STS_ROLE_ARN: ${{ needs.data.outputs.awsStsRoleArn != '' && needs.data.outputs.awsStsRoleArn || vars.DEPLOYMENT_AWS_STS_ROLE_ARN }}
+      AZURE_RG: ${{ needs.data.outputs.azureResourceGroup != '' && needs.data.outputs.azureResourceGroup || vars.DEPLOYMENT_AZURE_RG }}
     secrets:
       token: ${{ secrets.BOT_TOKEN }}
       AWS_ACCESS_KEY_ID: ${{ secrets.TF_AWS_ACCESS_KEY_ID }}
