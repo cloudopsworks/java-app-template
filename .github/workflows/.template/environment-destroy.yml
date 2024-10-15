@@ -29,7 +29,7 @@ on:
         required: false
         default: ''
 
-concurrency: build-${{ github.repository }}-${{ github.ref }}
+concurrency: destroy-${{ github.repository }}-${{ inputs.destroyedDeploymentName }}
 
 # Permission Settings for the entire RUN
 permissions:
