@@ -33,7 +33,7 @@ on:
         required: false
         default: ''
 
-concurrency: build-${{ github.repository }}-${{ github.ref }}
+concurrency: unlock-${{ github.repository }}-${{ inputs.destroyedDeploymentName }}
 
 # Permission Settings for the entire RUN
 permissions:
