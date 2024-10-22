@@ -28,33 +28,196 @@ concurrency: build-${{ github.repository }}-${{ github.ref }}
 permissions:
   actions: write
   contents: write
-  issues: write
   packages: write
   statuses: write
+  pull-requests: write
+  issues: write
+  checks: write
 
 jobs:
   code-build:
-    name: Code Build for ${{ github.ref_name }}
+    name: 'Code Build - Branch: ${{ github.ref_name }}'
     runs-on: ubuntu-latest
+    if: |
+      github.event_name == 'create' && 
+      (startsWith(github.ref, 'refs/heads/support/') || startsWith(github.ref, 'refs/heads/release/')) ||
+      (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+    outputs:
+      is_release: ${{ steps.config.outputs.is_release }}
+      is_pre_release: ${{ steps.config.outputs.is_pre_release }}
+      semver: ${{ steps.build.outputs.semver }}
+      deployment_name: ${{ steps.config.outputs.deployment_name }}
+      blue_green_enabled: ${{ steps.config.outputs.blue_green_enabled }}
+      target_cloud: ${{ steps.config.outputs.target_cloud }}
+      deployment_enabled: ${{ steps.config.outputs.deployment_enabled }}
+      is_library: ${{ steps.config.outputs.is_library }}
+      cloud: ${{ steps.config.outputs.cloud }}
+      cloud_type: ${{ steps.config.outputs.cloud_type }}
+      runner_set: ${{ steps.config.outputs.runner_set }}
+      apis_enabled: ${{ steps.config.outputs.apis_enabled }}
+      container_enabled: ${{ steps.config.outputs.container_enabled }}
     steps:
-      - name: Checkout w/ Blueprint
+      - name: Checkout w/Blueprint
         uses: cloudopsworks/blueprints/cd/checkout@develop
+        with:
+          blueprint_ref: 'develop'
+
+      - name: Pipeline Configuration
+        id: config
+        uses: ./bp/ci/config
 
       - name: Build Java
+        id: build
         uses: ./bp/ci/java/build
+        with:
+          bot_user: ${{ vars.BOT_USER }}
+          token: ${{ secrets.BOT_TOKEN }}
+
+      - name: Deploy Component
+        if: steps.config.outputs.is_library == 'true'
+        uses: ./bp/ci/java/deploy
+        with:
+          bot_user: ${{ vars.BOT_USER }}
+          token: ${{ secrets.BOT_TOKEN }}
 
       - name: Save Build Artifacts
         uses: ./bp/ci/java/artifacts
 
       - name: Save Api Artifacts
+        if: steps.config.outputs.apis_enabled == 'true'
         uses: ./bp/ci/api/artifacts
 
       - name: Build & Save Container
+        if: steps.config.outputs.container_enabled == 'true'
         uses: ./bp/ci/java/container
+        with:
+          semver: ${{ steps.build.outputs.semver }}
+          java_version: ${{ steps.build.outputs.java_version }}
+          java_dist: ${{ steps.build.outputs.java_dist }}
+          java_image_variant: ${{ steps.build.outputs.java_image_variant }}
+          environment: ${{ steps.config.outputs.environment }}
+          is_release: ${{ steps.config.outputs.is_release }}
+          default_registry_address: ${{ vars.DOCKER_REGISTRY_ADDRESS }}
 
-      - name: Code Scanning (SAST/SCA)
-        uses: ./bp/ci/java/scan
+  deploy-container:
+    needs:
+      - code-build
+    if: ${{ needs.code-build.outputs.container_enabled == 'true' && needs.code-build.outputs.deployment_enabled == 'true' && needs.code-build.outputs.is_library != 'true' }}
+    uses: ./.github/workflows/deploy-container.yml
+    with:
+      deployment_name: ${{ needs.code-build.outputs.deployment_name }}
+      cloud: ${{ needs.code-build.outputs.cloud }}
+      cloud_type: ${{ needs.code-build.outputs.cloud_type }}
+      runner_set: ${{ needs.code-build.outputs.runner_set }}
+      default_aws_region: ${{ vars.DEPLOYMENT_AWS_REGION }}
+      default_aws_sts_role_arn: ${{ vars.DEPLOYMENT_AWS_STS_ROLE_ARN }}
+      default_azure_rg: ${{ vars.DEPLOYMENT_AZURE_RG }}
+      default_registry_address: ${{ vars.DOCKER_REGISTRY_ADDRESS }}
+    secrets:
+      token: ${{ secrets.BOT_TOKEN }}
+      aws_access_key_id: ${{ secrets.BUILD_AWS_ACCESS_KEY_ID }}
+      aws_secret_access_key: ${{ secrets.BUILD_AWS_SECRET_ACCESS_KEY }}
+      azure_service_id: ${{ secrets.AZURE_SERVICE_ID }}
+      azure_service_secret: ${{ secrets.AZURE_SERVICE_SECRET }}
 
-      - name: API Scanning
-        uses: ./bp/ci/api/scan
+  release:
+    needs:
+      - code-build
+      - deploy-container
+    runs-on: ubuntu-latest
+    if: |
+      (needs.code-build.result == 'success') &&
+      (needs.code-build.outputs.is_release == 'true')
+    steps:
+      - name: Checkout w/Blueprint
+        uses: cloudopsworks/blueprints/cd/checkout@develop
+        id: co
+        with:
+          blueprint_ref: 'develop'
 
+      - name: Perform Release
+        uses: ./bp/cd/release
+        with:
+          source_path: ${{ steps.co.outputs.source_path }}
+          ref_name: ${{ needs.code-build.outputs.semver }}
+          release_tag: ${{ needs.code-build.outputs.semver }}
+          is_pre_release: ${{ needs.code-build.outputs.is_pre_release == 'true' }}
+          files_globs: |
+            *.zip
+            *.jar
+          token: ${{ secrets.BOT_TOKEN }}
+
+  scan:
+    name: 'Code Scan SAST/SCA/DAST'
+    needs:
+      - code-build
+      - deploy-container
+    if: needs.code-build.result == 'success'
+    uses: ./.github/workflows/scan.yml
+    with:
+      deployment_name: ${{ needs.code-build.outputs.deployment_name }}
+      bot_user: ${{ vars.BOT_USER }}
+      sonarqube_url: ${{ vars.SONARQUBE_URL }}
+      dtrack_url: ${{ vars.DEPENDENCYTRACK_URL }}
+    secrets:
+      token: ${{ secrets.BOT_TOKEN }}
+      sonarqube_token: ${{ secrets.SONARQUBE_TOKEN }}
+      snyk_token: ${{ secrets.SNYK_TOKEN }}
+      semgrep_token: ${{ secrets.SEMGREP_TOKEN }}
+      dtrack_token: ${{ secrets.DEPENDENCYTRACK_TOKEN }}
+
+  deploy:
+    needs:
+      - code-build
+      - deploy-container
+    if: |
+      needs.code-build.result == 'success' &&
+      needs.code-build.outputs.blue_green_enabled != 'true' && 
+      needs.code-build.outputs.deployment_enabled == 'true' && 
+      needs.code-build.outputs.is_library != 'true'
+    uses: ./.github/workflows/deploy.yml
+    with:
+      deployment_name: ${{ needs.code-build.outputs.deployment_name }}
+      cloud: ${{ needs.code-build.outputs.cloud }}
+      cloud_type: ${{ needs.code-build.outputs.cloud_type }}
+      runner_set: ${{ needs.code-build.outputs.runner_set }}
+      default_aws_region: ${{ vars.DEPLOYMENT_AWS_REGION }}
+      default_aws_sts_role_arn: ${{ vars.DEPLOYMENT_AWS_STS_ROLE_ARN }}
+      default_azure_rg: ${{ vars.DEPLOYMENT_AZURE_RG }}
+      terraform_state_conf: ${{ vars.DEPLOYMENT_STATE_CONF }}
+      semver: ${{ needs.code-build.outputs.semver }}
+      apis_enabled: ${{ needs.code-build.outputs.apis_enabled == 'true' }}
+    secrets:
+      token: ${{ secrets.BOT_TOKEN }}
+      aws_access_key_id: ${{ secrets.BUILD_AWS_ACCESS_KEY_ID }}
+      aws_secret_access_key: ${{ secrets.BUILD_AWS_SECRET_ACCESS_KEY }}
+      azure_service_id: ${{ secrets.AZURE_SERVICE_ID }}
+      azure_service_secret: ${{ secrets.AZURE_SERVICE_SECRET }}
+
+  deploy-blue-green:
+    needs:
+      - code-build
+      - deploy-container
+    if: |
+      needs.code-build.result == 'success' &&
+      needs.code-build.outputs.blue_green_enabled == 'true'  && 
+      needs.code-build.outputs.deployment_enabled == 'true' && 
+      needs.code-build.outputs.is_library != 'true'
+    uses: ./.github/workflows/deploy-blue-green.yml
+    with:
+      deployment_name: ${{ needs.code-build.outputs.deployment_name }}
+      cloud: ${{ needs.code-build.outputs.cloud }}
+      cloud_type: ${{ needs.code-build.outputs.cloud_type }}
+      runner_set: ${{ needs.code-build.outputs.runner_set }}
+      default_aws_region: ${{ vars.DEPLOYMENT_AWS_REGION }}
+      default_aws_sts_role_arn: ${{ vars.DEPLOYMENT_AWS_STS_ROLE_ARN }}
+      default_azure_rg: ${{ vars.DEPLOYMENT_AZURE_RG }}
+      terraform_state_conf: ${{ vars.DEPLOYMENT_STATE_CONF }}
+      semver: ${{ needs.code-build.outputs.semver }}
+      apis_enabled: ${{ needs.code-build.outputs.apis_enabled == 'true' }}
+    secrets:
+      token: ${{ secrets.BOT_TOKEN }}
+      aws_access_key_id: ${{ secrets.BUILD_AWS_ACCESS_KEY_ID }}
+      aws_secret_access_key: ${{ secrets.BUILD_AWS_SECRET_ACCESS_KEY }}
+      azure_service_id: ${{ secrets.AZURE_SERVICE_ID }}
+      azure_service_secret: ${{ secrets.AZURE_SERVICE_SECRET }}
