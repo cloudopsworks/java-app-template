@@ -113,6 +113,11 @@ jobs:
         with:
           blueprint_ref: 'v5'
 
+      # Get Pipeline Config
+      - name: Get Pipeline Config
+        id: config
+        uses: ./bp/ci/config
+
       - name: Deploy AWS
         if: ${{ inputs.cloud == 'AWS' }}
         uses: ./bp/cd/deploy/app/aws
@@ -164,6 +169,8 @@ jobs:
 #          environment: ${{ steps.config.outputs.environment }}
 
   deploy-blue:
+    needs:
+      - deploy-green
     name: 'Deploy Blue Environment - Branch: ${{ github.ref_name }} - Env: ${{ inputs.deployment_name }}'
     runs-on: ${{ inputs.runner_set }}
     environment: ${{ inputs.deployment_name }}
@@ -172,6 +179,11 @@ jobs:
         uses: cloudopsworks/blueprints/cd/checkout@v5
         with:
           blueprint_ref: 'v5'
+
+      # Get Pipeline Config
+      - name: Get Pipeline Config
+        id: config
+        uses: ./bp/ci/config
 
       - name: Deploy AWS
         if: ${{ inputs.cloud == 'AWS' }}
@@ -214,6 +226,8 @@ jobs:
 #          token: ${{ secrets.token }}
 
   destroy-green:
+    needs:
+      - deploy-blue
     name: 'Destroy Green environment - Branch: ${{ github.ref_name }} - Env: ${{ inputs.deployment_name }}'
     runs-on: ${{ inputs.runner_set }}
     steps:
@@ -221,6 +235,11 @@ jobs:
         uses: cloudopsworks/blueprints/cd/checkout@v5
         with:
           blueprint_ref: 'v5'
+
+      # Get Pipeline Config
+      - name: Get Pipeline Config
+        id: config
+        uses: ./bp/ci/config
 
       - name: Destroy AWS
         if: ${{ inputs.cloud == 'AWS' }}
