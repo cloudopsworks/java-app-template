@@ -50,4 +50,5 @@ jobs:
 
       # Scan the code with semgrep
       - name: Semgrep Scan
+        working-directory: ${{ needs. }}
         run: semgrep ci

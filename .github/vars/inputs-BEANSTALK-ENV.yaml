@@ -2,6 +2,7 @@ environment: "dev|uat|prod|demo"
 runner_set: "RUNNER-ENV"
 versions_bucket: "VERSIONS_BUCKET"
 #logs_bucket: "LOGS_BUCKET"
+#blue_green: true # uncomment for Prod environment to support blue/green deploy
 aws:
   region: "AWS_REGION"
   sts_role_arn: "AWS_STS_ROLE_ARN"
@@ -131,6 +132,10 @@ beanstalk:
   #    key: value
   #    key2: value2
   extra_settings: []
+  #  - name: "PORT"
+  #    namespace: "aws:elasticbeanstalk:application:environment"
+  #    resource: ""
+  #    value: "8080"
   #    - name: SETTING_NAME
   #      namespace: aws:NAMESPACE
   #      resource: ""

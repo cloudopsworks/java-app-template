@@ -1,0 +1,60 @@
+##
+# (c) 2024 - Cloud Ops Works LLC - https://cloudops.works/
+#            On GitHub: https://github.com/cloudopsworks
+#            Distributed Under Apache v2.0 License
+#
+name: Release Build
+on:
+  # Run on create - but only on the support and release branches
+  create:
+  # Run only on branches PUSH except when charts are modified
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+      - 'v[0-9]+.[0-9]+.[0-9]+**'
+    branches:
+      - develop
+      - support/**
+      - release/**
+    paths-ignore:
+      - '.github/**'
+      - '!.github/vars/**'
+      - '!.github/values/**'
+  workflow_dispatch:
+
+concurrency: build-${{ github.repository }}-${{ github.ref }}
+
+# Permission Settings for the entire RUN
+permissions:
+  actions: write
+  contents: write
+  issues: write
+  packages: write
+  statuses: write
+
+jobs:
+  code-build:
+    name: Code Build for ${{ github.ref_name }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout w/ Blueprint
+        uses: cloudopsworks/blueprints/cd/checkout@develop
+
+      - name: Build Java
+        uses: ./bp/ci/java/build
+
+      - name: Save Build Artifacts
+        uses: ./bp/ci/java/artifacts
+
+      - name: Save Api Artifacts
+        uses: ./bp/ci/api/artifacts
+
+      - name: Build & Save Container
+        uses: ./bp/ci/java/container
+
+      - name: Code Scanning (SAST/SCA)
+        uses: ./bp/ci/java/scan
+
+      - name: API Scanning
+        uses: ./bp/ci/api/scan
+
