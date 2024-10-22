@@ -3,7 +3,8 @@
 #            On GitHub: https://github.com/cloudopsworks
 #            Distributed Under Apache v2.0 License
 #
-name: Do Retry command
+name: Slash command on Retry Automerge
+
 on:
   repository_dispatch:
     types:
@@ -18,7 +19,12 @@ permissions:
   statuses: write
 
 jobs:
-  promote:
-    uses: {{REPO_OWNER}}/base-app-template/.github/workflows/slash-on-retry-automerge.yml@v5
-    secrets:
-      token: ${{ secrets.BOT_TOKEN }}
+  retry-automerge:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: pascalgn/automerge-action@v0.15.6
+        env:
+          GITHUB_TOKEN: "${{ secrets.BOT_TOKEN }}"
+          MERGE_LABELS: "approved,!do-not-merge"
+          UPDATE_LABELS: "approved"
+          #LOG: "TRACE"

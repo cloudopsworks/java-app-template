@@ -19,6 +19,10 @@ permissions:
 
 jobs:
   gitops:
-    uses: {{REPO_OWNER}}/base-app-template/.github/workflows/slash-commands.yml@v5
-    secrets:
-      token: ${{ secrets.BOT_TOKEN }}
+    name: 'Gitops Chatops Agent'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Git-Ops
+        uses: cloudopsworks/blueprints/cd/gitops/command@v5
+        with:
+          token: ${{ secrets.BOT_TOKEN }}

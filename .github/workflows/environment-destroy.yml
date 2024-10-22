@@ -1,0 +1,125 @@
+##
+# (c) 2024 - Cloud Ops Works LLC - https://cloudops.works/
+#            On GitHub: https://github.com/cloudopsworks
+#            Distributed Under Apache v2.0 License
+#
+name: Environment Destruction Process
+on:
+  # Runs only on demand
+  workflow_dispatch:
+    inputs:
+      destroyedDeploymentName:
+        type: choice
+        description: Select Environment to destroy
+        options:
+          - develop/dev
+          - release/production
+          - test/uat
+          - prerelease/demo
+      environment:
+        type: choice
+        description: Environment to destroy
+        options:
+          - dev
+          - uat
+          - prod
+      qualifier:
+        type: string
+        description: Qualifier for the lock (green/bluee)
+        required: false
+        default: ''
+
+concurrency: destroy-${{ github.repository }}-${{ inputs.destroyedDeploymentName }}
+
+# Permission Settings for the entire RUN
+permissions:
+  actions: write
+  contents: write
+  issues: write
+  packages: write
+  statuses: write
+
+jobs:
+  preload:
+    name: Preload Configuration
+    runs-on: ubuntu-latest
+    outputs:
+      runner_set: ${{ steps.config.outputs.runner_set }}
+    steps:
+      - name: Checkout w/Blueprint
+        uses: cloudopsworks/blueprints/cd/checkout@v5
+        with:
+          blueprint_ref: 'v5'
+
+      - name: Pipeline Configuration
+        id: config
+        uses: ./bp/ci/config
+
+  destroy-environment:
+    needs:
+      - preload
+    name: 'Destroy Environment - Branch: ${{ github.ref_name }} - Env: ${{ inputs.destroyedDeploymentName }}'
+    runs-on: ${{ needs.preload.outputs.runner_set }}
+    environment: ${{ inputs.destroyedDeploymentName }}
+    steps:
+      - name: Checkout w/Blueprint
+        uses: cloudopsworks/blueprints/cd/checkout@v5
+        with:
+          blueprint_ref: 'v5'
+
+      - name: Pipeline Configuration
+        id: config
+        uses: ./bp/ci/config
+
+      - name: Destroy AWS
+        if: ${{ steps.config.outputs.cloud == 'AWS' }}
+        uses: ./bp/cd/deploy/app/aws
+        with:
+          destroy: true
+          qualifier: ${{ inputs.qualifier }}
+          cloud_type: ${{ steps.config.outputs.cloud_type }}
+          token: ${{ secrets.BOT_TOKEN }}
+          aws_region: ${{ steps.config.outputs.aws_region != '' && steps.config.outputs.aws_region || vars.DEPLOYMENT_AWS_REGION }}
+          aws_sts_role_arn: ${{ steps.config.outputs.aws_sts_role_arn != '' && steps.config.outputs.aws_sts_role_arn || vars.DEPLOYMENT_AWS_STS_ROLE_ARN }}
+          aws_access_key_id: ${{ secrets.BUILD_AWS_ACCESS_KEY_ID }}
+          aws_secret_access_key: ${{ secrets.BUILD_AWS_SECRET_ACCESS_KEY }}
+          terraform_state_conf: ${{ vars.DEPLOYMENT_STATE_CONF }}
+          release_name: ${{ steps.config.outputs.release_name }}
+          release_version: 'v1'
+          package_name: ${{ steps.config.outputs.package_name }}
+          deployment_name: ${{ inputs.destroyedDeploymentName }}
+          environment: ${{ steps.config.outputs.environment }}
+
+      - name: Destroy Azure
+        if: ${{ steps.config.outputs.cloud == 'AZURE' }}
+        uses: ./bp/cd/deploy/app/azure
+        with:
+          destroy: true
+          qualifier: ${{ inputs.qualifier }}
+          cloud_type: ${{ steps.config.outputs.cloud_type }}
+          token: ${{ secrets.BOT_TOKEN }}
+          azure_service_id: ${{ secrets.AZURE_SERVICE_ID }}
+          azure_service_secret: ${{ secrets.AZURE_SERVICE_SECRET }}
+          azure_rg: ${{ steps.config.outputs.azure_rg != '' && steps.config.outputs.azure_rg || vars.DEPLOYMENT_AZURE_RG }}
+          terraform_state_conf: ${{ vars.DEPLOYMENT_STATE_CONF }}
+          release_name: ${{ steps.config.outputs.release_name }}
+          release_version: ${{ inputs.semver }}
+          package_name: ${{ steps.config.outputs.package_name }}
+          deployment_name: ${{ inputs.destroyedDeploymentName }}
+          environment: ${{ steps.config.outputs.environment }}
+
+#      - name: Destroy GCP
+#        if: ${{ steps.config.outputs.cloud == 'GCP' }}
+#        uses: ./bp/cd/deploy/app/azure
+#        with:
+#          destroy: true
+#          qualifier: 'green'
+#          cloud_type: ${{ steps.config.outputs.cloud_type }}
+#          token: ${{ secrets.BOT_TOKEN }}
+#          gcp_service_id: ${{ secrets.GCP_SERVICE_ID }}
+#          terraform_state_conf: ${{ vars.DEPLOYMENT_STATE_CONF }}
+#          release_name: ${{ steps.config.outputs.release_name }}
+#          release_version: ${{ inputs.semver }}
+#          package_name: ${{ steps.config.outputs.package_name }}
+#          deployment_name: ${{ inputs.destroyedDeploymentName }}
+#          environment: ${{ steps.config.outputs.environment }}

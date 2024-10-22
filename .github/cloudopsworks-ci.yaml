@@ -92,7 +92,7 @@ cd:
       #  var2: value2
       # Sample variables to deploy into different account
       #  DEPLOYMENT_AWS_REGION: us-east-1
-      #  DEPLOYMENT_STS_ROLE_ARN: arn:aws:iam::123456789012:role/TerraformAccessRole
+      #  DEPLOYMENT_AWS_STS_ROLE_ARN: arn:aws:iam::123456789012:role/TerraformAccessRole
       #enabled: false
       env: dev
       #targetName: dev-target

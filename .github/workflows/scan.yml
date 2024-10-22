@@ -1,0 +1,180 @@
+##
+# (c) 2024 - Cloud Ops Works LLC - https://cloudops.works/
+#            On GitHub: https://github.com/cloudopsworks
+#            Distributed Under Apache v2.0 License
+#
+name: Scan Code SAST/DAST/SCA
+on:
+  workflow_call:
+    inputs:
+      deployment_name:
+        required: true
+        type: string
+      bot_user:
+        required: true
+        type: string
+      sonarqube_url:
+        required: true
+        type: string
+      dtrack_url:
+        required: true
+        type: string
+
+    secrets:
+      token:
+        description: 'GitHub Token'
+        required: true
+      semgrep_token:
+        description: 'Semgrep Token'
+        required: true
+      sonarqube_token:
+        description: 'SonarQube Token'
+        required: true
+      snyk_token:
+        description: 'Snyk Token'
+        required: true
+      dtrack_token:
+        description: 'Dependency Track Token'
+        required: true
+
+
+concurrency: scan-${{ github.repository }}-${{ github.ref }}
+
+permissions:
+  contents: read
+  packages: write
+  statuses: write
+  pull-requests: write
+  issues: write
+  checks: write
+
+jobs:
+  preload:
+    name: Preload Configuration
+    runs-on: ubuntu-latest
+    outputs:
+      sonarqube_enabled: ${{ steps.config.outputs.sonarqube_enabled }}
+      dtrack_enabled: ${{ steps.config.outputs.dtrack_enabled }}
+      dtrack_project_type: ${{ steps.config.outputs.dtrack_project_type }}
+      snyk_enabled: ${{ steps.config.outputs.snyk_enabled }}
+      semgrep_enabled: ${{ steps.config.outputs.semgrep_enabled }}
+      apis_enabled: ${{ steps.config.outputs.apis_enabled }}
+    steps:
+      - name: Checkout w/Blueprint
+        uses: cloudopsworks/blueprints/cd/checkout@v5
+        with:
+          blueprint_ref: 'v5'
+
+      - name: Pipeline Configuration
+        id: config
+        uses: ./bp/ci/java/scan/config
+
+  scan-semgrep:
+    name: Scan Code with semgrep
+    needs:
+      - preload
+    runs-on: ubuntu-20.04
+    container:
+      image: semgrep/semgrep
+    env:
+      SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_TOKEN }}
+    steps:
+      - name: Checkout w/Blueprint
+        uses: cloudopsworks/blueprints/cd/checkout@v5
+        id: co
+        with:
+          blueprint_ref: 'v5'
+
+      - name: Semgrep Scan
+        if: ${{ needs.preload.outputs.semgrep_enabled == 'true' }}
+        uses: ./bp/ci/java/scan/semgrep
+        continue-on-error: true
+        with:
+          source_path: ${{ steps.co.outputs.source_path }}
+          semgrep_token: ${{ secrets.semgrep_token }}
+          bot_user: ${{ inputs.bot_user }}
+          token: ${{ inputs.token }}
+
+
+  scan-others:
+    name: Scan Code
+    needs:
+      - preload
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout w/Blueprint
+        uses: cloudopsworks/blueprints/cd/checkout@v5
+        id: co
+        with:
+          blueprint_ref: 'v5'
+
+      - name: Build Java
+        id: build
+        uses: ./bp/ci/java/build
+        with:
+          bot_user: ${{ inputs.bot_user }}
+          token: ${{ inputs.token }}
+
+      - name: Test / Verify / Install Java
+        id: test
+        uses: ./bp/ci/java/test/verify
+        with:
+          bot_user: ${{ inputs.bot_user }}
+          token: ${{ inputs.token }}
+          dtrack_project_type: ${{ needs.preload.outputs.dtrack_project_type }}
+
+      - name: Snyk Scan
+        if: ${{ needs.preload.outputs.snyk_enabled == 'true' }}
+        uses: ./bp/ci/java/scan/snyk
+        continue-on-error: true
+        with:
+          source_path: ${{ steps.co.outputs.source_path }}
+          snyk_token: ${{ secrets.snyk_token }}
+          bot_user: ${{ inputs.bot_user }}
+          token: ${{ inputs.token }}
+
+      - name: SonarQube Scan
+        if: ${{ needs.preload.outputs.sonarqube_enabled == 'true' }}
+        uses: ./bp/ci/java/scan/sonarqube
+        continue-on-error: true
+        with:
+          source_path: ${{ steps.co.outputs.source_path }}
+          bot_user: ${{ inputs.bot_user }}
+          token: ${{ inputs.token }}
+          sonarqube_url: ${{ vars.sonarqube_url }}
+          sonarqube_token: ${{ secrets.sonarqube_token }}
+          sonarqube_project_key: ${{ steps.build.outputs.package_name }}
+          semver: ${{ steps.build.outputs.semver }}
+
+      - name: SonarQube Scan APIS
+        if: ${{ needs.preload.outputs.sonarqube_enabled == 'true' && needs.preload.outputs.apis_enabled == 'true' }}
+        uses: ./bp/ci/api/scan/sonarqube
+        continue-on-error: true
+        with:
+          source_path: ${{ steps.co.outputs.source_path }}
+          bot_user: ${{ inputs.bot_user }}
+          token: ${{ inputs.token }}
+          sonarqube_url: ${{ vars.sonarqube_url }}
+          sonarqube_token: ${{ secrets.sonarqube_token }}
+          sonarqube_project_key: ${{ steps.build.outputs.package_name }}
+          semver: ${{ steps.build.outputs.semver }}
+
+      - name: Dependency track Scan
+        if: ${{ needs.preload.outputs.dtrack_enabled == 'true' }}
+        uses: ./bp/ci/java/scan/dtrack
+        continue-on-error: true
+        with:
+          source_path: ${{ steps.co.outputs.source_path }}
+          bot_user: ${{ inputs.bot_user }}
+          token: ${{ inputs.token }}
+          dtrack_url: ${{ vars.dtrack_url }}
+          dtrack_token: ${{ secrets.dtrack_token }}
+          dtrack_project_key: ${{ steps.build.outputs.package_name }}
+          project_type: ${{ needs.preload.outputs.dtrack_project_type }}
+
+      - name: Upload Artifacts
+        uses: ./bp/ci/java/test/artifacts
+        with:
+          bot_user: ${{ inputs.bot_user }}
+          token: ${{ inputs.token }}
+
