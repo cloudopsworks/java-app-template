@@ -63,6 +63,7 @@ jobs:
     name: 'Deploy APIS into environment - Branch: ${{ github.ref_name }} - Env: ${{ inputs.deployment_name }}'
     runs-on: ${{ inputs.runner_set }}
     if: ${{ inputs.apis_enabled }}
+    environment: ${{ inputs.deployment_name }}
     steps:
       - name: Checkout w/Blueprint
         uses: cloudopsworks/blueprints/cd/checkout@v5
