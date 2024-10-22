@@ -67,7 +67,7 @@ jobs:
 
       - name: Pipeline Configuration
         id: config
-        uses: ./bp/ci/java/scan/config
+        uses: ./bp/ci/scan/config
 
   scan-semgrep:
     name: Scan Code with semgrep
