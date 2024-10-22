@@ -58,9 +58,9 @@ jobs:
     runs-on: ${{ inputs.runner_set }}
     steps:
       - name: Checkout w/Blueprint
-        uses: cloudopsworks/blueprints/cd/checkout@develop
+        uses: cloudopsworks/blueprints/cd/checkout@v5
         with:
-          blueprint_ref: 'develop'
+          blueprint_ref: 'v5'
 
       # Get Pipeline Config
       - name: Get Pipeline Config

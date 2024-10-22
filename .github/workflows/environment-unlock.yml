@@ -51,9 +51,9 @@ jobs:
       runner_set: ${{ steps.config.outputs.runner_set }}
     steps:
       - name: Checkout w/Blueprint
-        uses: cloudopsworks/blueprints/cd/checkout@develop
+        uses: cloudopsworks/blueprints/cd/checkout@v5
         with:
-          blueprint_ref: 'develop'
+          blueprint_ref: 'v5'
 
       - name: Pipeline Configuration
         id: config
@@ -67,9 +67,9 @@ jobs:
     environment: ${{ inputs.destroyedDeploymentName }}
     steps:
       - name: Checkout w/Blueprint
-        uses: cloudopsworks/blueprints/cd/checkout@develop
+        uses: cloudopsworks/blueprints/cd/checkout@v5
         with:
-          blueprint_ref: 'develop'
+          blueprint_ref: 'v5'
 
       - name: Pipeline Configuration
         id: config

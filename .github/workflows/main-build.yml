@@ -58,9 +58,9 @@ jobs:
       container_enabled: ${{ steps.config.outputs.container_enabled }}
     steps:
       - name: Checkout w/Blueprint
-        uses: cloudopsworks/blueprints/cd/checkout@develop
+        uses: cloudopsworks/blueprints/cd/checkout@v5
         with:
-          blueprint_ref: 'develop'
+          blueprint_ref: 'v5'
 
       - name: Pipeline Configuration
         id: config
@@ -130,10 +130,10 @@ jobs:
       (needs.code-build.outputs.is_release == 'true')
     steps:
       - name: Checkout w/Blueprint
-        uses: cloudopsworks/blueprints/cd/checkout@develop
+        uses: cloudopsworks/blueprints/cd/checkout@v5
         id: co
         with:
-          blueprint_ref: 'develop'
+          blueprint_ref: 'v5'
 
       - name: Perform Release
         uses: ./bp/cd/release

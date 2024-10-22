@@ -61,9 +61,9 @@ jobs:
       apis_enabled: ${{ steps.config.outputs.apis_enabled }}
     steps:
       - name: Checkout w/Blueprint
-        uses: cloudopsworks/blueprints/cd/checkout@develop
+        uses: cloudopsworks/blueprints/cd/checkout@v5
         with:
-          blueprint_ref: 'develop'
+          blueprint_ref: 'v5'
 
       - name: Pipeline Configuration
         id: config
@@ -80,10 +80,10 @@ jobs:
       SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_TOKEN }}
     steps:
       - name: Checkout w/Blueprint
-        uses: cloudopsworks/blueprints/cd/checkout@develop
+        uses: cloudopsworks/blueprints/cd/checkout@v5
         id: co
         with:
-          blueprint_ref: 'develop'
+          blueprint_ref: 'v5'
 
       - name: Semgrep Scan
         if: ${{ needs.preload.outputs.semgrep_enabled == 'true' }}
@@ -103,10 +103,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout w/Blueprint
-        uses: cloudopsworks/blueprints/cd/checkout@develop
+        uses: cloudopsworks/blueprints/cd/checkout@v5
         id: co
         with:
-          blueprint_ref: 'develop'
+          blueprint_ref: 'v5'
 
       - name: Build Java
         id: build
