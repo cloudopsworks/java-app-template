@@ -20,6 +20,9 @@ excludeGlobs:
   - skafold*
   - original-*.jar
   - tronador/*
+  - .tronador
+  - Makefile
+  - apifiles/*
 
 # Repo & CD Configurations
 # Some of them previously managed in OWNERS file
