@@ -1,5 +1,6 @@
 environment: "dev|uat|prod|demo"
 runner_set: "RUNNER-ENV"
+#disable_deploy: true
 versions_bucket: "VERSIONS_BUCKET"
 #logs_bucket: "LOGS_BUCKET"
 #blue_green: true # uncomment for Prod environment to support blue/green deploy
