@@ -109,18 +109,19 @@ jobs:
       cloud: ${{ needs.code-build.outputs.cloud }}
       cloud_type: ${{ needs.code-build.outputs.cloud_type }}
       runner_set: ${{ needs.code-build.outputs.runner_set }}
-      default_aws_region: ${{ vars.DEPLOYMENT_AWS_REGION }}
-      default_aws_sts_role_arn: ${{ vars.DEPLOYMENT_AWS_STS_ROLE_ARN }}
-      default_azure_rg: ${{ vars.DEPLOYMENT_AZURE_RG }}
+      default_aws_region: ${{ vars.BUILD_AWS_REGION }}
+      default_aws_sts_role_arn: ${{ vars.BUILD_AWS_STS_ROLE_ARN }}
+      default_azure_rg: ${{ vars.BUILD_AZURE_RG }}
       default_registry_address: ${{ vars.DOCKER_REGISTRY_ADDRESS }}
     secrets:
       token: ${{ secrets.BOT_TOKEN }}
       aws_access_key_id: ${{ secrets.BUILD_AWS_ACCESS_KEY_ID }}
       aws_secret_access_key: ${{ secrets.BUILD_AWS_SECRET_ACCESS_KEY }}
-      azure_service_id: ${{ secrets.AZURE_SERVICE_ID }}
-      azure_service_secret: ${{ secrets.AZURE_SERVICE_SECRET }}
+      azure_service_id: ${{ secrets.BUILD_AZURE_SERVICE_ID }}
+      azure_service_secret: ${{ secrets.BUILD_AZURE_SERVICE_SECRET }}
 
   release:
+    name: 'Generate Release'
     needs:
       - code-build
       - deploy-container
@@ -189,10 +190,10 @@ jobs:
       apis_enabled: ${{ needs.code-build.outputs.apis_enabled == 'true' }}
     secrets:
       token: ${{ secrets.BOT_TOKEN }}
-      aws_access_key_id: ${{ secrets.BUILD_AWS_ACCESS_KEY_ID }}
-      aws_secret_access_key: ${{ secrets.BUILD_AWS_SECRET_ACCESS_KEY }}
-      azure_service_id: ${{ secrets.AZURE_SERVICE_ID }}
-      azure_service_secret: ${{ secrets.AZURE_SERVICE_SECRET }}
+      aws_access_key_id: ${{ secrets.DEPLOYMENT_AWS_ACCESS_KEY_ID }}
+      aws_secret_access_key: ${{ secrets.DEPLOYMENT_AWS_SECRET_ACCESS_KEY }}
+      azure_service_id: ${{ secrets.DEPLOYMENT_AZURE_SERVICE_ID }}
+      azure_service_secret: ${{ secrets.DEPLOYMENT_AZURE_SERVICE_SECRET }}
 
   deploy-blue-green:
     needs:
@@ -217,7 +218,7 @@ jobs:
       apis_enabled: ${{ needs.code-build.outputs.apis_enabled == 'true' }}
     secrets:
       token: ${{ secrets.BOT_TOKEN }}
-      aws_access_key_id: ${{ secrets.BUILD_AWS_ACCESS_KEY_ID }}
-      aws_secret_access_key: ${{ secrets.BUILD_AWS_SECRET_ACCESS_KEY }}
-      azure_service_id: ${{ secrets.AZURE_SERVICE_ID }}
-      azure_service_secret: ${{ secrets.AZURE_SERVICE_SECRET }}
+      aws_access_key_id: ${{ secrets.DEPLOYMENT_AWS_ACCESS_KEY_ID }}
+      aws_secret_access_key: ${{ secrets.DEPLOYMENT_AWS_SECRET_ACCESS_KEY }}
+      azure_service_id: ${{ secrets.DEPLOYMENT_AZURE_SERVICE_ID }}
+      azure_service_secret: ${{ secrets.DEPLOYMENT_AZURE_SERVICE_SECRET }}

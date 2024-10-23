@@ -126,8 +126,8 @@ jobs:
       token: ${{ secrets.BOT_TOKEN }}
       aws_access_key_id: ${{ secrets.BUILD_AWS_ACCESS_KEY_ID }}
       aws_secret_access_key: ${{ secrets.BUILD_AWS_SECRET_ACCESS_KEY }}
-      azure_service_id: ${{ secrets.AZURE_SERVICE_ID }}
-      azure_service_secret: ${{ secrets.AZURE_SERVICE_SECRET }}
+      azure_service_id: ${{ secrets.BUILD_AZURE_SERVICE_ID }}
+      azure_service_secret: ${{ secrets.BUILD_AZURE_SERVICE_SECRET }}
 
   preview:
     name: 'Preview Deployment'

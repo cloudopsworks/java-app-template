@@ -3,7 +3,9 @@ runner_set: "RUNNER-ENV"
 #disable_deploy: true
 aws:
   region: "AWS_REGION"
-  sts_role_arn: "AWS_STS_ROLE_ARN"
+#  sts_role_arn: "AWS_STS_ROLE_ARN" # Optional: when existing role is same for build and deploy
+#  build_sts_role_arn: "BUILD_AWS_STS_ROLE_ARN" # Optional: when existing role is different for build and deploy
+#  deploy_sts_role_arn: "DEPLOY_AWS_STS_ROLE_ARN" # Optional: when existing role is different for build and deploy
 lambda:
   arch: x86_64 | arm64
   #  iam:

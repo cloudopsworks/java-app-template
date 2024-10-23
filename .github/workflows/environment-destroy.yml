@@ -80,7 +80,7 @@ jobs:
           cloud_type: ${{ steps.config.outputs.cloud_type }}
           token: ${{ secrets.BOT_TOKEN }}
           aws_region: ${{ steps.config.outputs.aws_region != '' && steps.config.outputs.aws_region || vars.DEPLOYMENT_AWS_REGION }}
-          aws_sts_role_arn: ${{ steps.config.outputs.aws_sts_role_arn != '' && steps.config.outputs.aws_sts_role_arn || vars.DEPLOYMENT_AWS_STS_ROLE_ARN }}
+          aws_sts_role_arn: ${{ steps.config.outputs.deploy_aws_sts_role_arn != '' && steps.config.outputs.deploy_aws_sts_role_arn || vars.DEPLOYMENT_AWS_STS_ROLE_ARN }}
           aws_access_key_id: ${{ secrets.BUILD_AWS_ACCESS_KEY_ID }}
           aws_secret_access_key: ${{ secrets.BUILD_AWS_SECRET_ACCESS_KEY }}
           terraform_state_conf: ${{ vars.DEPLOYMENT_STATE_CONF }}

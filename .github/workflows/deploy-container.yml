@@ -73,7 +73,7 @@ jobs:
           cloud: ${{ inputs.cloud }}
           environment: ${{ steps.config.outputs.environment }}
           aws_region: ${{ steps.config.outputs.aws_region != '' && steps.config.outputs.aws_region || inputs.default_aws_region }}
-          aws_sts_role_arn: ${{ steps.config.outputs.aws_sts_role_arn != '' && steps.config.outputs.aws_sts_role_arn || inputs.default_aws_sts_role_arn }}
+          aws_sts_role_arn: ${{ steps.config.outputs.build_aws_sts_role_arn != '' && steps.config.outputs.build_aws_sts_role_arn || inputs.default_aws_sts_role_arn }}
           aws_access_key_id: ${{ secrets.aws_access_key_id }}
           aws_secret_access_key: ${{ secrets.aws_secret_access_key }}
           azure_service_id: ${{ secrets.azure_service_id }}
