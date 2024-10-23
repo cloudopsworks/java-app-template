@@ -4,6 +4,7 @@
 #            Distributed Under Apache v2.0 License
 #
 name: Build Pull Request
+run-name: 'Build Pull Request - Branch: ${{ github.ref_name }}'
 on:
   pull_request:
     types:
@@ -31,7 +32,6 @@ permissions:
 
 jobs:
   check-pr:
-    name: 'Check on Pull Request - Branch: ${{ github.ref_name }}'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout w/Blueprint
