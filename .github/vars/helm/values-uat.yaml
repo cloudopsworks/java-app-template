@@ -2,7 +2,8 @@
 #podAnnotations: []
 #replicaCount: 1
 #env: []
-probePath: /healthz
+probe:
+  path: /healthz
 startupProbe:
   enabled: true
 #livenessProbe:
