@@ -106,8 +106,8 @@ jobs:
           destroy: true
           cloud_type: ${{ steps.config.outputs.cloud }}
           token: ${{ secrets.token }}
-          azure_service_id: ${{ secrets.AZURE_SERVICE_ID }}
-          azure_service_secret: ${{ secrets.AZURE_SERVICE_SECRET }}
+          azure_service_id: ${{ secrets.DEPLOYMENT_AZURE_SERVICE_ID }}
+          azure_service_secret: ${{ secrets.DEPLOYMENT_AZURE_SERVICE_SECRET }}
           azure_rg: ${{ steps.config.outputs.azure_rg != '' && steps.config.outputs.azure_rg || vars.PREVIEW_AZURE_RESOURCE_GROUP }}
           terraform_state_conf: ${{ inputs.terraform_state_conf }}
           release_name: ${{ steps.config.outputs.release_name }}
