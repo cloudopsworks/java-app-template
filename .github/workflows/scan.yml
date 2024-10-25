@@ -141,7 +141,7 @@ jobs:
           source_path: ${{ steps.co.outputs.source_path }}
           bot_user: ${{ inputs.bot_user }}
           token: ${{ inputs.token }}
-          sonarqube_url: ${{ vars.sonarqube_url }}
+          sonarqube_url: ${{ inputs.sonarqube_url }}
           sonarqube_token: ${{ secrets.sonarqube_token }}
           sonarqube_project_key: ${{ steps.build.outputs.package_name }}
           semver: ${{ steps.build.outputs.semver }}
@@ -154,7 +154,7 @@ jobs:
           source_path: ${{ steps.co.outputs.source_path }}
           bot_user: ${{ inputs.bot_user }}
           token: ${{ inputs.token }}
-          sonarqube_url: ${{ vars.sonarqube_url }}
+          sonarqube_url: ${{ inputs.sonarqube_url }}
           sonarqube_token: ${{ secrets.sonarqube_token }}
           sonarqube_project_key: ${{ steps.build.outputs.package_name }}
           semver: ${{ steps.build.outputs.semver }}
@@ -167,7 +167,7 @@ jobs:
           source_path: ${{ steps.co.outputs.source_path }}
           bot_user: ${{ inputs.bot_user }}
           token: ${{ inputs.token }}
-          dtrack_url: ${{ vars.dtrack_url }}
+          dtrack_url: ${{ inputs.dtrack_url }}
           dtrack_token: ${{ secrets.dtrack_token }}
           dtrack_project_key: ${{ steps.build.outputs.package_name }}
           project_type: ${{ needs.preload.outputs.dtrack_project_type }}
