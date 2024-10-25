@@ -21,6 +21,16 @@ repository_owner: "REPO_OWNER" # Required
 # Set Sonarqube processing to true if want to enable, the tool is disabled by default
 #sonarqube:
 #  enabled: true
+#  sources_path: "src/"
+#  binaries_path: "target/classes"
+#  libraries_path: "target/libs/**/*.jar"
+#  tests_path: "src/"
+#  tests_binaries: "target/test-classes"
+#  tests_inclusions: "src/**/test/**/*"
+#  tests_libraries: "target/libs/**/*.jar"
+#  exclusions: "target/**,"src/**/test/**/*"
+#  extra_exclusions:
+#  branch_disabled: true # uncomment only if you are using Community Sonarqube
 #
 # Set DependencyTrack processing to false if want to disable, the tool is enabled by default
 # type: is one of => Library , Application , Container , Framework , Device , Firmware , File , Operating System
