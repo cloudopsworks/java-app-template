@@ -167,10 +167,11 @@ jobs:
           container_registry: ${{ vars.PREVIEW_DOCKER_REGISTRY_ADDRESS }}
           pull_request_name: pr${{ github.event.pull_request.number }}
           cluster_name: ${{ vars.PREVIEW_AWS_EKS_CLUSTER_NAME }}
+          rancher_project_id: ${{ vars.PREVIEW_RANCHER_PROJECT_ID }}
 
       - name: Deploy Azure
         if: ${{ steps.config.outputs.cloud == 'AZURE' }}
-        uses: ./bp/cd/deploy/app/azure
+        uses: ./bp/cd/deploy/preview/azure
         with:
           cloud_type: ${{ steps.config.outputs.cloud }}
           token: ${{ secrets.token }}
@@ -186,20 +187,26 @@ jobs:
           container_registry: ${{ vars.PREVIEW_DOCKER_REGISTRY_ADDRESS }}
           pull_request_name: pr${{ github.event.pull_request.number }}
           cluster_name: ${{ vars.PREVIEW_AZURE_AKS_CLUSTER_NAME }}
+          rancher_project_id: ${{ vars.PREVIEW_RANCHER_PROJECT_ID }}
 
 #      - name: Deploy GCP
 #        if: ${{ steps.config.outputs.cloud == 'GCP' }}
-#        uses: ./bp/cd/deploy/app/azure
+#        uses: ./bp/cd/deploy/preview/gcp
 #        with:
-#          cloud_type: ${{ inputs.cloud_type }}
+#          cloud_type: ${{ steps.config.outputs.cloud }}
 #          token: ${{ secrets.token }}
-#          gcp_service_id: ${{ secrets.gcp_service_id }}
+#          gcp_service_id: ${{ secrets.GCP_SERVICE_ID }}
+#          gcp_service_secret: ${{ secrets.GCP_SERVICE_SECRET }}
 #          terraform_state_conf: ${{ inputs.terraform_state_conf }}
 #          release_name: ${{ steps.config.outputs.release_name }}
 #          release_version: ${{ inputs.semver }}
 #          package_name: ${{ steps.config.outputs.package_name }}
 #          deployment_name: ${{ inputs.deployment_name }}
 #          environment: ${{ steps.config.outputs.environment }}
+#          container_registry: ${{ vars.PREVIEW_DOCKER_REGISTRY_ADDRESS }}
+#          pull_request_name: pr${{ github.event.pull_request.number }}
+#          cluster_name: ${{ vars.PREVIEW_AZURE_AKS_CLUSTER_NAME }}
+#          rancher_project_id: ${{ vars.PREVIEW_RANCHER_PROJECT_ID }}
 
   scan:
     name: 'Code Scan SAST/SCA/DAST'
