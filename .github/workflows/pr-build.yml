@@ -68,6 +68,8 @@ jobs:
       apis_enabled: ${{ steps.config.outputs.apis_enabled }}
       container_enabled: ${{ steps.config.outputs.container_enabled }}
       has_preview: ${{ steps.config.outputs.has_preview }}
+      project_key: ${{ steps.config.outputs.project_key }}
+      project_owner: ${{ steps.config.outputs.project_owner }}
     steps:
       - name: Checkout w/Blueprint
         uses: cloudopsworks/blueprints/cd/checkout@v5
@@ -107,6 +109,8 @@ jobs:
           environment: ${{ steps.config.outputs.environment }}
           is_release: ${{ steps.config.outputs.is_release }}
           default_registry_address: ${{ vars.DOCKER_REGISTRY_ADDRESS }}
+          project_key: ${{ steps.config.outputs.project_key }}
+          project_owner: ${{ steps.config.outputs.project_owner }}
 
   deploy-container:
     needs:
@@ -122,6 +126,8 @@ jobs:
       default_aws_sts_role_arn: ${{ vars.PREVIEW_AWS_STS_ROLE_ARN }}
       default_azure_rg: ${{ vars.PREVIEW_AZURE_RG }}
       default_registry_address: ${{ vars.PREVIEW_DOCKER_REGISTRY_ADDRESS }}
+      project_key: ${{ needs.code-build.outputs.project_key }}
+      project_owner: ${{ needs.code-build.outputs.project_owner }}
     secrets:
       token: ${{ secrets.BOT_TOKEN }}
       aws_access_key_id: ${{ secrets.BUILD_AWS_ACCESS_KEY_ID }}
@@ -161,7 +167,7 @@ jobs:
           terraform_state_conf: ${{ vars.DEPLOYMENT_STATE_CONF }}
           release_name: ${{ steps.config.outputs.release_name }}
           release_version: ${{ needs.code-build.outputs.semver }}
-          package_name: ${{ steps.config.outputs.package_name }}
+          project_key: ${{ steps.config.outputs.project_key }}
           deployment_name: ${{ steps.config.outputs.deployment_name }}
           environment: ${{ steps.config.outputs.environment }}
           container_registry: ${{ vars.PREVIEW_DOCKER_REGISTRY_ADDRESS }}
@@ -181,7 +187,7 @@ jobs:
           terraform_state_conf: ${{ inputs.terraform_state_conf }}
           release_name: ${{ steps.config.outputs.release_name }}
           release_version: ${{ inputs.semver }}
-          package_name: ${{ steps.config.outputs.package_name }}
+          project_key: ${{ steps.config.outputs.project_key }}
           deployment_name: ${{ inputs.deployment_name }}
           environment: ${{ steps.config.outputs.environment }}
           container_registry: ${{ vars.PREVIEW_DOCKER_REGISTRY_ADDRESS }}
@@ -200,7 +206,7 @@ jobs:
 #          terraform_state_conf: ${{ inputs.terraform_state_conf }}
 #          release_name: ${{ steps.config.outputs.release_name }}
 #          release_version: ${{ inputs.semver }}
-#          package_name: ${{ steps.config.outputs.package_name }}
+#          project_key: ${{ steps.config.outputs.project_key }}
 #          deployment_name: ${{ inputs.deployment_name }}
 #          environment: ${{ steps.config.outputs.environment }}
 #          container_registry: ${{ vars.PREVIEW_DOCKER_REGISTRY_ADDRESS }}

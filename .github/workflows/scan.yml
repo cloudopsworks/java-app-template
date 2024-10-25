@@ -59,6 +59,7 @@ jobs:
       snyk_enabled: ${{ steps.config.outputs.snyk_enabled }}
       semgrep_enabled: ${{ steps.config.outputs.semgrep_enabled }}
       apis_enabled: ${{ steps.config.outputs.apis_enabled }}
+      project_key: ${{ steps.config.outputs.project_key }}
     steps:
       - name: Checkout w/Blueprint
         uses: cloudopsworks/blueprints/cd/checkout@v5
@@ -143,7 +144,7 @@ jobs:
           token: ${{ inputs.token }}
           sonarqube_url: ${{ inputs.sonarqube_url }}
           sonarqube_token: ${{ secrets.sonarqube_token }}
-          sonarqube_project_key: ${{ steps.build.outputs.package_name }}
+          sonarqube_project_key: ${{ needs.preload.outputs.project_key }}
           semver: ${{ steps.build.outputs.semver }}
 
       - name: SonarQube Scan APIS
@@ -156,7 +157,7 @@ jobs:
           token: ${{ inputs.token }}
           sonarqube_url: ${{ inputs.sonarqube_url }}
           sonarqube_token: ${{ secrets.sonarqube_token }}
-          sonarqube_project_key: ${{ steps.build.outputs.package_name }}
+          sonarqube_project_key: ${{ needs.preload.outputs.project_key }}
           semver: ${{ steps.build.outputs.semver }}
 
       - name: Dependency track Scan
@@ -169,7 +170,7 @@ jobs:
           token: ${{ inputs.token }}
           dtrack_url: ${{ inputs.dtrack_url }}
           dtrack_token: ${{ secrets.dtrack_token }}
-          dtrack_project_key: ${{ steps.build.outputs.package_name }}
+          dtrack_project_key: ${{ needs.preload.outputs.project_key }}
           project_type: ${{ needs.preload.outputs.dtrack_project_type }}
 
       - name: Upload Artifacts
