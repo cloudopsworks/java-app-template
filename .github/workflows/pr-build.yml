@@ -156,8 +156,8 @@ jobs:
           token: ${{ secrets.BOT_TOKEN }}
           aws_region: ${{ vars.PREVIEW_AWS_REGION }}
           aws_sts_role_arn: ${{ vars.PREVIEW_AWS_STS_ROLE_ARN }}
-          aws_access_key_id: ${{ secrets.BUILD_AWS_ACCESS_KEY_ID }}
-          aws_secret_access_key: ${{ secrets.BUILD_AWS_SECRET_ACCESS_KEY }}
+          aws_access_key_id: ${{ secrets.PREVIEW_AWS_ACCESS_KEY_ID }}
+          aws_secret_access_key: ${{ secrets.PREVIEW_AWS_SECRET_ACCESS_KEY }}
           terraform_state_conf: ${{ vars.DEPLOYMENT_STATE_CONF }}
           release_name: ${{ steps.config.outputs.release_name }}
           release_version: ${{ needs.code-build.outputs.semver }}
