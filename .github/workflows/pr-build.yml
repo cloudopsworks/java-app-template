@@ -195,9 +195,8 @@ jobs:
 #        with:
 #          cloud_type: ${{ steps.config.outputs.cloud }}
 #          token: ${{ secrets.token }}
-#          gcp_service_id: ${{ secrets.AZURE_SERVICE_ID }}
-#          gcp_service_secret: ${{ secrets.AZURE_SERVICE_SECRET }}
-#          gcp_rg: ${{ steps.config.outputs.azure_rg != '' && steps.config.outputs.azure_rg || vars.PREVIEW_AZURE_RESOURCE_GROUP }}
+#          gcp_service_id: ${{ secrets.GCP_SERVICE_ID }}
+#          gcp_service_secret: ${{ secrets.GCP_SERVICE_SECRET }}
 #          terraform_state_conf: ${{ inputs.terraform_state_conf }}
 #          release_name: ${{ steps.config.outputs.release_name }}
 #          release_version: ${{ inputs.semver }}
