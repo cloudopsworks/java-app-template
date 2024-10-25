@@ -53,7 +53,7 @@ jobs:
       is_library: ${{ steps.config.outputs.is_library }}
       cloud: ${{ steps.config.outputs.cloud }}
       cloud_type: ${{ steps.config.outputs.cloud_type }}
-      runner_set: ${{ steps.config.outputs.runner_set }}
+      runner_set: ${{ steps.config.outputs.runner_set != '' && steps.config.outputs.runner_set || vars.DEPLOYMENT_RUNNER_SET }}
       apis_enabled: ${{ steps.config.outputs.apis_enabled }}
       container_enabled: ${{ steps.config.outputs.container_enabled }}
     steps:
