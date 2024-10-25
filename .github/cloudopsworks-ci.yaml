@@ -4,6 +4,7 @@
 #            Distributed Under Apache v2.0 License
 #
 zipGlobs:
+  - target/libs/**
   - target/*.jar
   - conf/**
 excludeGlobs:
