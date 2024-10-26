@@ -87,7 +87,7 @@ jobs:
           terraform_state_conf: ${{ inputs.terraform_state_conf }}
           release_name: ${{ steps.config.outputs.release_name }}
           release_version: ${{ inputs.semver }}
-          package_name: ${{ steps.config.outputs.package_name }}
+          project_key: ${{ steps.config.outputs.project_key }}
           deployment_name: ${{ inputs.deployment_name }}
           environment: ${{ steps.config.outputs.environment }}
 
@@ -131,7 +131,7 @@ jobs:
           terraform_state_conf: ${{ inputs.terraform_state_conf }}
           release_name: ${{ steps.config.outputs.release_name }}
           release_version: ${{ inputs.semver }}
-          package_name: ${{ steps.config.outputs.package_name }}
+          project_key: ${{ steps.config.outputs.project_key }}
           deployment_name: ${{ inputs.deployment_name }}
           environment: ${{ steps.config.outputs.environment }}
 
@@ -147,7 +147,7 @@ jobs:
           terraform_state_conf: ${{ inputs.terraform_state_conf }}
           release_name: ${{ steps.config.outputs.release_name }}
           release_version: ${{ inputs.semver }}
-          package_name: ${{ steps.config.outputs.package_name }}
+          project_key: ${{ steps.config.outputs.project_key }}
           deployment_name: ${{ inputs.deployment_name }}
           environment: ${{ steps.config.outputs.environment }}
 
@@ -161,6 +161,6 @@ jobs:
 #          terraform_state_conf: ${{ inputs.terraform_state_conf }}
 #          release_name: ${{ steps.config.outputs.release_name }}
 #          release_version: ${{ inputs.semver }}
-#          package_name: ${{ steps.config.outputs.package_name }}
+#          project_key: ${{ steps.config.outputs.project_key }}
 #          deployment_name: ${{ inputs.deployment_name }}
 #          environment: ${{ steps.config.outputs.environment }}

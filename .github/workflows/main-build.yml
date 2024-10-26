@@ -56,6 +56,8 @@ jobs:
       runner_set: ${{ steps.config.outputs.runner_set != '' && steps.config.outputs.runner_set || vars.DEPLOYMENT_RUNNER_SET }}
       apis_enabled: ${{ steps.config.outputs.apis_enabled }}
       container_enabled: ${{ steps.config.outputs.container_enabled }}
+      project_key: ${{ steps.config.outputs.project_key }}
+      project_owner: ${{ steps.config.outputs.project_owner }}
     steps:
       - name: Checkout w/Blueprint
         uses: cloudopsworks/blueprints/cd/checkout@v5
@@ -98,6 +100,8 @@ jobs:
           environment: ${{ steps.config.outputs.environment }}
           is_release: ${{ steps.config.outputs.is_release }}
           default_registry_address: ${{ vars.DOCKER_REGISTRY_ADDRESS }}
+          project_key: ${{ steps.config.outputs.project_key }}
+          project_owner: ${{ steps.config.outputs.project_owner }}
 
   deploy-container:
     needs:
@@ -113,6 +117,8 @@ jobs:
       default_aws_sts_role_arn: ${{ vars.BUILD_AWS_STS_ROLE_ARN }}
       default_azure_rg: ${{ vars.BUILD_AZURE_RG }}
       default_registry_address: ${{ vars.DOCKER_REGISTRY_ADDRESS }}
+      project_key: ${{ needs.code-build.outputs.project_key }}
+      project_owner: ${{ needs.code-build.outputs.project_owner }}
     secrets:
       token: ${{ secrets.BOT_TOKEN }}
       aws_access_key_id: ${{ secrets.BUILD_AWS_ACCESS_KEY_ID }}

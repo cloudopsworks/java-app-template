@@ -92,7 +92,7 @@ jobs:
           terraform_state_conf: ${{ vars.DEPLOYMENT_STATE_CONF }}
           release_name: ${{ steps.config.outputs.release_name }}
           release_version: ${{ needs.code-build.outputs.semver }}
-          package_name: ${{ steps.config.outputs.package_name }}
+          project_key: ${{ steps.config.outputs.project_key }}
           deployment_name: ${{ steps.config.outputs.deployment_name }}
           environment: ${{ steps.config.outputs.environment }}
           container_registry: ${{ vars.PREVIEW_DOCKER_REGISTRY_ADDRESS }}
@@ -112,7 +112,7 @@ jobs:
           terraform_state_conf: ${{ inputs.terraform_state_conf }}
           release_name: ${{ steps.config.outputs.release_name }}
           release_version: ${{ inputs.semver }}
-          package_name: ${{ steps.config.outputs.package_name }}
+          project_key: ${{ steps.config.outputs.project_key }}
           deployment_name: ${{ inputs.deployment_name }}
           environment: ${{ steps.config.outputs.environment }}
           container_registry: ${{ vars.PREVIEW_DOCKER_REGISTRY_ADDRESS }}
@@ -130,7 +130,7 @@ jobs:
 #          terraform_state_conf: ${{ inputs.terraform_state_conf }}
 #          release_name: ${{ steps.config.outputs.release_name }}
 #          release_version: ${{ inputs.semver }}
-#          package_name: ${{ steps.config.outputs.package_name }}
+#          project_key: ${{ steps.config.outputs.project_key }}
 #          deployment_name: ${{ inputs.deployment_name }}
 #          environment: ${{ steps.config.outputs.environment }}
 

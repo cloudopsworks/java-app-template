@@ -1,10 +1,10 @@
 #annotations: []
 #podAnnotations: []
 #replicaCount: 1
-#env: {}
+#env: []
 probe:
   path: /healthz
-  #port: 8082
+#  port: 8082
 startupProbe:
   enabled: true
 #livenessProbe:

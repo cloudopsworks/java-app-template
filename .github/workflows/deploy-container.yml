@@ -35,6 +35,12 @@ on:
         required: false
         type: string
         default: ''
+      project_key:
+        required: true
+        type: string
+      project_owner:
+        required: true
+        type: string
     secrets:
       token:
         description: 'GitHub Token'
@@ -79,4 +85,5 @@ jobs:
           azure_service_id: ${{ secrets.azure_service_id }}
           azure_service_secret: ${{ secrets.azure_service_secret }}
           default_registry_address: ${{ inputs.default_registry_address }}
-
+          project_key: ${{ inputs.project_key }}
+          project_owner: ${{ inputs.project_owner }}
