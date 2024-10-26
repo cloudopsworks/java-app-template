@@ -93,7 +93,7 @@ jobs:
         uses: ./bp/ci/java/deploy
         with:
           bot_user: ${{ vars.BOT_USER }}
-          github_token: ${{ secrets.BOT_TOKEN }}
+          token: ${{ secrets.BOT_TOKEN }}
 
       - name: Save Build Artifacts
         uses: ./bp/ci/java/artifacts
