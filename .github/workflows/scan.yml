@@ -19,6 +19,9 @@ on:
       dtrack_url:
         required: true
         type: string
+      default_runner_set:
+        required: true
+        type: string
 
     secrets:
       token:
@@ -60,7 +63,7 @@ jobs:
       semgrep_enabled: ${{ steps.config.outputs.semgrep_enabled }}
       apis_enabled: ${{ steps.config.outputs.apis_enabled }}
       project_key: ${{ steps.config.outputs.project_key }}
-      runner_set: ${{ steps.config.outputs.runner_set != '' && steps.config.outputs.runner_set || vars.DEPLOYMENT_RUNNER_SET  }}
+      runner_set: ${{ steps.config.outputs.runner_set != '' && steps.config.outputs.runner_set || inputs.default_runner_set  }}
     steps:
       - name: Checkout w/Blueprint
         uses: cloudopsworks/blueprints/cd/checkout@v5
