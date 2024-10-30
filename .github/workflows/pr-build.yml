@@ -224,6 +224,7 @@ jobs:
       bot_user: ${{ vars.BOT_USER }}
       sonarqube_url: ${{ vars.SONARQUBE_URL }}
       dtrack_url: ${{ vars.DEPENDENCYTRACK_URL }}
+      default_runner_set: ${{ vars.DEPLOYMENT_RUNNER_SET }}
     secrets:
       token: ${{ secrets.BOT_TOKEN }}
       sonarqube_token: ${{ secrets.SONARQUBE_TOKEN }}
