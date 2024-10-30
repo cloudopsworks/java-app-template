@@ -60,6 +60,7 @@ jobs:
       semgrep_enabled: ${{ steps.config.outputs.semgrep_enabled }}
       apis_enabled: ${{ steps.config.outputs.apis_enabled }}
       project_key: ${{ steps.config.outputs.project_key }}
+      runner_set: ${{ steps.config.outputs.runner_set != '' && steps.config.outputs.runner_set || vars.DEPLOYMENT_RUNNER_SET  }}
     steps:
       - name: Checkout w/Blueprint
         uses: cloudopsworks/blueprints/cd/checkout@v5
@@ -101,7 +102,7 @@ jobs:
     name: Scan Code
     needs:
       - preload
-    runs-on: ubuntu-latest
+    runs-on: ${{ needs.preload.outputs.runner_set }}
     steps:
       - name: Checkout w/Blueprint
         uses: cloudopsworks/blueprints/cd/checkout@v5
