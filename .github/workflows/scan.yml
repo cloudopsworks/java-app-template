@@ -64,6 +64,7 @@ jobs:
       apis_enabled: ${{ steps.config.outputs.apis_enabled }}
       project_key: ${{ steps.config.outputs.project_key }}
       runner_set: ${{ steps.config.outputs.runner_set != '' && steps.config.outputs.runner_set || inputs.default_runner_set  }}
+      fail_on_quality_gate: ${{ steps.config.outputs.fail_on_quality_gate }}
     steps:
       - name: Checkout w/Blueprint
         uses: cloudopsworks/blueprints/cd/checkout@v5
@@ -150,6 +151,16 @@ jobs:
           sonarqube_token: ${{ secrets.sonarqube_token }}
           sonarqube_project_key: ${{ needs.preload.outputs.project_key }}
           semver: ${{ steps.build.outputs.semver }}
+
+      - name: SonarQube Scan Quality Gate
+        if: ${{ needs.preload.outputs.sonarqube_enabled == 'true' }}
+        uses: ./bp/ci/scan/sonarqube/quality-gate
+        timeout-minutes: 5
+        continue-on-error: ${{ needs.preload.outputs.fail_on_quality_gate != 'true' }}
+        with:
+          source_path: ${{ steps.co.outputs.source_path }}
+          sonarqube_url: ${{ inputs.sonarqube_url }}
+          sonarqube_token: ${{ secrets.sonarqube_token }}
 
       - name: SonarQube Scan APIS
         if: ${{ needs.preload.outputs.sonarqube_enabled == 'true' && needs.preload.outputs.apis_enabled == 'true' }}
