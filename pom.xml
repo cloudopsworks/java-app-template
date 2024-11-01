@@ -115,6 +115,7 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/x
             </goals>
             <configuration>
               <outputFormat>all</outputFormat>
+              <outputDirectory>${project.build.directory}</outputDirectory>
               <outputName>bom</outputName>
             </configuration>
           </execution>
