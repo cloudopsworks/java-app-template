@@ -99,7 +99,7 @@ jobs:
           source_path: ${{ steps.co.outputs.source_path }}
           semgrep_token: ${{ secrets.semgrep_token }}
           bot_user: ${{ inputs.bot_user }}
-          token: ${{ inputs.token }}
+          token: ${{ secrets.token }}
 
 
   scan-others:
@@ -119,14 +119,14 @@ jobs:
         uses: ./bp/ci/java/build
         with:
           bot_user: ${{ inputs.bot_user }}
-          token: ${{ inputs.token }}
+          token: ${{ secrets.token }}
 
       - name: Test / Verify / Install Java
         id: test
         uses: ./bp/ci/java/test/verify
         with:
           bot_user: ${{ inputs.bot_user }}
-          token: ${{ inputs.token }}
+          token: ${{ secrets.token }}
           dtrack_project_type: ${{ needs.preload.outputs.dtrack_project_type }}
 
       - name: Snyk Scan
@@ -138,7 +138,7 @@ jobs:
           snyk_token: ${{ secrets.snyk_token }}
           bot_user: ${{ inputs.bot_user }}
           semver: ${{ steps.build.outputs.semver }}
-          token: ${{ inputs.token }}
+          token: ${{ secrets.token }}
 
       - name: SonarQube Scan
         if: ${{ needs.preload.outputs.sonarqube_enabled == 'true' }}
@@ -146,7 +146,7 @@ jobs:
         continue-on-error: true
         with:
           source_path: ${{ steps.co.outputs.source_path }}
-          token: ${{ inputs.token }}
+          token: ${{ secrets.token }}
           sonarqube_url: ${{ inputs.sonarqube_url }}
           sonarqube_token: ${{ secrets.sonarqube_token }}
           sonarqube_project_key: ${{ needs.preload.outputs.project_key }}
@@ -168,7 +168,7 @@ jobs:
         continue-on-error: true
         with:
           source_path: ${{ steps.co.outputs.source_path }}
-          token: ${{ inputs.token }}
+          token: ${{ secrets.token }}
           sonarqube_url: ${{ inputs.sonarqube_url }}
           sonarqube_token: ${{ secrets.sonarqube_token }}
           sonarqube_project_key: ${{ needs.preload.outputs.project_key }}
@@ -180,7 +180,7 @@ jobs:
         continue-on-error: true
         with:
           source_path: ${{ steps.co.outputs.source_path }}
-          token: ${{ inputs.token }}
+          token: ${{ secrets.token }}
           dtrack_url: ${{ inputs.dtrack_url }}
           dtrack_token: ${{ secrets.dtrack_token }}
           dtrack_project_key: ${{ needs.preload.outputs.project_key }}
@@ -191,5 +191,5 @@ jobs:
         uses: ./bp/ci/java/test/artifacts
         with:
           bot_user: ${{ inputs.bot_user }}
-          token: ${{ inputs.token }}
+          token: ${{ secrets.token }}
 
