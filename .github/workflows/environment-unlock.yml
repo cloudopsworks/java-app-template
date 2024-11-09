@@ -9,8 +9,9 @@ on:
   workflow_dispatch:
     inputs:
       unlockDeploymentName:
-        type: choice
+        type: environment
         description: Select Environment to destroy
+        required: true
         options:
           - develop/dev
           - release/production
@@ -19,6 +20,7 @@ on:
       environment:
         type: choice
         description: Environment to destroy
+        required: true
         options:
           - dev
           - uat
