@@ -61,7 +61,7 @@ repository_owner: "REPO_OWNER" # Required
 #custom_run_command: java -jar app.jar
 #
 # Custom User Group Command, this command can be uncommented in some cases to cover the proper
-# User creation on images like based on Busybox or Redhat UBI-8/9 or Fedora
+# User creation on images like based on Busybox or Redhat UBI-8/9 or Fedora, important double scape of \
 #custom_usergroup: |
 #  groupadd --gid $GROUP_ID --system $GROUP_NAME \\
 #    && useradd --uid $USER_ID --system --gid $GROUP_ID --home /app/webapp $USER_NAME
