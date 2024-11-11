@@ -12,11 +12,11 @@ repository_owner: "REPO_OWNER" # Required
 #
 # Set Snyk processing to true if want to enable, the tool is disabled by default
 #snyk:
-#  enabled: false
+#  enabled: true
 #
 # Set Semgrep processing to true if want to enable, the tool is disabled by default
 #semgrep:
-#  enabled: false
+#  enabled: true
 #
 # Set Sonarqube processing to true if want to enable, the tool is disabled by default
 #sonarqube:
@@ -24,11 +24,11 @@ repository_owner: "REPO_OWNER" # Required
 #  fail_on_quality_gate: true
 #  sources_path: "src/"
 #  binaries_path: "target/classes"
-#  libraries_path: "target/libs/**/*.jar"
+#  libraries_path: "target/libs/**/*.jar" # defaults to blank
 #  tests_path: "src/"
 #  tests_binaries: "target/test-classes"
 #  tests_inclusions: "src/**/test/**/*"
-#  tests_libraries: "target/libs/**/*.jar"
+#  tests_libraries: "target/libs/**/*.jar" # defaults to blank
 #  exclusions: "target/**,"src/**/test/**/*"
 #  extra_exclusions:
 #  branch_disabled: true # uncomment only if you are using Community Sonarqube
@@ -74,14 +74,14 @@ repository_owner: "REPO_OWNER" # Required
 #
 # Preview configuration, if enabled will create a preview environment for each PR
 #preview:
-#  enabled: false
+#  enabled: true
 #  kubernetes: true
 #  domain: example.com
 #
 # API Gateway configuration, if enabled will deploy apis to the environment api gateway
 # configuration is done under .github/vars/apigw/
 #apis:
-#  enabled: false
+#  enabled: true
 #
 ## CD pipeline configuration uncomment and configure accordingly to enable
 # Target Cloud
