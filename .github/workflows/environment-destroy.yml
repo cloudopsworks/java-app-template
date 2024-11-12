@@ -12,11 +12,6 @@ on:
         type: environment
         description: Select Environment to destroy
         required: true
-        options:
-          - develop/dev
-          - release/production
-          - test/uat
-          - prerelease/demo
       environment:
         type: choice
         description: Environment to destroy
