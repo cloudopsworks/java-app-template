@@ -90,7 +90,7 @@ jobs:
         uses: ./bp/ci/api/artifacts
 
       - name: Build & Save Container
-        if: steps.config.outputs.container_enabled == 'true'
+        if: ${{ steps.config.outputs.container_enabled == 'true' && needs.code-build.outputs.is_library != 'true' }}
         uses: ./bp/ci/java/container
         with:
           semver: ${{ steps.build.outputs.semver }}
@@ -133,6 +133,7 @@ jobs:
       - deploy-container
     runs-on: ubuntu-latest
     if: |
+      always() &&
       (needs.code-build.result == 'success') &&
       (needs.code-build.outputs.is_release == 'true')
     steps:
@@ -159,7 +160,7 @@ jobs:
     needs:
       - code-build
       - deploy-container
-    if: needs.code-build.result == 'success'
+    if: always() && needs.code-build.result == 'success'
     uses: ./.github/workflows/scan.yml
     with:
       deployment_name: ${{ needs.code-build.outputs.deployment_name }}
@@ -179,6 +180,7 @@ jobs:
       - code-build
       - deploy-container
     if: |
+      always() &&
       needs.code-build.result == 'success' &&
       needs.code-build.outputs.blue_green_enabled != 'true' && 
       needs.code-build.outputs.deployment_enabled == 'true' && 
@@ -207,6 +209,7 @@ jobs:
       - code-build
       - deploy-container
     if: |
+      always() &&
       needs.code-build.result == 'success' &&
       needs.code-build.outputs.blue_green_enabled == 'true'  && 
       needs.code-build.outputs.deployment_enabled == 'true' && 
