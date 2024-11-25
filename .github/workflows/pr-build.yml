@@ -168,6 +168,7 @@ jobs:
           release_name: ${{ steps.config.outputs.release_name }}
           release_version: ${{ needs.code-build.outputs.semver }}
           project_key: ${{ steps.config.outputs.project_key }}
+          project_owner: ${{ steps.config.outputs.project_owner }}
           deployment_name: ${{ steps.config.outputs.deployment_name }}
           environment: ${{ steps.config.outputs.environment }}
           container_registry: ${{ vars.PREVIEW_DOCKER_REGISTRY_ADDRESS }}
