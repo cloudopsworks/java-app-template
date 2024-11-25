@@ -27,6 +27,10 @@ on:
         description: 'Default Runner Set'
         required: true
         type: string
+      environment:
+        description: 'Environment'
+        required: true
+        type: string
       is_preview:
         description: 'Is Preview Environment'
         required: false
