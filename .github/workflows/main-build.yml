@@ -161,7 +161,9 @@ jobs:
     needs:
       - code-build
       - deploy-container
-    if: always() && needs.code-build.result == 'success'
+    if: |
+      always() && 
+      (needs.code-build.result == 'success')
     uses: ./.github/workflows/scan.yml
     with:
       deployment_name: ${{ needs.code-build.outputs.deployment_name }}
