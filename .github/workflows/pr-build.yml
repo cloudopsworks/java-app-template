@@ -70,6 +70,7 @@ jobs:
       has_preview: ${{ steps.config.outputs.has_preview }}
       project_key: ${{ steps.config.outputs.project_key }}
       project_owner: ${{ steps.config.outputs.project_owner }}
+      environment: ${{ steps.config.outputs.environment }}
     steps:
       - name: Checkout w/Blueprint
         uses: cloudopsworks/blueprints/cd/checkout@v5
@@ -226,6 +227,8 @@ jobs:
       sonarqube_url: ${{ vars.SONARQUBE_URL }}
       dtrack_url: ${{ vars.DEPENDENCYTRACK_URL }}
       default_runner_set: ${{ vars.DEPLOYMENT_RUNNER_SET }}
+      environment: ${{ needs.code-build.outputs.environment }}
+      is_preview: true
     secrets:
       token: ${{ secrets.BOT_TOKEN }}
       sonarqube_token: ${{ secrets.SONARQUBE_TOKEN }}
