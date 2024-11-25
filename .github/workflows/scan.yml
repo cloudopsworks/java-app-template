@@ -8,20 +8,30 @@ on:
   workflow_call:
     inputs:
       deployment_name:
+        description: 'Deployment Name'
         required: true
         type: string
       bot_user:
+        description: 'Bot User'
         required: true
         type: string
       sonarqube_url:
+        description: 'SonarQube URL'
         required: true
         type: string
       dtrack_url:
+        description: 'Dependency Track URL'
         required: true
         type: string
       default_runner_set:
+        description: 'Default Runner Set'
         required: true
         type: string
+      is_preview:
+        description: 'Is Preview Environment'
+        required: false
+        type: boolean
+        default: false
 
     secrets:
       token:
