@@ -30,7 +30,7 @@ on:
         required: false
         default: ''
 
-concurrency: unlock-${{ github.repository }}-${{ inputs.destroyedDeploymentName }}
+concurrency: unlock-${{ github.repository }}-${{ inputs.unlockDeploymentName }}
 
 # Permission Settings for the entire RUN
 permissions:
@@ -61,7 +61,7 @@ jobs:
       - preload
     name: 'Unlock Environment - Branch: ${{ github.ref_name }} - Env: ${{ inputs.unlockDeploymentName }}'
     runs-on: ${{ needs.preload.outputs.runner_set }}
-    environment: ${{ inputs.destroyedDeploymentName }}
+    environment: ${{ inputs.unlockDeploymentName }}
     steps:
       - name: Checkout w/Blueprint
         uses: cloudopsworks/blueprints/cd/checkout@v5
@@ -89,7 +89,7 @@ jobs:
           release_name: ${{ steps.config.outputs.release_name }}
           release_version: 'v1'
           project_key: ${{ steps.config.outputs.project_key }}
-          deployment_name: ${{ inputs.destroyedDeploymentName }}
+          deployment_name: ${{ inputs.unlockDeploymentName }}
           environment: ${{ steps.config.outputs.environment }}
 
       - name: Destroy Azure
@@ -108,7 +108,7 @@ jobs:
           release_name: ${{ steps.config.outputs.release_name }}
           release_version: ${{ inputs.semver }}
           project_key: ${{ steps.config.outputs.project_key }}
-          deployment_name: ${{ inputs.destroyedDeploymentName }}
+          deployment_name: ${{ inputs.unlockDeploymentName }}
           environment: ${{ steps.config.outputs.environment }}
 
 #      - name: Destroy GCP
@@ -125,5 +125,5 @@ jobs:
 #          release_name: ${{ steps.config.outputs.release_name }}
 #          release_version: ${{ inputs.semver }}
 #          project_key: ${{ steps.config.outputs.project_key }}
-#          deployment_name: ${{ inputs.destroyedDeploymentName }}
+#          deployment_name: ${{ inputs.unlockDeploymentName }}
 #          environment: ${{ steps.config.outputs.environment }}
