@@ -4,6 +4,7 @@ runner_set: "RUNNER-ENV"
 versions_bucket: "VERSIONS_BUCKET"
 #logs_bucket: "LOGS_BUCKET"
 #blue_green: true # uncomment for Prod environment to support blue/green deploy
+container_registry: REGISTRY
 aws:
   region: "AWS_REGION"
 #  sts_role_arn: "AWS_STS_ROLE_ARN" # Optional: when existing role is same for build and deploy
