@@ -90,7 +90,7 @@ jobs:
           release_version: 'v1'
           project_key: ${{ steps.config.outputs.project_key }}
           deployment_name: ${{ inputs.unlockDeploymentName }}
-          environment: ${{ steps.config.outputs.environment }}
+          environment: ${{ inputs.environment }}
 
       - name: Destroy Azure
         if: ${{ steps.config.outputs.cloud == 'AZURE' }}
@@ -109,7 +109,7 @@ jobs:
           release_version: ${{ inputs.semver }}
           project_key: ${{ steps.config.outputs.project_key }}
           deployment_name: ${{ inputs.unlockDeploymentName }}
-          environment: ${{ steps.config.outputs.environment }}
+          environment: ${{ inputs.environment }}
 
 #      - name: Destroy GCP
 #        if: ${{ steps.config.outputs.cloud == 'GCP' }}
