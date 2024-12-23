@@ -1,6 +1,9 @@
 environment: "dev|uat|prod|demo"
 runner_set: "RUNNER-ENV"
 #disable_deploy: true
+versions_bucket: "VERSIONS_BUCKET"
+#logs_bucket: "LOGS_BUCKET"
+container_registry: REGISTRY # optional if Preview = false, can comment out
 aws:
   region: "AWS_REGION"
 #  sts_role_arn: "AWS_STS_ROLE_ARN" # Optional: when existing role is same for build and deploy
