@@ -59,6 +59,7 @@ jobs:
       project_key: ${{ steps.config.outputs.project_key }}
       project_owner: ${{ steps.config.outputs.project_owner }}
       environment: ${{ steps.config.outputs.environment }}
+      has_qualifier: ${{ steps.config.outputs.has_qualifier }}
     steps:
       - name: Checkout w/Blueprint
         uses: cloudopsworks/blueprints/cd/checkout@v5
@@ -136,7 +137,8 @@ jobs:
     if: |
       always() &&
       (needs.code-build.result == 'success') &&
-      (needs.code-build.outputs.is_release == 'true')
+      (needs.code-build.outputs.is_release == 'true') &&
+      (needs.code-build.outputs.has_qualifier != 'true')
     steps:
       - name: Checkout w/Blueprint
         uses: cloudopsworks/blueprints/cd/checkout@v5
