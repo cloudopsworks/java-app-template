@@ -52,7 +52,10 @@ jobs:
   code-build:
     name: 'Code Build - Branch: ${{ github.ref_name }}'
     runs-on: ubuntu-latest
-    if: ${{ ! startsWith(github.head_ref, 'release/') && ! startsWith(github.head_ref,'support/') && ! startsWith(github.head_ref,'master')}}
+    if: |
+      (! startsWith(github.head_ref, 'release/')) &&
+      (! startsWith(github.head_ref,'support/')) &&
+      (! startsWith(github.head_ref,'master'))
     outputs:
       is_release: ${{ steps.config.outputs.is_release }}
       is_pre_release: ${{ steps.config.outputs.is_pre_release }}
