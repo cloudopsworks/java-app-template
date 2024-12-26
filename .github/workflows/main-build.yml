@@ -92,7 +92,9 @@ jobs:
         uses: ./bp/ci/api/artifacts
 
       - name: Build & Save Container
-        if: ${{ steps.config.outputs.container_enabled == 'true' && steps.config.outputs.is_library != 'true' }}
+        if: |
+          (steps.config.outputs.container_enabled == 'true') &&
+          (steps.config.outputs.is_library != 'true')
         uses: ./bp/ci/java/container
         with:
           semver: ${{ steps.build.outputs.semver }}
