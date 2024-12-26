@@ -116,7 +116,10 @@ jobs:
   deploy-container:
     needs:
       - code-build
-    if: ${{ needs.code-build.outputs.container_enabled == 'true' && needs.code-build.outputs.deployment_enabled == 'true' && needs.code-build.outputs.is_library != 'true' }}
+    if: |
+      (needs.code-build.outputs.container_enabled == 'true') &&
+      (needs.code-build.outputs.deployment_enabled == 'true') &&
+      (needs.code-build.outputs.is_library != 'true')
     uses: ./.github/workflows/deploy-container.yml
     with:
       deployment_name: ${{ needs.code-build.outputs.deployment_name }}
