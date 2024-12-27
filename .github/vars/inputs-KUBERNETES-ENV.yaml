@@ -5,9 +5,13 @@ runner_set: "RUNNER-ENV"
 container_registry: REGISTRY
 cluster_name: CLUSTER_NAME
 namespace: NAMESPACE
+secret_files:
+  enabled: false
+  #files_path: values/secrets
+  mount_point: /app/secrets
 config_map:
   enabled:  false
-  files_path: values/configmaps
+  #files_path: values/configmaps
   mount_point: /app/configmap
 #helm_repo_url: oci://HELM_REPO_URL|https://HELM_REPO_URL
 #helm_chart_name: CHART_NAME
