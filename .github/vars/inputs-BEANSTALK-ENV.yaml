@@ -67,6 +67,7 @@ beanstalk:
   # Can specify complete name for certain environments to Stick the stack to a specific version.
   solution_stack: SOLUTION_STACK
   application: APPLICATION
+  #wait_for_ready_timeout: "20m"
   iam:
     instance_profile: INSTANCE_PROFILE
     service_role: SERVICE_ROLE
