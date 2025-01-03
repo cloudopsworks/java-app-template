@@ -128,20 +128,12 @@ jobs:
         with:
           blueprint_ref: 'v5'
 
-      - name: Build Java
-        id: build
-        uses: ./bp/ci/java/build
+      - name: Download Target Artifacts
+        uses: ./bp/ci/common/download/artifacts
         with:
           bot_user: ${{ inputs.bot_user }}
           token: ${{ secrets.token }}
-
-      - name: Test / Verify / Install Java
-        id: test
-        uses: ./bp/ci/java/test/verify
-        with:
-          bot_user: ${{ inputs.bot_user }}
-          token: ${{ secrets.token }}
-          dtrack_project_type: ${{ needs.preload.outputs.dtrack_project_type }}
+          destination_path: 'target'
 
       - name: Snyk Scan
         if: ${{ needs.preload.outputs.snyk_enabled == 'true' }}
