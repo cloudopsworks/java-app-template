@@ -70,7 +70,7 @@ jobs:
         id: config
         uses: ./bp/ci/config
 
-      - name: Build Java
+      - name: Java Build and Test
         id: build
         uses: ./bp/ci/java/build
         with:
