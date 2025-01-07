@@ -96,10 +96,10 @@ jobs:
           aws_secret_access_key: ${{ secrets.aws_secret_access_key }}
           terraform_state_conf: ${{ inputs.terraform_state_conf }}
           release_name: ${{ needs.preload.outputs.release_name }}
-          release_version: ${{ inputs.semver }}
+          release_version: 'v1'
           project_key: ${{ needs.preload.outputs.project_key }}
-          deployment_name: ${{ inputs.deployment_name }}
-          environment: ${{ needs.preload.outputs.environment }}
+          deployment_name: ${{ inputs.unlockDeploymentName }}
+          environment: ${{ inputs.environment }}
 
       - name: Unlock Application Deploy AWS
         if: ${{ needs.preload.outputs.cloud == 'AWS' && inputs.target == 'app' }}
@@ -133,10 +133,10 @@ jobs:
           azure_rg: ${{ needs.preload.outputs.azure_rg != '' && needs.preload.outputs.azure_rg || vars.DEPLOYMENT_AZURE_RG }}
           terraform_state_conf: ${{ inputs.terraform_state_conf }}
           release_name: ${{ needs.preload.outputs.release_name }}
-          release_version: ${{ inputs.semver }}
+          release_version: 'v1'
           project_key: ${{ needs.preload.outputs.project_key }}
-          deployment_name: ${{ inputs.deployment_name }}
-          environment: ${{ needs.preload.outputs.environment }}
+          deployment_name: ${{ inputs.unlockDeploymentName }}
+          environment: ${{ inputs.environment }}
 
       - name: Unlock Application Deploy Azure
         if: ${{ needs.preload.outputs.cloud == 'AZURE' && inputs.target == 'app' }}
