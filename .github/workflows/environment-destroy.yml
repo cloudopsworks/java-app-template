@@ -89,15 +89,15 @@ jobs:
         with:
           destroy: true
           token: ${{ secrets.token }}
-          aws_region: ${{ needs.preload.outputs.aws_region != '' && needs.preload.outputs.aws_region || inputs.default_aws_region }}
-          aws_sts_role_arn: ${{ needs.preload.outputs.deploy_aws_sts_role_arn != '' && needs.preload.outputs.deploy_aws_sts_role_arn || inputs.default_aws_sts_role_arn }}
-          aws_access_key_id: ${{ secrets.aws_access_key_id }}
-          aws_secret_access_key: ${{ secrets.aws_secret_access_key }}
-          terraform_state_conf: ${{ inputs.terraform_state_conf }}
+          aws_region: ${{ needs.preload.outputs.aws_region != '' && needs.preload.outputs.aws_region || vars.DEPLOYMENT_AWS_REGION }}
+          aws_sts_role_arn: ${{ needs.preload.outputs.deploy_aws_sts_role_arn != '' && needs.preload.outputs.deploy_aws_sts_role_arn || vars.DEPLOYMENT_AWS_STS_ROLE_ARN }}
+          aws_access_key_id: ${{ secrets.DEPLOYMENT_AWS_ACCESS_KEY_ID }}
+          aws_secret_access_key: ${{ secrets.DEPLOYMENT_AWS_SECRET_ACCESS_KEY }}
+          terraform_state_conf: ${{ vars.DEPLOYMENT_STATE_CONF }}
           release_name: ${{ needs.preload.outputs.release_name }}
           release_version: 'v1'
           project_key: ${{ needs.preload.outputs.project_key }}
-          deployment_name: ${{ inputs.unlockDeploymentName }}
+          deployment_name: ${{ inputs.destroyedDeploymentName }}
           environment: ${{ inputs.environment }}
 
 
@@ -129,11 +129,11 @@ jobs:
           azure_service_id: ${{ secrets.DEPLOYMENT_AZURE_SERVICE_ID }}
           azure_service_secret: ${{ secrets.DEPLOYMENT_AZURE_SERVICE_SECRET }}
           azure_rg: ${{ needs.preload.outputs.azure_rg != '' && needs.preload.outputs.azure_rg || vars.DEPLOYMENT_AZURE_RG }}
-          terraform_state_conf: ${{ inputs.terraform_state_conf }}
+          terraform_state_conf: ${{ vars.DEPLOYMENT_STATE_CONF }}
           release_name: ${{ needs.preload.outputs.release_name }}
           release_version: 'v1'
           project_key: ${{ needs.preload.outputs.project_key }}
-          deployment_name: ${{ inputs.unlockDeploymentName }}
+          deployment_name: ${{ inputs.destroyedDeploymentName }}
           environment: ${{ inputs.environment }}
 
       - name: Destroy Application Deploy Azure
