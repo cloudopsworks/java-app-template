@@ -84,7 +84,7 @@ jobs:
           blueprint_ref: 'v5'
 
       - name: Install runner tools
-        uses: bp/ci/common/install/runner-tools
+        uses: ./bp/ci/common/install/runner-tools
 
       - name: Unlock API AWS
         if: ${{ needs.preload.outputs.cloud == 'AWS' && inputs.target == 'api' }}
