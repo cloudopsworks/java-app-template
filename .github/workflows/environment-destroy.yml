@@ -80,6 +80,9 @@ jobs:
         with:
           blueprint_ref: 'v5'
 
+      - name: Install runner tools
+        uses: bp/ci/common/install/runner-tools
+
       - name: Destroy API AWS
         if: ${{ steps.config.outputs.cloud == 'AWS' && (inputs.target == 'api' || inputs.target == 'BOTH') }}
         uses: ./bp/cd/deploy/api/aws
