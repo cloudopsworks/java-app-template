@@ -86,7 +86,7 @@ repository_owner: "REPO_OWNER" # Required
 # Observability configuration: if enabled will deploy observability tools to the environment
 #observability:
 #  enabled: true
-#  agent: xray | newrelic | datadog | dynatrace
+#  agent: xray | newrelic | datadog | dynatrace (optional: defaults to xray)
 #  config:
 #    # XRAY agent Configuration
 #    configFilePath: /app/xray
