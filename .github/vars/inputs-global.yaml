@@ -83,6 +83,40 @@ repository_owner: "REPO_OWNER" # Required
 #apis:
 #  enabled: true
 #
+# Observability configuration: if enabled will deploy observability tools to the environment
+#observability:
+#  enabled: true
+#  agent: xray | newrelic | datadog | dynatrace
+#  configuration:
+#    # XRAY agent Configuration
+#    contextMissingStrategy: LOG_ERROR
+#    tracingEnabled: "true"
+#    samplingStrategy: CENTRAL | LOCAL | NONE | ALL
+#    traceIdInjectionPrefix: ""
+#    samplingRulesManifest: "path-to-sampling-rules-manifest"
+#    awsServiceHandlerManifest: "path-to-aws-service-handler-manifest"
+#    awsSdkVersion: 1 | 2
+#    maxStackTraceLength: 50
+#    streamingThreshold: 100
+#    traceIdInjection: "true"
+#    pluginsEnabled: "true"
+#    collectSqlQueries: "false"
+#    contextPropagation: "true"
+#    # DataDog agent Configuration
+#    logs_enabled: "true"
+#    logs_config_container_collect_all: "true"
+#    container_exclude_logs: "name:datadog-agent"
+#    trace_debug: "false"
+#    logs_injection: "true"
+#    profiling_enabled: "true"
+#    trace_sample_rate: 1.0
+#    trace_sampling_rules: "path-to-sampling-rules"
+#    apm_non_local_traffic: "true"
+#    apm_enabled: "true"
+#    dogstatsd_non_local_traffic: "true"
+#    http_client_error_statuses: "400,401,403,404,405,409,410,429,500,501,502,503,504,505"
+#    http_server_error_statuses: "500,501,502,503,504,505"
+#
 ## CD pipeline configuration uncomment and configure accordingly to enable
 # Target Cloud
 cloud: aws | azure | gcp

@@ -51,6 +51,14 @@ on:
         required: false
         type: boolean
         default: false
+      observability_enabled:
+        description: 'Observability Enabled'
+        required: true
+        type: boolean
+      observability_agent:
+        description: 'Observability Agent'
+        required: true
+        type: string
     secrets:
       token:
         description: 'GitHub Token'
