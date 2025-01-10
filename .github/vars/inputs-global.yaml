@@ -87,8 +87,10 @@ repository_owner: "REPO_OWNER" # Required
 #observability:
 #  enabled: true
 #  agent: xray | newrelic | datadog | dynatrace
-#  configuration:
+#  config:
 #    # XRAY agent Configuration
+#    configFilePath: /app/xray
+#    configFileName: xray-config.json
 #    contextMissingStrategy: LOG_ERROR
 #    tracingEnabled: "true"
 #    samplingStrategy: CENTRAL | LOCAL | NONE | ALL
