@@ -105,6 +105,7 @@ repository_owner: "REPO_OWNER" # Required
 #    collectSqlQueries: "false"
 #    contextPropagation: "true"
 #    # DataDog agent Configuration
+#    tags: tag1=value1,tag2=value2
 #    logs_enabled: "true"
 #    logs_config_container_collect_all: "true"
 #    container_exclude_logs: "name:datadog-agent"
