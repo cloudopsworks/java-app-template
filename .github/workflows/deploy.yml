@@ -152,6 +152,8 @@ jobs:
           project_key: ${{ steps.config.outputs.project_key }}
           deployment_name: ${{ inputs.deployment_name }}
           environment: ${{ steps.config.outputs.environment }}
+          observability_enabled: ${{ inputs.observability_enabled }}
+          observability_agent: ${{ inputs.observability_agent }}
 
       - name: Deploy Azure
         if: ${{ inputs.cloud == 'AZURE' }}
@@ -168,6 +170,8 @@ jobs:
           project_key: ${{ steps.config.outputs.project_key }}
           deployment_name: ${{ inputs.deployment_name }}
           environment: ${{ steps.config.outputs.environment }}
+          observability_enabled: ${{ inputs.observability_enabled }}
+          observability_agent: ${{ inputs.observability_agent }}
 
 #      - name: Deploy GCP
 #        if: ${{ inputs.cloud == 'GCP' }}
@@ -182,3 +186,5 @@ jobs:
 #          project_key: ${{ steps.config.outputs.project_key }}
 #          deployment_name: ${{ inputs.deployment_name }}
 #          environment: ${{ steps.config.outputs.environment }}
+#          observability_enabled: ${{ inputs.observability_enabled }}
+#          observability_agent: ${{ inputs.observability_agent }}
