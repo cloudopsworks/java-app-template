@@ -172,6 +172,7 @@ jobs:
           environment: ${{ steps.config.outputs.environment }}
           observability_enabled: ${{ inputs.observability_enabled }}
           observability_agent: ${{ inputs.observability_agent }}
+          source_language: java
 
 #      - name: Deploy GCP
 #        if: ${{ inputs.cloud == 'GCP' }}
@@ -188,3 +189,4 @@ jobs:
 #          environment: ${{ steps.config.outputs.environment }}
 #          observability_enabled: ${{ inputs.observability_enabled }}
 #          observability_agent: ${{ inputs.observability_agent }}
+#          source_language: java
