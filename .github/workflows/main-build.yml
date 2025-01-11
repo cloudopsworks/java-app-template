@@ -212,7 +212,7 @@ jobs:
       terraform_state_conf: ${{ vars.DEPLOYMENT_STATE_CONF }}
       semver: ${{ needs.code-build.outputs.semver }}
       apis_enabled: ${{ needs.code-build.outputs.apis_enabled == 'true' }}
-      observability_enabled: ${{ needs.code-build.outputs.observability_enabled }}
+      observability_enabled: ${{ needs.code-build.outputs.observability_enabled == 'true' }}
       observability_agent: ${{ needs.code-build.outputs.observability_agent }}
     secrets:
       token: ${{ secrets.BOT_TOKEN }}
