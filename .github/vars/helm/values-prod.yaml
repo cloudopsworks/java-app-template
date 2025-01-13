@@ -26,4 +26,4 @@ ingress:
 
 # Uncomment to enable opentelemetry instrumentation
 #podAnnotations:
-#  instrumentation.opentelemetry.io/inject-java: "true"
+#  instrumentation.opentelemetry.io/inject-nodejs: "true"
