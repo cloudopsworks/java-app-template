@@ -51,6 +51,14 @@ on:
         required: false
         type: boolean
         default: false
+      observability_enabled:
+        description: 'Observability Enabled'
+        required: true
+        type: boolean
+      observability_agent:
+        description: 'Observability Agent'
+        required: true
+        type: string
     secrets:
       token:
         description: 'GitHub Token'
@@ -144,6 +152,8 @@ jobs:
           project_key: ${{ steps.config.outputs.project_key }}
           deployment_name: ${{ inputs.deployment_name }}
           environment: ${{ steps.config.outputs.environment }}
+          observability_enabled: ${{ inputs.observability_enabled }}
+          observability_agent: ${{ inputs.observability_agent }}
 
       - name: Deploy Azure
         if: ${{ inputs.cloud == 'AZURE' }}
@@ -160,6 +170,9 @@ jobs:
           project_key: ${{ steps.config.outputs.project_key }}
           deployment_name: ${{ inputs.deployment_name }}
           environment: ${{ steps.config.outputs.environment }}
+          observability_enabled: ${{ inputs.observability_enabled }}
+          observability_agent: ${{ inputs.observability_agent }}
+          source_language: java
 
 #      - name: Deploy GCP
 #        if: ${{ inputs.cloud == 'GCP' }}
@@ -174,3 +187,6 @@ jobs:
 #          project_key: ${{ steps.config.outputs.project_key }}
 #          deployment_name: ${{ inputs.deployment_name }}
 #          environment: ${{ steps.config.outputs.environment }}
+#          observability_enabled: ${{ inputs.observability_enabled }}
+#          observability_agent: ${{ inputs.observability_agent }}
+#          source_language: java
