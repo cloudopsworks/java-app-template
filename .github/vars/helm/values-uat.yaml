@@ -23,3 +23,7 @@ ingress:
                 name: PROJECT_NAME-helm
                 port:
                   number: 80
+
+# Uncomment to enable opentelemetry instrumentation
+#podAnnotations:
+#  instrumentation.opentelemetry.io/inject-java: "true"
