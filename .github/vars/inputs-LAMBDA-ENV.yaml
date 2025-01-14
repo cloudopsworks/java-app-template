@@ -131,7 +131,7 @@ lambda:
 
   ##
   # Optional: Xray tracing enable
-  #tracing:
+  tracing: {}
   #  enabled: true
   #  mode: Active | PassThrough
 
