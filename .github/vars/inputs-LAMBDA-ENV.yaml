@@ -11,103 +11,105 @@ aws:
 #  deploy_sts_role_arn: "DEPLOYMENT_AWS_STS_ROLE_ARN" # Optional: when existing role is different for build and deploy
 lambda:
   arch: x86_64 | arm64
-  #  iam:
+  iam: {}
+  #  enabled: true
+  #  execRole:
   #    enabled: true
-  #    execRole:
-  #      enabled: true
-  #      principals:
-  #        - lambda.amazonaws.com
-  #        - apigateway.amazonaws.com
-  #    statements:
-  #      - effect: Allow # Uncomment below to if vpc.enabled = true
-  #        action:
-  #          - ec2:CreateNetworkInterface
-  #          - ec2:DescribeNetworkInterfaces
-  #          - ec2:DeleteNetworkInterface
-  #          - ec2:AssignPrivateIpAddresses
-  #          - ec2:UnassignPrivateIpAddresses
-  #        resource:
-  #          - "*"
-  #      - effect: Allow # Uncomment below to if vpc.enabled = true
-  #        action:
-  #          - ec2:DescribeSecurityGroups
-  #          - ec2:DescribeSubnets
-  #          - ec2:DescribeVpcs
-  #        resource:
-  #          - "*"
-  #      - effect: Allow
-  #        action:
-  #          - s3:PutObject
-  #          - s3:GetObject
-  #          - s3:DeleteObject
-  #          - s3:ListBucket
-  #        resource:
-  #          - arn:aws:s3:::<bucket-name>
-  #          - arn:aws:s3:::<bucket-name>/*
-  #      - effect: Allow
-  #        action:
-  #          - s3:ListAllMyBuckets
-  #        resource:
-  #          - "*"
-  #      - effect: Allow
-  #        action:
-  #          - dynamodb:PutItem
-  #          - dynamodb:GetItem
-  #          - dynamodb:DeleteItem
-  #          - dynamodb:UpdateItem
-  #          - dynamodb:Scan
-  #          - dynamodb:Query
-  #        resource:
-  #          - arn:aws:dynamodb:<region>:123456789012:table/<dynamodb-table>
-  #          - arn:aws:dynamodb:<region>:123456789012:table/<dynamodb-table>/*
-  #      - effect: Allow
-  #        action:
-  #          - dynamodb:ListTables
-  #        resource:
-  #          - "*"
+  #    principals:
+  #      - lambda.amazonaws.com
+  #      - apigateway.amazonaws.com
+  #  policy_attachments:
+  #    - arn: arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess
+  #  statements:
+  #    - effect: Allow # Uncomment below to if vpc.enabled = true
+  #      action:
+  #        - ec2:CreateNetworkInterface
+  #        - ec2:DescribeNetworkInterfaces
+  #        - ec2:DeleteNetworkInterface
+  #        - ec2:AssignPrivateIpAddresses
+  #        - ec2:UnassignPrivateIpAddresses
+  #      resource:
+  #        - "*"
+  #    - effect: Allow # Uncomment below to if vpc.enabled = true
+  #      action:
+  #        - ec2:DescribeSecurityGroups
+  #        - ec2:DescribeSubnets
+  #        - ec2:DescribeVpcs
+  #      resource:
+  #        - "*"
+  #    - effect: Allow
+  #      action:
+  #        - s3:PutObject
+  #        - s3:GetObject
+  #        - s3:DeleteObject
+  #        - s3:ListBucket
+  #      resource:
+  #        - arn:aws:s3:::<bucket-name>
+  #        - arn:aws:s3:::<bucket-name>/*
+  #    - effect: Allow
+  #      action:
+  #        - s3:ListAllMyBuckets
+  #      resource:
+  #        - "*"
+  #    - effect: Allow
+  #      action:
+  #        - dynamodb:PutItem
+  #        - dynamodb:GetItem
+  #        - dynamodb:DeleteItem
+  #        - dynamodb:UpdateItem
+  #        - dynamodb:Scan
+  #        - dynamodb:Query
+  #      resource:
+  #        - arn:aws:dynamodb:<region>:123456789012:table/<dynamodb-table>
+  #        - arn:aws:dynamodb:<region>:123456789012:table/<dynamodb-table>/*
+  #    - effect: Allow
+  #      action:
+  #        - dynamodb:ListTables
+  #      resource:
+  #        - "*"
   environment:
     variables:
       - name: key
         value: value
   handler: index.handler
   runtime: nodejs14.x
-  #  memory_size: 128
-  #  reserved_concurrency: -1
-  #  timeout: 3
+  #memory_size: 128
+  #reserved_concurrency: -1
+  #timeout: 3
 
   ##
   # Optionals: function Urls
   functionUrls: []
-  #    - id: prod
-  #      qualifier: "prod"
-  #      authorizationType: "AWS_IAM"
-  #      cors:
-  #        allowCredentials: true
-  #        allowMethods:
-  #          - "GET"
-  #          - "POST"
-  #        allowOrigins:
-  #          - "*"
-  #        allowHeaders:
-  #          - "date"
-  #          - "keep-alive"
-  #        exposeHeaders:
-  #          - "date"
-  #          - "keep-alive"
-  #        maxAge: 86400
-  #    - id: "dev"
-  #      authorizationType: "NONE"
+  #  - id: prod
+  #    qualifier: "prod"
+  #    authorizationType: "AWS_IAM"
+  #    cors:
+  #      allowCredentials: true
+  #      allowMethods:
+  #        - "GET"
+  #        - "POST"
+  #      allowOrigins:
+  #        - "*"
+  #      allowHeaders:
+  #        - "date"
+  #        - "keep-alive"
+  #      exposeHeaders:
+  #        - "date"
+  #        - "keep-alive"
+  #      maxAge: 86400
+  #  - id: "dev"
+  #    authorizationType: "NONE"
   ##
   # Optionals: event bridge scheduling
   #            Remove comment on items to enable
   schedule:
     enabled: false
-    #    flexible:
-    #      enabled: true
-    #      maxWindow: 20 # Minutes
+    #  flexible:
+    #    enabled: true
+    #    maxWindow: 20 # Minutes
     expression: "rate(1 hour)"
-  #    timezone: "UTC-3"
-  #    suspended: false
+    #  timezone: "UTC-3"
+    #  suspended: false
 
   ##
   # VPC configuration for the Lambda function
@@ -115,10 +117,10 @@ lambda:
     enabled: false
     create_security_group: false
     security_groups: []
-    #      - sg-1234567890abcdef0
-    #      - sg-1234567890abcdef1
+    #  - sg-1234567890abcdef0
+    #  - sg-1234567890abcdef1
     subnets: []
-  #      - subnet-1234567890abcdef0
+    #  - subnet-1234567890abcdef0
 
   ##
   # Optional: logging config
@@ -179,5 +181,5 @@ lambda:
 ##
 # Optional variable for adding extra tags to the environment
 tags: {}
-#    key: value
-#    key2: value2
+#  key: value
+#  key2: value2
