@@ -23,6 +23,17 @@ aws:
   vpc_link_name: test-link
   #log_location: /aws/apigateway
   #log_retention_days: 30
+  #settings:
+  #  metrics_enabled: true | false
+  #  logging_level: OFF | ERROR | INFO
+  #  data_trace_enabled: true | false
+  #  throttling_burst_limit: -1 | 10000
+  #  throttling_rate_limit: -1 | 5000
+  #  caching_enabled: true | false
+  #  cache_ttl_in_seconds: 300
+  #  cache_data_encrypted: true | false
+  #  require_authorization_for_cache_control: true | false
+  #  unauthorized_cache_control_header_strategy: FAIL_WITH_403 | SUCCEED_WITH_RESPONSE_HEADER | SUCCEED_WITHOUT_RESPONSE_HEADER
   publish_bucket:
     enabled: false
     name: test-apigw-backup
