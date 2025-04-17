@@ -22,7 +22,7 @@ on:
           - prod
       target:
         type: choice
-        description: What to Unlock?
+        description: What to Destroy?
         required: true
         default: BOTH
         options:
