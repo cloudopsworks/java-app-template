@@ -44,7 +44,7 @@ jobs:
         with:
           token: ${{ secrets.BOT_TOKEN }}
           source_ref: ${{ github.base_ref }}
-          blueprint_ref: 'v5'
+          blueprint_ref: 'v5.8'
 
       - name: Pipeline Configuration
         id: config
@@ -71,7 +71,7 @@ jobs:
         uses: cloudopsworks/blueprints/cd/checkout@v5
         with:
           source_ref: ${{ github.head_ref }}
-          blueprint_ref: 'v5'
+          blueprint_ref: 'v5.8'
 
       # Get Pipeline Config
       - name: Get Pipeline Config
@@ -147,7 +147,7 @@ jobs:
         with:
           token: ${{ secrets.BOT_TOKEN }}
           source_ref: ${{ github.head_ref }}
-          blueprint_ref: 'v5'
+          blueprint_ref: 'v5.8'
 
       - name: Delete local & remote Release
         if: ${{ github.event.pull_request.merged == true && startsWith(github.head_ref, 'release/') && ( github.base_ref == 'master' || github.base_ref == 'main' || startsWith(github.base_ref,'support/') ) }}
