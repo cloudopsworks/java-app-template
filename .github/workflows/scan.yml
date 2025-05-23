@@ -83,7 +83,7 @@ jobs:
       - name: Checkout w/Blueprint
         uses: cloudopsworks/blueprints/cd/checkout@v5
         with:
-          blueprint_ref: 'v5'
+          blueprint_ref: 'v5.8'
 
       - name: Pipeline Configuration
         id: config
@@ -103,7 +103,7 @@ jobs:
         uses: cloudopsworks/blueprints/cd/checkout@v5
         id: co
         with:
-          blueprint_ref: 'v5'
+          blueprint_ref: 'v5.8'
 
       - name: Download Target Artifacts
         uses: ./bp/ci/common/download/artifacts
@@ -133,7 +133,7 @@ jobs:
         uses: cloudopsworks/blueprints/cd/checkout@v5
         id: co
         with:
-          blueprint_ref: 'v5'
+          blueprint_ref: 'v5.8'
 
       - name: Download Target Artifacts
         uses: ./bp/ci/common/download/artifacts

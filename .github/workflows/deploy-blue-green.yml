@@ -76,7 +76,7 @@ jobs:
       - name: Checkout w/Blueprint
         uses: cloudopsworks/blueprints/cd/checkout@v5
         with:
-          blueprint_ref: 'v5'
+          blueprint_ref: 'v5.8'
 
       # Get Pipeline Config
       - name: Get Pipeline Config
@@ -119,7 +119,7 @@ jobs:
       - name: Checkout w/Blueprint
         uses: cloudopsworks/blueprints/cd/checkout@v5
         with:
-          blueprint_ref: 'v5'
+          blueprint_ref: 'v5.8'
 
       # Get Pipeline Config
       - name: Get Pipeline Config
@@ -192,7 +192,7 @@ jobs:
       - name: Checkout w/Blueprint
         uses: cloudopsworks/blueprints/cd/checkout@v5
         with:
-          blueprint_ref: 'v5'
+          blueprint_ref: 'v5.8'
 
       # Get Pipeline Config
       - name: Get Pipeline Config
@@ -252,7 +252,7 @@ jobs:
       - name: Checkout w/Blueprint
         uses: cloudopsworks/blueprints/cd/checkout@v5
         with:
-          blueprint_ref: 'v5'
+          blueprint_ref: 'v5.8'
 
       # Get Pipeline Config
       - name: Get Pipeline Config
