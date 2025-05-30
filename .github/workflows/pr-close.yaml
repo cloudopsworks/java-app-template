@@ -40,7 +40,7 @@ jobs:
       has_preview: ${{ steps.config.outputs.has_preview }}
     steps:
       - name: Checkout w/Blueprint
-        uses: cloudopsworks/blueprints/cd/checkout@v5
+        uses: cloudopsworks/blueprints/cd/checkout@v5.8
         with:
           token: ${{ secrets.BOT_TOKEN }}
           source_ref: ${{ github.base_ref }}
@@ -68,7 +68,7 @@ jobs:
     runs-on: ${{ needs.code-build.outputs.runner_set }}
     steps:
       - name: Checkout w/Blueprint
-        uses: cloudopsworks/blueprints/cd/checkout@v5
+        uses: cloudopsworks/blueprints/cd/checkout@v5.8
         with:
           source_ref: ${{ github.head_ref }}
           blueprint_ref: 'v5.8'
@@ -142,7 +142,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout w/Blueprint
-        uses: cloudopsworks/blueprints/cd/checkout@v5
+        uses: cloudopsworks/blueprints/cd/checkout@v5.8
         id: co
         with:
           token: ${{ secrets.BOT_TOKEN }}

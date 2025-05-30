@@ -74,7 +74,7 @@ jobs:
     environment: ${{ inputs.deployment_name }}
     steps:
       - name: Checkout w/Blueprint
-        uses: cloudopsworks/blueprints/cd/checkout@v5
+        uses: cloudopsworks/blueprints/cd/checkout@v5.8
         with:
           blueprint_ref: 'v5.8'
 
@@ -117,7 +117,7 @@ jobs:
     environment: ${{ inputs.deployment_name }}
     steps:
       - name: Checkout w/Blueprint
-        uses: cloudopsworks/blueprints/cd/checkout@v5
+        uses: cloudopsworks/blueprints/cd/checkout@v5.8
         with:
           blueprint_ref: 'v5.8'
 
@@ -190,7 +190,7 @@ jobs:
     environment: ${{ inputs.deployment_name }}
     steps:
       - name: Checkout w/Blueprint
-        uses: cloudopsworks/blueprints/cd/checkout@v5
+        uses: cloudopsworks/blueprints/cd/checkout@v5.8
         with:
           blueprint_ref: 'v5.8'
 
@@ -250,7 +250,7 @@ jobs:
     runs-on: ${{ inputs.runner_set }}
     steps:
       - name: Checkout w/Blueprint
-        uses: cloudopsworks/blueprints/cd/checkout@v5
+        uses: cloudopsworks/blueprints/cd/checkout@v5.8
         with:
           blueprint_ref: 'v5.8'
 

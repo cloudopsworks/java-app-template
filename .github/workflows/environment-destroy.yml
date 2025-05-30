@@ -60,7 +60,7 @@ jobs:
       azure_rg: ${{ steps.config.outputs.azure_rg }}
     steps:
       - name: Checkout w/Blueprint
-        uses: cloudopsworks/blueprints/cd/checkout@v5
+        uses: cloudopsworks/blueprints/cd/checkout@v5.8
         with:
           blueprint_ref: 'v5.8'
 
@@ -76,7 +76,7 @@ jobs:
     environment: ${{ inputs.destroyedDeploymentName }}
     steps:
       - name: Checkout w/Blueprint
-        uses: cloudopsworks/blueprints/cd/checkout@v5
+        uses: cloudopsworks/blueprints/cd/checkout@v5.8
         with:
           blueprint_ref: 'v5.8'
 

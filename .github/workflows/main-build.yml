@@ -64,7 +64,7 @@ jobs:
       observability_agent: ${{ steps.config.outputs.observability_agent }}
     steps:
       - name: Checkout w/Blueprint
-        uses: cloudopsworks/blueprints/cd/checkout@v5
+        uses: cloudopsworks/blueprints/cd/checkout@v5.8
         with:
           blueprint_ref: 'v5.8'
 
@@ -150,7 +150,7 @@ jobs:
       (needs.code-build.outputs.has_qualifier != 'true')
     steps:
       - name: Checkout w/Blueprint
-        uses: cloudopsworks/blueprints/cd/checkout@v5
+        uses: cloudopsworks/blueprints/cd/checkout@v5.8
         id: co
         with:
           blueprint_ref: 'v5.8'

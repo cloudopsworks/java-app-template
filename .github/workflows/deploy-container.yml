@@ -64,7 +64,7 @@ jobs:
     runs-on: ${{ inputs.runner_set }}
     steps:
       - name: Checkout w/Blueprint
-        uses: cloudopsworks/blueprints/cd/checkout@v5
+        uses: cloudopsworks/blueprints/cd/checkout@v5.8
         with:
           blueprint_ref: 'v5.8'
 
