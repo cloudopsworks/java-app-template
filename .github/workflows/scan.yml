@@ -81,7 +81,7 @@ jobs:
       fail_on_quality_gate: ${{ steps.config.outputs.fail_on_quality_gate }}
     steps:
       - name: Checkout w/Blueprint
-        uses: cloudopsworks/blueprints/cd/checkout@v5
+        uses: cloudopsworks/blueprints/cd/checkout@v5.8
         with:
           blueprint_ref: 'v5.8'
 
@@ -100,7 +100,7 @@ jobs:
       SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_TOKEN }}
     steps:
       - name: Checkout w/Blueprint
-        uses: cloudopsworks/blueprints/cd/checkout@v5
+        uses: cloudopsworks/blueprints/cd/checkout@v5.8
         id: co
         with:
           blueprint_ref: 'v5.8'
@@ -130,7 +130,7 @@ jobs:
     runs-on: ${{ needs.preload.outputs.runner_set }}
     steps:
       - name: Checkout w/Blueprint
-        uses: cloudopsworks/blueprints/cd/checkout@v5
+        uses: cloudopsworks/blueprints/cd/checkout@v5.8
         id: co
         with:
           blueprint_ref: 'v5.8'
