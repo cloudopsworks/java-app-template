@@ -135,7 +135,7 @@ jobs:
 #          environment: ${{ steps.config.outputs.environment }}
 
   branch_deletion:
-    if: always()
+    if: ${{ ! cancelled() }}
     needs:
       - preload
       - preview-destroy

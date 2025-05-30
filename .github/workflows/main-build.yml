@@ -144,7 +144,7 @@ jobs:
       - deploy-container
     runs-on: ubuntu-latest
     if: |
-      always() &&
+      (! cancelled()) &&
       (needs.code-build.result == 'success') &&
       (needs.code-build.outputs.is_release == 'true') &&
       (needs.code-build.outputs.has_qualifier != 'true')
@@ -173,7 +173,7 @@ jobs:
       - code-build
       - deploy-container
     if: |
-      always() && 
+      (! cancelled()) && 
       (needs.code-build.result == 'success')
     uses: ./.github/workflows/scan.yml
     with:
@@ -195,7 +195,7 @@ jobs:
       - code-build
       - deploy-container
     if: |
-      always() &&
+      (! cancelled()) &&
       (needs.code-build.result == 'success') &&
       (needs.code-build.outputs.blue_green_enabled != 'true') && 
       (needs.code-build.outputs.deployment_enabled == 'true') && 
@@ -226,7 +226,7 @@ jobs:
       - code-build
       - deploy-container
     if: |
-      always() &&
+      (! cancelled()) &&
       (needs.code-build.result == 'success') &&
       (needs.code-build.outputs.blue_green_enabled == 'true')  && 
       (needs.code-build.outputs.deployment_enabled == 'true') && 
