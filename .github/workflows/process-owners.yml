@@ -28,10 +28,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout w/Blueprint
-        uses: cloudopsworks/blueprints/cd/checkout@v5.8
+        uses: cloudopsworks/blueprints/cd/checkout@v5.9
         with:
           token: ${{ secrets.BOT_TOKEN_SCOPED }}
-          blueprint_ref: 'v5.8'
+          blueprint_ref: 'v5.9'
 
       - name: Pipeline Configuration
         id: config

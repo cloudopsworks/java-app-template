@@ -11,6 +11,7 @@ apigw_definitions:
 aws:
   stage: uat
   stage_only: false
+  #http_api: true # uncomment if using HTTP APIs
   #endpoint_type: REGIONAL
   #vpc_endpoint_ids:
   # - vpce-1234567890abcdef0
@@ -20,7 +21,16 @@ aws:
   #xray_enabled: true
   #cache_cluster_enabled: true
   #cache_cluster_size: 0.5
-  vpc_link_name: test-link-uat
+  #vpc_link_name: test-link-uat # DEPRECATED
+  rest_vpc_link_name: test-link-uat # use this for REST APIs
+  #http_vpc_link:
+  #  id: VPC_LINK_ID # use this for HTTP APIs
+  #  server_name: test.uat.cloudopsworks.co
+  #  type: lb | cloudmap
+  #  lb:
+  #    name: test-elb-uat
+  #    listener_port: 80
+  #fail_on_warnings: false # uncomment to disable fail on warnings
   #log_location: /aws/apigateway
   #log_retention_days: 30
   #settings:
@@ -38,7 +48,7 @@ aws:
     enabled: false
     name: test-apigw-backup
     prefix_path: test
-  stage_variables:
+  stage_variables: # comment out if not needed or lambda function does not require stage variables
     - name: url
       value: test-api.uat.sample.com
   authorizers:

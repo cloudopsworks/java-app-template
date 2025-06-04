@@ -25,7 +25,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Approve Command
-        uses: cloudopsworks/blueprints/cd/gitops/approved@v5.8
+        uses: cloudopsworks/blueprints/cd/gitops/approved@v5.9
         with:
           token: ${{ secrets.BOT_TOKEN }}
 #          command: ${{ github.event.client_payload.command }}

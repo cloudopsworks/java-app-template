@@ -81,9 +81,9 @@ jobs:
       fail_on_quality_gate: ${{ steps.config.outputs.fail_on_quality_gate }}
     steps:
       - name: Checkout w/Blueprint
-        uses: cloudopsworks/blueprints/cd/checkout@v5.8
+        uses: cloudopsworks/blueprints/cd/checkout@v5.9
         with:
-          blueprint_ref: 'v5.8'
+          blueprint_ref: 'v5.9'
 
       - name: Pipeline Configuration
         id: config
@@ -100,10 +100,10 @@ jobs:
       SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_TOKEN }}
     steps:
       - name: Checkout w/Blueprint
-        uses: cloudopsworks/blueprints/cd/checkout@v5.8
+        uses: cloudopsworks/blueprints/cd/checkout@v5.9
         id: co
         with:
-          blueprint_ref: 'v5.8'
+          blueprint_ref: 'v5.9'
 
       - name: Download Target Artifacts
         uses: ./bp/ci/common/download/artifacts
@@ -130,10 +130,10 @@ jobs:
     runs-on: ${{ needs.preload.outputs.runner_set }}
     steps:
       - name: Checkout w/Blueprint
-        uses: cloudopsworks/blueprints/cd/checkout@v5.8
+        uses: cloudopsworks/blueprints/cd/checkout@v5.9
         id: co
         with:
-          blueprint_ref: 'v5.8'
+          blueprint_ref: 'v5.9'
 
       - name: Download Target Artifacts
         uses: ./bp/ci/common/download/artifacts
