@@ -76,6 +76,17 @@ lambda:
   #memory_size: 128
   #reserved_concurrency: -1
   #timeout: 3
+  # Provisioned concurrency enables if uncomment and set > 1
+  #provisioned_concurrent_executions: 1
+
+  ##
+  # Optional: if you want to create an alias for the Lambda function
+  #alias:
+  #  enabled: true
+  #  name: "prod" # prod | uat | dev | demo
+  #  routing_config:
+  #    - version: "1" # Version of the Lambda function
+  #      weight: 1.0 # Weight for the routing, can be between 0.0 and 1.0
 
   ##
   # Optionals: function Urls

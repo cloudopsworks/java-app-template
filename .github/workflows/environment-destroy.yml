@@ -58,11 +58,13 @@ jobs:
       release_name: ${{ steps.config.outputs.release_name }}
       project_key: ${{ steps.config.outputs.project_key }}
       azure_rg: ${{ steps.config.outputs.azure_rg }}
+      gcp_project: ${{ steps.config.outputs.gcp_project }}
+      gcp_region: ${{ steps.config.outputs.gcp_region }}
     steps:
       - name: Checkout w/Blueprint
-        uses: cloudopsworks/blueprints/cd/checkout@v5.8
+        uses: cloudopsworks/blueprints/cd/checkout@v5.9
         with:
-          blueprint_ref: 'v5.8'
+          blueprint_ref: 'v5.9'
 
       - name: Pipeline Configuration
         id: config
@@ -76,9 +78,9 @@ jobs:
     environment: ${{ inputs.destroyedDeploymentName }}
     steps:
       - name: Checkout w/Blueprint
-        uses: cloudopsworks/blueprints/cd/checkout@v5.8
+        uses: cloudopsworks/blueprints/cd/checkout@v5.9
         with:
-          blueprint_ref: 'v5.8'
+          blueprint_ref: 'v5.9'
 
       - name: Install runner tools
         uses: ./bp/ci/common/install/runner-tools
@@ -154,18 +156,38 @@ jobs:
           deployment_name: ${{ inputs.destroyedDeploymentName }}
           environment: ${{ inputs.environment }}
 
-#      - name: Destroy GCP
-#        if: ${{ needs.preload.outputs.cloud == 'GCP' }}
-#        uses: ./bp/cd/deploy/app/azure
-#        with:
-#          destroy: true
-#          qualifier: 'green'
-#          cloud_type: ${{ needs.preload.outputs.cloud_type }}
-#          token: ${{ secrets.BOT_TOKEN }}
-#          gcp_service_id: ${{ secrets.GCP_SERVICE_ID }}
-#          terraform_state_conf: ${{ vars.DEPLOYMENT_STATE_CONF }}
-#          release_name: ${{ needs.preload.outputs.release_name }}
-#          release_version: ${{ inputs.semver }}
-#          project_key: ${{ needs.preload.outputs.project_key }}
-#          deployment_name: ${{ inputs.destroyedDeploymentName }}
-#          environment: ${{ needs.preload.outputs.environment }}
+      - name: Destroy API GCP
+        if: ${{ needs.preload.outputs.cloud == 'GCP' }}
+        uses: ./bp/cd/deploy/api/gcp
+        with:
+          destroy: true
+          qualifier: ${{ inputs.qualifier }}
+          cloud_type: ${{ inputs.cloud_type }}
+          token: ${{ secrets.BOT_TOKEN }}
+          gcp_credentials: ${{ secrets.DEPLOYMENT_GCP_CREDENTIALS }}
+          gcp_project: ${{ needs.preload.outputs.gcp_project != '' && needs.preload.outputs.gcp_project || vars.DEPLOYMENT_GCP_PROJECT }}
+          gcp_region: ${{ needs.preload.outputs.gcp_region != '' && needs.preload.outputs.gcp_region || vars.DEPLOYMENT_GCP_REGION }}
+          terraform_state_conf: ${{ vars.DEPLOYMENT_STATE_CONF }}
+          release_name: ${{ needs.preload.outputs.release_name }}
+          release_version: 'v1'
+          project_key: ${{ needs.preload.outputs.project_key }}
+          deployment_name: ${{ inputs.destroyedDeploymentName }}
+          environment: ${{ inputs.environment }}
+
+      - name: Destroy Application Deploy GCP
+        if: ${{ needs.preload.outputs.cloud == 'GCP' }}
+        uses: ./bp/cd/deploy/app/gcp
+        with:
+          destroy: true
+          qualifier: ${{ inputs.qualifier }}
+          cloud_type: ${{ inputs.cloud_type }}
+          token: ${{ secrets.BOT_TOKEN }}
+          gcp_credentials: ${{ secrets.DEPLOYMENT_GCP_CREDENTIALS }}
+          gcp_project: ${{ needs.preload.outputs.gcp_project != '' && needs.preload.outputs.gcp_project || vars.DEPLOYMENT_GCP_PROJECT }}
+          gcp_region: ${{ needs.preload.outputs.gcp_region != '' && needs.preload.outputs.gcp_region || vars.DEPLOYMENT_GCP_REGION }}
+          terraform_state_conf: ${{ vars.DEPLOYMENT_STATE_CONF }}
+          release_name: ${{ needs.preload.outputs.release_name }}
+          release_version: ${{ inputs.semver }}
+          project_key: ${{ needs.preload.outputs.project_key }}
+          deployment_name: ${{ inputs.destroyedDeploymentName }}
+          environment: ${{ inputs.environment }}
