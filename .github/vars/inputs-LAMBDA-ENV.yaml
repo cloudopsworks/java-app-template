@@ -72,7 +72,7 @@ lambda:
       - name: key
         value: value
   handler: index.handler
-  runtime: nodejs14.x
+  runtime: java21
   #memory_size: 128
   #reserved_concurrency: -1
   #timeout: 3
