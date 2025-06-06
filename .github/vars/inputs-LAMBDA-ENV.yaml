@@ -170,6 +170,9 @@ lambda:
   #    filterSuffix: ".log"
   #  sqs:
   #    queueName: SQS_QUEUE_NAME
+  #    batchSize: 10 # Optional: Maximum number of items to retrieve in a single batch, defaults to 10
+  #    maximumConcurrency: 2 # Optional: Maximum number of concurrent messages to process
+  #    metricsConfig: true # Optional: Enable metrics for the DynamoDB stream, defaults to false
   #    filterCriteria:
   #      body:
   #        Temperature:
@@ -180,7 +183,22 @@ lambda:
   #              - 100
   #        Location:
   #          - New York
-  #    filterSuffix: ".log"
+  #  dynamodb:
+  #    tableName: DYNAMODB_TABLE_NAME
+  #    startingPosition: LATEST | TRIM_HORIZON # Optional: Starting position for the stream, defaults to LATEST
+  #    batchSize: 100 # Optional: Maximum number of records to retrieve in a single batch, defaults to 100
+  #    maximumRetryAttempts: 3 # Optional: Maximum number of retry attempts for failed records, defaults to -1
+  #    metricsConfig: true # Optional: Enable metrics for the DynamoDB stream, defaults to false
+  #    filterCriteria:
+  #      body:
+  #        Temperature:
+  #          - numeric:
+  #              - ">"
+  #              - 0
+  #              - "<="
+  #              - 100
+  #        Location:
+  #          - New York
 
   ## Lambda Layers
   layers: []
