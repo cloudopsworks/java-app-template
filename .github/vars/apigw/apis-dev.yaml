@@ -51,8 +51,20 @@ aws:
   stage_variables:
     - name: url
       value: test-api.dev.sample.com
+  #lambda_options:
+  #  format_version: "1.0" # Optional, defaults to "2.0"
+  #  responses: # (Optional)
+  #    default:
+  #      statusCode: "200"
+  #  pass_through_behavior: when_no_match | when_no_templates | never # defaults to when_no_match
+  #  content_handling: CONVERT_TO_TEXT | CONVERT_TO_BINARY # defaults to CONVERT_TO_TEXT
   authorizers:
     - name: Lambda-Auth
+      #scheme:
+      #  name: Authorization
+      #  in: header
+      #  type: apiKey
+      #  authtype: custom
       authtype: lambda
       #result_ttl_seconds: 10
       #identity_source: method.request.header.Authorization
