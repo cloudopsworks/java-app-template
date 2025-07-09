@@ -41,7 +41,9 @@ repository_owner: "REPO_OWNER" # Required
 #  type: Application
 #
 # Set if this is a library project
-#isLibrary: true
+# Set if this is a library project
+#isLibrary: true # DEPRECATED!
+#is_library: true
 #
 # Dockerfile Inline content that will be merged into the Dockerfile
 #docker_inline: |
