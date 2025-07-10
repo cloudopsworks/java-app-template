@@ -57,6 +57,7 @@ aws:
   #    default:
   #      statusCode: "200"
   #  pass_through_behavior: when_no_match | when_no_templates | never # defaults to when_no_match
+  #  timeout_millis: 30000
   #  content_handling: CONVERT_TO_TEXT | CONVERT_TO_BINARY # defaults to CONVERT_TO_TEXT
   authorizers:
     - name: Lambda-Auth
