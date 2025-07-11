@@ -22,6 +22,7 @@ repository_owner: "REPO_OWNER" # Required
 #sonarqube:
 #  enabled: true
 #  fail_on_quality_gate: true
+#  quality_gate_enabled: false # defaults to true
 #  sources_path: "src/"
 #  binaries_path: "target/classes"
 #  libraries_path: "target/libs/**/*.jar" # defaults to blank
