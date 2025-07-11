@@ -82,6 +82,7 @@ jobs:
       project_key: ${{ steps.config.outputs.project_key }}
       runner_set: ${{ steps.config.outputs.runner_set != '' && steps.config.outputs.runner_set || inputs.default_runner_set  }}
       fail_on_quality_gate: ${{ steps.config.outputs.fail_on_quality_gate }}
+      quality_gate_enabled: ${{ steps.config.outputs.quality_gate_enabled }}
     steps:
       - name: Checkout w/Blueprint
         uses: cloudopsworks/blueprints/cd/checkout@v5.9
@@ -169,7 +170,7 @@ jobs:
           semver: ${{ steps.build.outputs.semver }}
 
       - name: SonarQube Scan Quality Gate
-        if: ${{ needs.preload.outputs.sonarqube_enabled == 'true' }}
+        if: ${{ needs.preload.outputs.sonarqube_enabled == 'true' && needs.preload.outputs.quality_gate_enabled == 'true' }}
         uses: ./bp/ci/scan/sonarqube/quality-gate
         timeout-minutes: 5
         continue-on-error: ${{ needs.preload.outputs.fail_on_quality_gate != 'true' }}
