@@ -123,8 +123,8 @@ lambda:
   #  timezone: "UTC-3"
   #  suspended: false
   #  payload: {} | ""             # (optional) Payload to send to the Lambda function, can be YAML (will be converted to JSON), JSON or string, defaults to null
-    multiple:                 # (optional) Multiple schedules, can be used to create multiple schedules for the same Lambda function
-      - expression: "rate(1 hour)" # (optional) Schedule expression, can be cron or rate, required if enabled is true
+  #  multiple:                 # (optional) Multiple schedules, can be used to create multiple schedules for the same Lambda function
+  #    - expression: "rate(1 hour)" # (optional) Schedule expression, can be cron or rate, required if enabled is true
         #  flexible:
         #    enabled: true
         #    maxWindow: 20 # Minutes
@@ -132,6 +132,7 @@ lambda:
         #  suspended: false
         #  payload: {} | ""               # (optional) Payload to send to the Lambda function, can be YAML (will be converted to JSON), JSON or string, defaults to null
 
+  ##
   # VPC configuration for the Lambda function
   vpc:
     enabled: false
