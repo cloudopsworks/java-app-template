@@ -114,15 +114,24 @@ lambda:
   # Optionals: event bridge scheduling
   #            Remove comment on items to enable
   schedule:
-    enabled: false
-    #  flexible:
-    #    enabled: true
-    #    maxWindow: 20 # Minutes
-    expression: "rate(1 hour)"
-    #  timezone: "UTC-3"
-    #  suspended: false
+    enabled: false        # (optional) Enable or disable singe schedule
+  #  schedule_group: "my-schedule-group" # (optional) Schedule group name, schedule group must already exists
+  #  flexible:
+  #    enabled: true
+  #    maxWindow: 20 # Minutes
+    expression: "rate(1 hour)"  # (optional) Schedule expression, can be cron or rate, required if enabled is true
+  #  timezone: "UTC-3"
+  #  suspended: false
+  #  payload: {} | ""             # (optional) Payload to send to the Lambda function, can be YAML (will be converted to JSON), JSON or string, defaults to null
+    multiple:                 # (optional) Multiple schedules, can be used to create multiple schedules for the same Lambda function
+      - expression: "rate(1 hour)" # (optional) Schedule expression, can be cron or rate, required if enabled is true
+        #  flexible:
+        #    enabled: true
+        #    maxWindow: 20 # Minutes
+        #  timezone: "UTC-3"
+        #  suspended: false
+        #  payload: {} | ""               # (optional) Payload to send to the Lambda function, can be YAML (will be converted to JSON), JSON or string, defaults to null
 
-  ##
   # VPC configuration for the Lambda function
   vpc:
     enabled: false
