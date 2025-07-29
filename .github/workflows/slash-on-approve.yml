@@ -14,7 +14,6 @@ on:
       - approved-command
       - approve-command
       - lgtm-command
-      -
 permissions:
   issues: write
   contents: write
