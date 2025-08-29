@@ -52,5 +52,6 @@ target/
 .vscode/
 
 ### Tronador ###
+.tronador*.mk
 .tronador
 tronador/

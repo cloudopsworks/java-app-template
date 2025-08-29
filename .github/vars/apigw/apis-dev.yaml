@@ -48,7 +48,10 @@ aws:
     enabled: false
     name: test-apigw-backup
     prefix_path: test
-  stage_variables:
+  #custom_parameters: # This enables to use custom ${} parameters within the API definition files
+  #  - name: url
+  #    value: test-api.dev.sample.com
+  stage_variables:  # comment out if not needed or lambda function does not require stage variables
     - name: url
       value: test-api.dev.sample.com
   #lambda_options: # Available for HTTP APIs only
