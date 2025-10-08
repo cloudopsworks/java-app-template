@@ -200,15 +200,17 @@ lambda:
   #    maximumRetryAttempts: 3 # Optional: Maximum number of retry attempts for failed records, defaults to -1
   #    metricsConfig: true # Optional: Enable metrics for the DynamoDB stream, defaults to false
   #    filterCriteria:
-  #      body:
-  #        Temperature:
-  #          - numeric:
-  #              - ">"
-  #              - 0
-  #              - "<="
-  #              - 100
-  #        Location:
-  #          - New York
+  #      - pattern: '{ "body": { "Temperature": [ { "numeric": [ ">", 0, "<=", 100 ] } ], "Location": [ "New York" ] } }'
+  #      - pattern_object:
+  #          body:
+  #            Temperature:
+  #              - numeric:
+  #                  - ">"
+  #                  - 0
+  #                  - "<="
+  #                  - 100
+  #            Location:
+  #              - New York
 
   ## Lambda Layers
   layers: []
