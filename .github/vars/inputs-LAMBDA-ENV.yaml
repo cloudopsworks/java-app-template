@@ -184,15 +184,17 @@ lambda:
   #    maximumConcurrency: 2 # Optional: Maximum number of concurrent messages to process
   #    metricsConfig: true # Optional: Enable metrics for the DynamoDB stream, defaults to false
   #    filterCriteria:
-  #      body:
-  #        Temperature:
-  #          - numeric:
-  #              - ">"
-  #              - 0
-  #              - "<="
-  #              - 100
-  #        Location:
-  #          - New York
+  #      - pattern: '{ "body": { "Temperature": [ { "numeric": [ ">", 0, "<=", 100 ] } ], "Location": [ "New York" ] } }'
+  #      - pattern_object:
+  #          body:
+  #            Temperature:
+  #              - numeric:
+  #                  - ">"
+  #                  - 0
+  #                  - "<="
+  #                  - 100
+  #            Location:
+  #              - New York
   #  dynamodb:
   #    tableName: DYNAMODB_TABLE_NAME
   #    startingPosition: LATEST | TRIM_HORIZON # Optional: Starting position for the stream, defaults to LATEST
