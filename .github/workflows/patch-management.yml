@@ -38,15 +38,27 @@ jobs:
         id: config
         uses: ./bp/ci/config
 
-      - name: Run Patchwork Workflow
+      - name: Init Patchwork Workflow
         id: patchwork
-        uses: ./bp/cd/tasks/ai/patchwork
+        uses: ./bp/ci/ai/patchwork/init
         with:
-          bot_user: ${{ vars.BOT_USER }}
+          #bot_user: ${{ vars.BOT_USER }}
           token: ${{ secrets.BOT_TOKEN }}
-          patched_token: ${{ secrets.PATCHED_CODES_TOKEN }}
           llm_base_url: ${{ secrets.HOSTED_LLM_BASE_URL }}
           llm_model: ${{ secrets.HOSTED_LLM_MODEL }}
           openai_api_key: ${{ secrets.OPENAI_API_KEY }}
+
+      - name: Java Patchwork Workflow
+        uses: ./bp/ci/ai/patchwork/lang/java
+        with:
+          #bot_user: ${{ vars.BOT_USER }}
+          token: ${{ secrets.BOT_TOKEN }}
           semgrep_token: ${{ secrets.SEMGREP_TOKEN }}
 
+      - name: Run Patchwork AutoFix
+        uses: ./bp/ci/ai/patchwork/run
+        with:
+          #bot_user: ${{ vars.BOT_USER }}
+          token: ${{ secrets.BOT_TOKEN }}
+          patched_token: ${{ secrets.PATCHED_CODES_TOKEN }}
+          semgrep_token: ${{ secrets.SEMGREP_TOKEN }}
