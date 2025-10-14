@@ -1,0 +1,51 @@
+##
+# (c) 2021-2025
+#     Cloud Ops Works LLC - https://cloudops.works/
+#     Find us on:
+#       GitHub: https://github.com/cloudopsworks
+#       WebSite: https://cloudops.works
+#     Distributed Under Apache v2.0 License
+#
+name: Enable AI Patch Management with Patchwork
+on:
+  workflow_dispatch:
+
+  schedule:
+    # Runs once a week on Mondays at 1 am EST
+    - cron: '0 6 * * 1'
+
+concurrency: patches-${{ github.repository }}-${{ github.ref }}
+
+permissions:
+  contents: write
+  packages: read
+  statuses: write
+  pull-requests: write
+  issues: write
+  checks: write
+
+jobs:
+  patches:
+    name: 'Patchwork execution'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout w/Blueprint
+        uses: cloudopsworks/blueprints/cd/checkout@v5.9
+        with:
+          blueprint_ref: 'v5.9'
+
+      - name: Pipeline Configuration
+        id: config
+        uses: ./bp/ci/config
+
+      - name: Run Patchwork Workflow
+        id: patchwork
+        uses: ./bp/cd/tasks/ai/patchwork
+        with:
+          bot_user: ${{ vars.BOT_USER }}
+          token: ${{ secrets.BOT_TOKEN }}
+          patched_token: ${{ secrets.PATCHED_CODES_TOKEN }}
+          llm_base_url: ${{ secrets.HOSTED_LLM_BASE_URL }}
+          llm_model: ${{ secrets.HOSTED_LLM_MODEL }}
+          openai_api_key: ${{ secrets.OPENAI_API_KEY }}
+
