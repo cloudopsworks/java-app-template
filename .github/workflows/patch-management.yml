@@ -25,8 +25,8 @@ permissions:
   checks: write
 
 jobs:
-  patches:
-    name: 'Patchwork execution'
+  autofix:
+    name: 'Patchwork AutoFix Execution'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout w/Blueprint
@@ -56,9 +56,37 @@ jobs:
           semgrep_token: ${{ secrets.SEMGREP_TOKEN }}
 
       - name: Run Patchwork AutoFix
-        uses: ./bp/ci/ai/patchwork/run
+        uses: ./bp/ci/ai/patchwork/autofix
         with:
           #bot_user: ${{ vars.BOT_USER }}
           token: ${{ secrets.BOT_TOKEN }}
           patched_token: ${{ secrets.PATCHED_CODES_TOKEN }}
           semgrep_token: ${{ secrets.SEMGREP_TOKEN }}
+
+  dependency_upgrade:
+    - name: Checkout w/Blueprint
+      uses: cloudopsworks/blueprints/cd/checkout@v5.9
+      with:
+        blueprint_ref: 'v5.9'
+
+    - name: Pipeline Configuration
+      id: config
+      uses: ./bp/ci/config
+
+    - name: Init Patchwork Workflow
+      id: patchwork
+      uses: ./bp/ci/ai/patchwork/init
+      with:
+        #bot_user: ${{ vars.BOT_USER }}
+        token: ${{ secrets.BOT_TOKEN }}
+        llm_base_url: ${{ secrets.HOSTED_LLM_BASE_URL }}
+        llm_model: ${{ secrets.HOSTED_LLM_MODEL }}
+        openai_api_key: ${{ secrets.OPENAI_API_KEY }}
+
+    - name: Run Patchwork DependencyUpgrade
+      uses: ./bp/ci/ai/patchwork/dependency-upgrade
+      with:
+        #bot_user: ${{ vars.BOT_USER }}
+        token: ${{ secrets.BOT_TOKEN }}
+        patched_token: ${{ secrets.PATCHED_CODES_TOKEN }}
+        libraries_io_key: ${{ secrets.LIBRARIES_IO_API_KEY }}
