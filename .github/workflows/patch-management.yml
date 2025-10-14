@@ -48,4 +48,5 @@ jobs:
           llm_base_url: ${{ secrets.HOSTED_LLM_BASE_URL }}
           llm_model: ${{ secrets.HOSTED_LLM_MODEL }}
           openai_api_key: ${{ secrets.OPENAI_API_KEY }}
+          semgrep_token: ${{ secrets.SEMGREP_TOKEN }}
 
