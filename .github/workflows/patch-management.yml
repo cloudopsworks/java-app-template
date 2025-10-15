@@ -9,6 +9,17 @@
 name: Enable AI Patch Management with Patchwork
 on:
   workflow_dispatch:
+    inputs:
+      run_autofix:
+        description: 'Run AutoFix Workflow'
+        required: true
+        default: true
+        type: boolean
+      run_dependency_upgrade:
+        description: 'Run Dependency Upgrade Workflow'
+        required: true
+        default: true
+        type: boolean
 
   schedule:
     # Runs once a week on Mondays at 1 am EST
@@ -28,28 +39,29 @@ jobs:
   autofix:
     name: 'Patchwork AutoFix Execution'
     runs-on: ubuntu-latest
+    if: ${{ (inputs.run_autofix || github.event.schedule != '') && vars.PATCHWORK_ENABLED == 'true' }}
     steps:
       - name: Checkout w/Blueprint
         uses: cloudopsworks/blueprints/cd/checkout@v5.9
         with:
           blueprint_ref: 'v5.9'
+          source_ref: 'develop'
 
       - name: Pipeline Configuration
         id: config
         uses: ./bp/ci/config
 
       - name: Init Patchwork Workflow
-        id: patchwork
         uses: ./bp/ci/ai/patchwork/init
         with:
           #bot_user: ${{ vars.BOT_USER }}
           token: ${{ secrets.BOT_TOKEN }}
-          llm_base_url: ${{ secrets.HOSTED_LLM_BASE_URL }}
-          llm_model: ${{ secrets.HOSTED_LLM_MODEL }}
+          llm_base_url: ${{ vars.HOSTED_LLM_BASE_URL }}
+          llm_model: ${{ vars.HOSTED_LLM_MODEL }}
           openai_api_key: ${{ secrets.OPENAI_API_KEY }}
 
       - name: Java Patchwork Workflow
-        uses: ./bp/ci/ai/patchwork/lang/java
+        uses: ./bp/ci/ai/patchwork/autofix/java
         with:
           #bot_user: ${{ vars.BOT_USER }}
           token: ${{ secrets.BOT_TOKEN }}
@@ -66,25 +78,32 @@ jobs:
   dependency_upgrade:
     name: 'Patchwork Dependency Upgrade Execution'
     runs-on: ubuntu-latest
+    if: ${{ inputs.run_dependency_upgrade && vars.PATCHWORK_ENABLED == 'true' }}
     steps:
       - name: Checkout w/Blueprint
         uses: cloudopsworks/blueprints/cd/checkout@v5.9
         with:
           blueprint_ref: 'v5.9'
+          source_ref: 'develop'
 
       - name: Pipeline Configuration
         id: config
         uses: ./bp/ci/config
 
       - name: Init Patchwork Workflow
-        id: patchwork
         uses: ./bp/ci/ai/patchwork/init
         with:
           #bot_user: ${{ vars.BOT_USER }}
           token: ${{ secrets.BOT_TOKEN }}
-          llm_base_url: ${{ secrets.HOSTED_LLM_BASE_URL }}
-          llm_model: ${{ secrets.HOSTED_LLM_MODEL }}
+          llm_base_url: ${{ vars.HOSTED_LLM_BASE_URL }}
+          llm_model: ${{ vars.HOSTED_LLM_MODEL }}
           openai_api_key: ${{ secrets.OPENAI_API_KEY }}
+
+      - name: Init Patchwork Java
+        uses: ./bp/ci/ai/patchwork/dependency-upgrade/java
+        with:
+          #bot_user: ${{ vars.BOT_USER }}
+          token: ${{ secrets.BOT_TOKEN }}
 
       - name: Run Patchwork DependencyUpgrade
         uses: ./bp/ci/ai/patchwork/dependency-upgrade
