@@ -144,7 +144,7 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/x
           </execution>
           <execution>
             <id>jacoco-site</id>
-            <phase>package</phase>
+            <phase>verify</phase>
             <goals>
               <goal>report</goal>
             </goals>
@@ -152,7 +152,6 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/x
         </executions>
         <configuration>
           <excludes>
-            <exclude>**/test/*</exclude>
             <exclude>**/exception/**</exclude>
           </excludes>
         </configuration>
