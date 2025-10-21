@@ -20,6 +20,11 @@ on:
         required: true
         default: true
         type: boolean
+      run_workflow_upgrade:
+        description: 'Run Application Worflow version Upgrade'
+        required: true
+        default: true
+        type: boolean
 
   schedule:
     # Runs once a week on Mondays at 1 am EST
@@ -112,3 +117,27 @@ jobs:
           token: ${{ secrets.BOT_TOKEN }}
           patched_token: ${{ secrets.PATCHED_CODES_TOKEN }}
           libraries_io_key: ${{ secrets.LIBRARIES_IO_API_KEY }}
+
+  workflow_upgrade:
+    name: "Workflow Version Baseline Upgrade"
+    runs-on: ubuntu-latest
+    if: ${{ inputs.run_workflow_upgrade && vars.PATCHWORK_ENABLED == 'true' }}
+    steps:
+      - name: Checkout w/Blueprint
+        uses: cloudopsworks/blueprints/cd/checkout@v5.9
+        with:
+          blueprint_ref: 'v5.9'
+          source_ref: 'develop'
+
+      - name: Pipeline Configuration
+        id: config
+        uses: ./bp/ci/config
+
+      - name: Workflow Upgrade
+        id: upgrade
+        uses: ./bp/ci/ai/wf-upgrade
+        with:
+          token: ${{ secrets.BOT_TOKEN }}
+          bot_user: ${{ vars.BOT_USER }}
+          bot_email: ${{ vars.BOT_EMAIL }}
+          patched_token: ${{ secrets.PATCHED_CODES_TOKEN }}
