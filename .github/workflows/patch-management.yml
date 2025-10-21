@@ -138,4 +138,6 @@ jobs:
         uses: ./bp/ci/ai/wf-upgrade
         with:
           token: ${{ secrets.BOT_TOKEN }}
+          bot_user: ${{ vars.BOT_USER }}
+          bot_email: ${{ vars.BOT_EMAIL }}
           patched_token: ${{ secrets.PATCHED_CODES_TOKEN }}
