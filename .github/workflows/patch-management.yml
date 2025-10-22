@@ -25,6 +25,16 @@ on:
         required: true
         default: false
         type: boolean
+      run_docstring_gen:
+        description: 'Run DocStrings Generation Workflow'
+        required: true
+        default: false
+        type: boolean
+      run_unittests_gen:
+        description: 'Run Generation of UnitTests Workflow'
+        required: true
+        default: false
+        type: boolean
       run_workflow_upgrade:
         description: 'Run Application Worflow version Upgrade'
         required: true
@@ -158,6 +168,68 @@ jobs:
           project_owner: ${{ steps.config.outputs.project_owner }}
           patched_token: ${{ secrets.PATCHED_CODES_TOKEN }}
           language: 'java'
+
+  docstrings_gen:
+    name: "Patchwork DocStrings Generation Execution"
+    runs-on: ubuntu-latest
+    if: ${{ inputs.run_docstring_gen && vars.PATCHWORK_ENABLED == 'true' }}
+    steps:
+      - name: Checkout w/Blueprint
+        uses: cloudopsworks/blueprints/cd/checkout@v5.9
+        with:
+          blueprint_ref: 'v5.9'
+          source_ref: 'develop'
+
+      - name: Pipeline Configuration
+        id: config
+        uses: ./bp/ci/config
+
+      - name: Init Patchwork Workflow
+        uses: ./bp/ci/ai/patchwork/init
+        with:
+          #bot_user: ${{ vars.BOT_USER }}
+          token: ${{ secrets.BOT_TOKEN }}
+          llm_base_url: ${{ vars.HOSTED_LLM_BASE_URL }}
+          llm_model: ${{ vars.HOSTED_LLM_MODEL }}
+          openai_api_key: ${{ secrets.OPENAI_API_KEY }}
+
+      - name: Run Patchwork Docstrings Generaton
+        uses: ./bp/ci/ai/patchwork/docstrings
+        with:
+          #bot_user: ${{ vars.BOT_USER }}
+          token: ${{ secrets.BOT_TOKEN }}
+          patched_token: ${{ secrets.PATCHED_CODES_TOKEN }}
+
+  unittest_gen:
+    name: "Patchwork Unit Tests Generation Execution"
+    runs-on: ubuntu-latest
+    if: ${{ inputs.run_unittests_gen && vars.PATCHWORK_ENABLED == 'true' }}
+    steps:
+      - name: Checkout w/Blueprint
+        uses: cloudopsworks/blueprints/cd/checkout@v5.9
+        with:
+          blueprint_ref: 'v5.9'
+          source_ref: 'develop'
+
+      - name: Pipeline Configuration
+        id: config
+        uses: ./bp/ci/config
+
+      - name: Init Patchwork Workflow
+        uses: ./bp/ci/ai/patchwork/init
+        with:
+          #bot_user: ${{ vars.BOT_USER }}
+          token: ${{ secrets.BOT_TOKEN }}
+          llm_base_url: ${{ vars.HOSTED_LLM_BASE_URL }}
+          llm_model: ${{ vars.HOSTED_LLM_MODEL }}
+          openai_api_key: ${{ secrets.OPENAI_API_KEY }}
+
+      - name: Run Patchwork Unit Tests Generaton
+        uses: ./bp/ci/ai/patchwork/unit_tests
+        with:
+          #bot_user: ${{ vars.BOT_USER }}
+          token: ${{ secrets.BOT_TOKEN }}
+          patched_token: ${{ secrets.PATCHED_CODES_TOKEN }}
 
   workflow_upgrade:
     name: "Workflow Version Baseline Upgrade"
