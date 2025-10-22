@@ -230,6 +230,7 @@ jobs:
           #bot_user: ${{ vars.BOT_USER }}
           token: ${{ secrets.BOT_TOKEN }}
           patched_token: ${{ secrets.PATCHED_CODES_TOKEN }}
+          file_extension: "java"
 
   workflow_upgrade:
     name: "Workflow Version Baseline Upgrade"
