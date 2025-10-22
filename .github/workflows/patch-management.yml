@@ -199,6 +199,7 @@ jobs:
           #bot_user: ${{ vars.BOT_USER }}
           token: ${{ secrets.BOT_TOKEN }}
           patched_token: ${{ secrets.PATCHED_CODES_TOKEN }}
+          base_path: "./src"
 
   unittest_gen:
     name: "Patchwork Unit Tests Generation Execution"
