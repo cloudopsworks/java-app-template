@@ -154,6 +154,8 @@ jobs:
           token: ${{ secrets.BOT_TOKEN }}
           sonarqube_url: ${{ vars.SONARQUBE_URL }}
           sonarqube_token: ${{ secrets.SONARQUBE_TOKEN }}
+          sonarqube_project_key: ${{ steps.config.outputs.project_key }}
+          project_owner: ${{ steps.config.outputs.project_owner }}
           patched_token: ${{ secrets.PATCHED_CODES_TOKEN }}
           language: 'java'
 
