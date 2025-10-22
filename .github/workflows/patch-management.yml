@@ -18,12 +18,17 @@ on:
       run_dependency_upgrade:
         description: 'Run Dependency Upgrade Workflow'
         required: true
-        default: true
+        default: false
+        type: boolean
+      run_sonarqube_fix:
+        description: 'Run SonarQube Findings Fixes Workflow'
+        required: true
+        default: false
         type: boolean
       run_workflow_upgrade:
         description: 'Run Application Worflow version Upgrade'
         required: true
-        default: true
+        default: false
         type: boolean
 
   schedule:
@@ -117,6 +122,42 @@ jobs:
           token: ${{ secrets.BOT_TOKEN }}
           patched_token: ${{ secrets.PATCHED_CODES_TOKEN }}
           libraries_io_key: ${{ secrets.LIBRARIES_IO_API_KEY }}
+
+  sonarqube_fix:
+    name: "Patchwork Sonarqube Autofix Execution"
+    runs-on: ubuntu-latest
+    if: ${{ inputs.run_sonarqube_fix && vars.PATCHWORK_ENABLED == 'true' }}
+    steps:
+      - name: Checkout w/Blueprint
+        uses: cloudopsworks/blueprints/cd/checkout@v5.9
+        with:
+          blueprint_ref: 'v5.9'
+          source_ref: 'develop'
+
+      - name: Pipeline Configuration
+        id: config
+        uses: ./bp/ci/config
+
+      - name: Init Patchwork Workflow
+        uses: ./bp/ci/ai/patchwork/init
+        with:
+          #bot_user: ${{ vars.BOT_USER }}
+          token: ${{ secrets.BOT_TOKEN }}
+          llm_base_url: ${{ vars.HOSTED_LLM_BASE_URL }}
+          llm_model: ${{ vars.HOSTED_LLM_MODEL }}
+          openai_api_key: ${{ secrets.OPENAI_API_KEY }}
+
+      - name: Run Patchwork AutoFix
+        uses: ./bp/ci/ai/patchwork/sonarqube
+        with:
+          #bot_user: ${{ vars.BOT_USER }}
+          token: ${{ secrets.BOT_TOKEN }}
+          sonarqube_url: ${{ vars.SONARQUBE_URL }}
+          sonarqube_token: ${{ secrets.SONARQUBE_TOKEN }}
+          sonarqube_project_key: ${{ steps.config.outputs.project_key }}
+          project_owner: ${{ steps.config.outputs.project_owner }}
+          patched_token: ${{ secrets.PATCHED_CODES_TOKEN }}
+          language: 'java'
 
   workflow_upgrade:
     name: "Workflow Version Baseline Upgrade"
