@@ -60,6 +60,9 @@ on:
       azure_service_secret:
         description: 'Azure Service Principal Secret'
         required: false
+      gcp_credentials:
+        description: 'Google Cloud Credentials secrets'
+        required: false
 
 jobs:
   deploy-container:
@@ -67,9 +70,9 @@ jobs:
     runs-on: ${{ inputs.runner_set }}
     steps:
       - name: Checkout w/Blueprint
-        uses: cloudopsworks/blueprints/cd/checkout@v5.9
+        uses: cloudopsworks/blueprints/cd/checkout@v5.10
         with:
-          blueprint_ref: 'v5.9'
+          blueprint_ref: 'v5.10'
 
       # Get Pipeline Config
       - name: Get Pipeline Config
@@ -87,6 +90,7 @@ jobs:
           aws_secret_access_key: ${{ secrets.aws_secret_access_key }}
           azure_service_id: ${{ secrets.azure_service_id }}
           azure_service_secret: ${{ secrets.azure_service_secret }}
+          gcp_credentials: ${{ secrets.gcp_credentials }}
           default_registry_address: ${{ inputs.default_registry_address }}
           project_key: ${{ inputs.project_key }}
           project_owner: ${{ inputs.project_owner }}

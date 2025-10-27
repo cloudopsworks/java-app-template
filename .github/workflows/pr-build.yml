@@ -38,10 +38,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout w/Blueprint
-        uses: cloudopsworks/blueprints/cd/checkout@v5.9
+        uses: cloudopsworks/blueprints/cd/checkout@v5.10
         with:
           source_ref: ${{ github.head_ref }}
-          blueprint_ref: 'v5.9'
+          blueprint_ref: 'v5.10'
 
       - name: Pipeline Configuration
         id: config
@@ -79,10 +79,10 @@ jobs:
       environment: ${{ steps.config.outputs.environment }}
     steps:
       - name: Checkout w/Blueprint
-        uses: cloudopsworks/blueprints/cd/checkout@v5.9
+        uses: cloudopsworks/blueprints/cd/checkout@v5.10
         with:
           source_ref: ${{ github.head_ref }}
-          blueprint_ref: 'v5.9'
+          blueprint_ref: 'v5.10'
 
       - name: Pipeline Configuration
         id: config
@@ -154,10 +154,10 @@ jobs:
     runs-on: ${{ needs.code-build.outputs.runner_set }}
     steps:
       - name: Checkout w/Blueprint
-        uses: cloudopsworks/blueprints/cd/checkout@v5.9
+        uses: cloudopsworks/blueprints/cd/checkout@v5.10
         with:
           source_ref: ${{ github.head_ref }}
-          blueprint_ref: 'v5.9'
+          blueprint_ref: 'v5.10'
 
       # Get Pipeline Config
       - name: Get Pipeline Config

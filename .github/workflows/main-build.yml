@@ -67,9 +67,9 @@ jobs:
       observability_agent: ${{ steps.config.outputs.observability_agent }}
     steps:
       - name: Checkout w/Blueprint
-        uses: cloudopsworks/blueprints/cd/checkout@v5.9
+        uses: cloudopsworks/blueprints/cd/checkout@v5.10
         with:
-          blueprint_ref: 'v5.9'
+          blueprint_ref: 'v5.10'
 
       - name: Pipeline Configuration
         id: config
@@ -139,6 +139,7 @@ jobs:
       aws_secret_access_key: ${{ secrets.BUILD_AWS_SECRET_ACCESS_KEY }}
       azure_service_id: ${{ secrets.BUILD_AZURE_SERVICE_ID }}
       azure_service_secret: ${{ secrets.BUILD_AZURE_SERVICE_SECRET }}
+      gcp_credentials: ${{ secrets.BUILD_GOOGLE_CREDENTIALS }}
 
   release:
     name: 'Generate Release'
@@ -153,10 +154,10 @@ jobs:
       (needs.code-build.outputs.has_qualifier != 'true')
     steps:
       - name: Checkout w/Blueprint
-        uses: cloudopsworks/blueprints/cd/checkout@v5.9
+        uses: cloudopsworks/blueprints/cd/checkout@v5.10
         id: co
         with:
-          blueprint_ref: 'v5.9'
+          blueprint_ref: 'v5.10'
 
       - name: Perform Release
         uses: ./bp/cd/release

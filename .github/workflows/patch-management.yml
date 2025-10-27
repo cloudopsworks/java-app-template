@@ -62,10 +62,10 @@ jobs:
     if: ${{ (inputs.run_autofix || github.event.schedule != '') && vars.PATCHWORK_ENABLED == 'true' }}
     steps:
       - name: Checkout w/Blueprint
-        uses: cloudopsworks/blueprints/cd/checkout@v5.9
+        uses: cloudopsworks/blueprints/cd/checkout@v5.10
         with:
           token: ${{ secrets.BOT_TOKEN }}
-          blueprint_ref: 'v5.9'
+          blueprint_ref: 'v5.10'
           source_ref: 'develop'
 
       - name: Pipeline Configuration
@@ -102,10 +102,10 @@ jobs:
     if: ${{ inputs.run_dependency_upgrade && vars.PATCHWORK_ENABLED == 'true' }}
     steps:
       - name: Checkout w/Blueprint
-        uses: cloudopsworks/blueprints/cd/checkout@v5.9
+        uses: cloudopsworks/blueprints/cd/checkout@v5.10
         with:
           token: ${{ secrets.BOT_TOKEN }}
-          blueprint_ref: 'v5.9'
+          blueprint_ref: 'v5.10'
           source_ref: 'develop'
 
       - name: Pipeline Configuration
@@ -141,10 +141,10 @@ jobs:
     if: ${{ inputs.run_sonarqube_fix && vars.PATCHWORK_ENABLED == 'true' }}
     steps:
       - name: Checkout w/Blueprint
-        uses: cloudopsworks/blueprints/cd/checkout@v5.9
+        uses: cloudopsworks/blueprints/cd/checkout@v5.10
         with:
           token: ${{ secrets.BOT_TOKEN }}
-          blueprint_ref: 'v5.9'
+          blueprint_ref: 'v5.10'
           source_ref: 'develop'
 
       - name: Pipeline Configuration
@@ -178,10 +178,10 @@ jobs:
     if: ${{ inputs.run_docstring_gen && vars.PATCHWORK_ENABLED == 'true' }}
     steps:
       - name: Checkout w/Blueprint
-        uses: cloudopsworks/blueprints/cd/checkout@v5.9
+        uses: cloudopsworks/blueprints/cd/checkout@v5.10
         with:
           token: ${{ secrets.BOT_TOKEN }}
-          blueprint_ref: 'v5.9'
+          blueprint_ref: 'v5.10'
           source_ref: 'develop'
 
       - name: Pipeline Configuration
@@ -211,10 +211,10 @@ jobs:
     if: ${{ inputs.run_unittests_gen && vars.PATCHWORK_ENABLED == 'true' }}
     steps:
       - name: Checkout w/Blueprint
-        uses: cloudopsworks/blueprints/cd/checkout@v5.9
+        uses: cloudopsworks/blueprints/cd/checkout@v5.10
         with:
           token: ${{ secrets.BOT_TOKEN }}
-          blueprint_ref: 'v5.9'
+          blueprint_ref: 'v5.10'
           source_ref: 'develop'
 
       - name: Pipeline Configuration
@@ -244,10 +244,10 @@ jobs:
     if: ${{ inputs.run_workflow_upgrade }}
     steps:
       - name: Checkout w/Blueprint
-        uses: cloudopsworks/blueprints/cd/checkout@v5.9
+        uses: cloudopsworks/blueprints/cd/checkout@v5.10
         with:
           token: ${{ secrets.BOT_TOKEN }}
-          blueprint_ref: 'v5.9'
+          blueprint_ref: 'v5.10'
           source_ref: 'develop'
 
       - name: Pipeline Configuration

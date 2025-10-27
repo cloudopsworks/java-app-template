@@ -43,11 +43,11 @@ jobs:
       has_preview: ${{ steps.config.outputs.has_preview }}
     steps:
       - name: Checkout w/Blueprint
-        uses: cloudopsworks/blueprints/cd/checkout@v5.9
+        uses: cloudopsworks/blueprints/cd/checkout@v5.10
         with:
           token: ${{ secrets.BOT_TOKEN }}
           source_ref: ${{ github.base_ref }}
-          blueprint_ref: 'v5.9'
+          blueprint_ref: 'v5.10'
 
       - name: Pipeline Configuration
         id: config
@@ -71,10 +71,10 @@ jobs:
     runs-on: ${{ needs.code-build.outputs.runner_set }}
     steps:
       - name: Checkout w/Blueprint
-        uses: cloudopsworks/blueprints/cd/checkout@v5.9
+        uses: cloudopsworks/blueprints/cd/checkout@v5.10
         with:
           source_ref: ${{ github.head_ref }}
-          blueprint_ref: 'v5.9'
+          blueprint_ref: 'v5.10'
 
       # Get Pipeline Config
       - name: Get Pipeline Config
@@ -145,12 +145,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout w/Blueprint
-        uses: cloudopsworks/blueprints/cd/checkout@v5.9
+        uses: cloudopsworks/blueprints/cd/checkout@v5.10
         id: co
         with:
           token: ${{ secrets.BOT_TOKEN }}
           source_ref: ${{ github.head_ref }}
-          blueprint_ref: 'v5.9'
+          blueprint_ref: 'v5.10'
 
       - name: Delete local & remote Release
         if: ${{ github.event.pull_request.merged == true && startsWith(github.head_ref, 'release/') && ( github.base_ref == 'master' || github.base_ref == 'main' || startsWith(github.base_ref,'support/') ) }}
