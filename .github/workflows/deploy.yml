@@ -59,6 +59,11 @@ on:
         required: false
         type: string
         default: ''
+      default_gcp_impersonate_sa:
+        description: 'Default GCP Impersonation SA ID'
+        required: false
+        type: string
+        default: ''
       apis_enabled:
         description: 'API Gateway Enabled'
         required: false
@@ -159,6 +164,7 @@ jobs:
           cloud_type: ${{ inputs.cloud_type }}
           token: ${{ secrets.token }}
           gcp_credentials: ${{ secrets.gcp_credentials }}
+          gcp_impersonate_sa: ${{ steps.config.outputs.gcp_impersonate_sa != '' && steps.config.outputs.gcp_impersonate_sa || inputs.default_gcp_impersonate_sa }}
           gcp_project: ${{ steps.config.outputs.gcp_project != '' && steps.config.outputs.gcp_project || inputs.default_gcp_project }}
           gcp_region: ${{ steps.config.outputs.gcp_region != '' && steps.config.outputs.gcp_region || inputs.default_gcp_region }}
           terraform_state_conf: ${{ inputs.terraform_state_conf }}
@@ -232,6 +238,7 @@ jobs:
         with:
           token: ${{ secrets.token }}
           gcp_credentials: ${{ secrets.gcp_credentials }}
+          gcp_impersonate_sa: ${{ steps.config.outputs.gcp_impersonate_sa != '' && steps.config.outputs.gcp_impersonate_sa || inputs.default_gcp_impersonate_sa }}
           gcp_project: ${{ steps.config.outputs.gcp_project != '' && steps.config.outputs.gcp_project || inputs.default_gcp_project }}
           gcp_region: ${{ steps.config.outputs.gcp_region != '' && steps.config.outputs.gcp_region || inputs.default_gcp_region }}
           terraform_state_conf: ${{ inputs.terraform_state_conf }}

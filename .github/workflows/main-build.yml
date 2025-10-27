@@ -213,6 +213,9 @@ jobs:
       runner_set: ${{ needs.code-build.outputs.runner_set }}
       default_aws_region: ${{ vars.DEPLOYMENT_AWS_REGION }}
       default_aws_sts_role_arn: ${{ vars.DEPLOYMENT_AWS_STS_ROLE_ARN }}
+      default_gcp_impersonate_sa: ${{ vars.DEPLOYMENT_GCP_IMPERSONATE_SA }}
+      default_gcp_project: ${{ vars.DEPLOYMENT_GCP_PROJECT }}
+      default_gcp_region: ${{ vars.DEPLOYMENT_GCP_REGION }}
       default_azure_rg: ${{ vars.DEPLOYMENT_AZURE_RG }}
       terraform_state_conf: ${{ vars.DEPLOYMENT_STATE_CONF }}
       semver: ${{ needs.code-build.outputs.semver }}
@@ -245,6 +248,9 @@ jobs:
       runner_set: ${{ needs.code-build.outputs.runner_set }}
       default_aws_region: ${{ vars.DEPLOYMENT_AWS_REGION }}
       default_aws_sts_role_arn: ${{ vars.DEPLOYMENT_AWS_STS_ROLE_ARN }}
+      default_gcp_impersonate_sa: ${{ vars.DEPLOYMENT_GCP_IMPERSONATE_SA }}
+      default_gcp_project: ${{ vars.DEPLOYMENT_GCP_PROJECT }}
+      default_gcp_region: ${{ vars.DEPLOYMENT_GCP_REGION }}
       default_azure_rg: ${{ vars.DEPLOYMENT_AZURE_RG }}
       terraform_state_conf: ${{ vars.DEPLOYMENT_STATE_CONF }}
       semver: ${{ needs.code-build.outputs.semver }}
