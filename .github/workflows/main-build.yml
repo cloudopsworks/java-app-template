@@ -131,6 +131,9 @@ jobs:
       default_aws_sts_role_arn: ${{ vars.BUILD_AWS_STS_ROLE_ARN }}
       default_azure_rg: ${{ vars.BUILD_AZURE_RESOURCE_GROUP }}
       default_registry_address: ${{ vars.DOCKER_REGISTRY_ADDRESS }}
+      default_gcp_project: ${{ vars.BUILD_GCP_PROJECT }}
+      default_gcp_region: ${{ vars.BUILD_GCP_REGION }}
+      default_gcp_impersonate_sa: ${{ vars.BUILD_GCP_IMPERSONATE_SA }}
       project_key: ${{ needs.code-build.outputs.project_key }}
       project_owner: ${{ needs.code-build.outputs.project_owner }}
     secrets:

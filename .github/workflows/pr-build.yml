@@ -202,7 +202,7 @@ jobs:
           token: ${{ secrets.BOT_TOKEN }}
           azure_service_id: ${{ secrets.DEPLOYMENT_AZURE_SERVICE_ID }}
           azure_service_secret: ${{ secrets.DEPLOYMENT_AZURE_SERVICE_SECRET }}
-          azure_rg: ${{ steps.config.outputs.azure_rg != '' && steps.config.outputs.azure_rg || vars.PREVIEW_AZURE_RESOURCE_GROUP }}
+          azure_rg: ${{ steps.config.outputs.build_azure_rg != '' && steps.config.outputs.build_azure_rg || vars.PREVIEW_AZURE_RESOURCE_GROUP }}
           terraform_state_conf: ${{ inputs.terraform_state_conf }}
           release_name: ${{ steps.config.outputs.release_name }}
           release_version: ${{ needs.code-build.outputs.semver }}
@@ -222,8 +222,8 @@ jobs:
           cloud_type: ${{ steps.config.outputs.cloud }}
           token: ${{ secrets.BOT_TOKEN }}
           gcp_credentials: ${{ secrets.PREVIEW_GCP_CREDENTIALS }}
-          gcp_project: ${{ steps.config.outputs.gcp_project != '' && steps.config.outputs.gcp_project || inputs.PREVIEW_GCP_PROJECT }}
-          gcp_region: ${{ steps.config.outputs.gcp_region != '' && steps.config.outputs.gcp_region || inputs.PREVIEW_GCP_REGION }}
+          gcp_project: ${{ vars.PREVIEW_GCP_PROJECT }}
+          gcp_region: ${{ vars.PREVIEW_GCP_REGION }}
           terraform_state_conf: ${{ inputs.terraform_state_conf }}
           release_name: ${{ steps.config.outputs.release_name }}
           release_version: ${{ needs.code-build.outputs.semver }}

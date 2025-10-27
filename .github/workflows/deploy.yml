@@ -147,7 +147,7 @@ jobs:
           token: ${{ secrets.token }}
           azure_service_id: ${{ secrets.azure_service_id }}
           azure_service_secret: ${{ secrets.azure_service_secret }}
-          azure_rg: ${{ steps.config.outputs.azure_rg != '' && steps.config.outputs.azure_rg || inputs.default_azure_rg }}
+          azure_rg: ${{ steps.config.outputs.build_azure_rg != '' && steps.config.outputs.build_azure_rg || inputs.default_azure_rg }}
           terraform_state_conf: ${{ inputs.terraform_state_conf }}
           release_name: ${{ steps.config.outputs.release_name }}
           release_version: ${{ inputs.semver }}
@@ -164,9 +164,9 @@ jobs:
           cloud_type: ${{ inputs.cloud_type }}
           token: ${{ secrets.token }}
           gcp_credentials: ${{ secrets.gcp_credentials }}
-          gcp_impersonate_sa: ${{ steps.config.outputs.gcp_impersonate_sa != '' && steps.config.outputs.gcp_impersonate_sa || inputs.default_gcp_impersonate_sa }}
+          gcp_impersonate_sa: ${{ steps.config.outputs.deploy_gcp_impersonate_sa != '' && steps.config.outputs.deploy_gcp_impersonate_sa || inputs.default_gcp_impersonate_sa }}
           gcp_project: ${{ steps.config.outputs.gcp_project != '' && steps.config.outputs.gcp_project || inputs.default_gcp_project }}
-          gcp_region: ${{ steps.config.outputs.gcp_region != '' && steps.config.outputs.gcp_region || inputs.default_gcp_region }}
+          gcp_region: ${{ steps.config.outputs.build_gcp_region != '' && steps.config.outputs.build_gcp_region || inputs.default_gcp_region }}
           terraform_state_conf: ${{ inputs.terraform_state_conf }}
           release_name: ${{ steps.config.outputs.release_name }}
           release_version: ${{ inputs.semver }}
@@ -224,7 +224,7 @@ jobs:
           token: ${{ secrets.token }}
           azure_service_id: ${{ secrets.azure_service_id }}
           azure_service_secret: ${{ secrets.azure_service_secret }}
-          azure_rg: ${{ steps.config.outputs.azure_rg != '' && steps.config.outputs.azure_rg || inputs.default_azure_rg }}
+          azure_rg: ${{ steps.config.outputs.build_azure_rg != '' && steps.config.outputs.build_azure_rg || inputs.default_azure_rg }}
           terraform_state_conf: ${{ inputs.terraform_state_conf }}
           release_name: ${{ steps.config.outputs.release_name }}
           release_version: ${{ inputs.semver }}
@@ -238,9 +238,9 @@ jobs:
         with:
           token: ${{ secrets.token }}
           gcp_credentials: ${{ secrets.gcp_credentials }}
-          gcp_impersonate_sa: ${{ steps.config.outputs.gcp_impersonate_sa != '' && steps.config.outputs.gcp_impersonate_sa || inputs.default_gcp_impersonate_sa }}
+          gcp_impersonate_sa: ${{ steps.config.outputs.deploy_gcp_impersonate_sa != '' && steps.config.outputs.deploy_gcp_impersonate_sa || inputs.default_gcp_impersonate_sa }}
           gcp_project: ${{ steps.config.outputs.gcp_project != '' && steps.config.outputs.gcp_project || inputs.default_gcp_project }}
-          gcp_region: ${{ steps.config.outputs.gcp_region != '' && steps.config.outputs.gcp_region || inputs.default_gcp_region }}
+          gcp_region: ${{ steps.config.outputs.build_gcp_region != '' && steps.config.outputs.build_gcp_region || inputs.default_gcp_region }}
           terraform_state_conf: ${{ inputs.terraform_state_conf }}
           release_name: ${{ steps.config.outputs.release_name }}
           release_version: ${{ inputs.semver }}
