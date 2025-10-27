@@ -129,7 +129,7 @@ jobs:
       runner_set: ${{ needs.code-build.outputs.runner_set }}
       default_aws_region: ${{ vars.BUILD_AWS_REGION }}
       default_aws_sts_role_arn: ${{ vars.BUILD_AWS_STS_ROLE_ARN }}
-      default_azure_rg: ${{ vars.BUILD_AZURE_RG }}
+      default_azure_rg: ${{ vars.BUILD_AZURE_RESOURCE_GROUP }}
       default_registry_address: ${{ vars.DOCKER_REGISTRY_ADDRESS }}
       project_key: ${{ needs.code-build.outputs.project_key }}
       project_owner: ${{ needs.code-build.outputs.project_owner }}
@@ -139,7 +139,7 @@ jobs:
       aws_secret_access_key: ${{ secrets.BUILD_AWS_SECRET_ACCESS_KEY }}
       azure_service_id: ${{ secrets.BUILD_AZURE_SERVICE_ID }}
       azure_service_secret: ${{ secrets.BUILD_AZURE_SERVICE_SECRET }}
-      gcp_credentials: ${{ secrets.BUILD_GOOGLE_CREDENTIALS }}
+      gcp_credentials: ${{ secrets.BUILD_GCP_CREDENTIALS }}
 
   release:
     name: 'Generate Release'
@@ -225,6 +225,7 @@ jobs:
       aws_secret_access_key: ${{ secrets.DEPLOYMENT_AWS_SECRET_ACCESS_KEY }}
       azure_service_id: ${{ secrets.DEPLOYMENT_AZURE_SERVICE_ID }}
       azure_service_secret: ${{ secrets.DEPLOYMENT_AZURE_SERVICE_SECRET }}
+      gcp_credentials: ${{ secrets.DEPLOYMENT_GCP_CREDENTIALS }}
 
   deploy-blue-green:
     needs:
