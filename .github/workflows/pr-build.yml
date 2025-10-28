@@ -222,6 +222,7 @@ jobs:
           cloud_type: ${{ steps.config.outputs.cloud }}
           token: ${{ secrets.BOT_TOKEN }}
           gcp_credentials: ${{ secrets.PREVIEW_GCP_CREDENTIALS }}
+          gcp_impersonate_sa: ${{ vars.PREVIEW_CGP_IMPERSONATE_SA }}
           gcp_project: ${{ vars.PREVIEW_GCP_PROJECT }}
           gcp_region: ${{ vars.PREVIEW_GCP_REGION }}
           terraform_state_conf: ${{ inputs.terraform_state_conf }}

@@ -34,6 +34,18 @@ on:
         required: false
         type: string
         default: ''
+      default_gcp_project:
+        required: false
+        type: string
+        default: ''
+      default_gcp_region:
+        required: false
+        type: string
+        default: ''
+      default_gcp_impersonate_sa:
+        required: false
+        type: string
+        default: ''
       default_registry_address:
         required: false
         type: string
