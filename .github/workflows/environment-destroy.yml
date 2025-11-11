@@ -62,7 +62,7 @@ jobs:
       project_key: ${{ steps.config.outputs.project_key }}
       azure_rg: ${{ steps.config.outputs.build_azure_rg }}
       gcp_project: ${{ steps.config.outputs.gcp_project }}
-      gcp_region: ${{ steps.config.outputs.build_gcp_region }}
+      gcp_region: ${{ steps.config.outputs.gcp_region }}
     steps:
       - name: Checkout w/Blueprint
         uses: cloudopsworks/blueprints/cd/checkout@v5.10
