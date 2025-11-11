@@ -41,6 +41,7 @@ on:
         required: true
         type: string
       semver:
+        description: 'Semver Version'
         required: true
         type: string
       default_azure_rg:
@@ -55,6 +56,11 @@ on:
         default: ''
       default_gcp_project:
         description: 'Default GCP Project ID'
+        required: false
+        type: string
+        default: ''
+      default_gcp_impersonate_sa:
+        description: 'Default GCP Impersonation SA ID'
         required: false
         type: string
         default: ''
