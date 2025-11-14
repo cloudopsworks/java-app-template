@@ -16,8 +16,8 @@ on:
       - develop
     paths:
       - OWNERS
-      - .github/cloudopsworks-ci.yaml
-      - .github/cloudopsworks-cd.yaml
+      - .cloudopsworks/cloudopsworks-ci.yaml
+      - .cloudopsworks/cloudopsworks-cd.yaml
   workflow_dispatch:
 
 concurrency: owners-${{ github.repository }}-${{ github.ref }}

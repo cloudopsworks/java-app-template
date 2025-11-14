@@ -85,7 +85,7 @@ repository_owner: "REPO_OWNER" # Required
 #    project_id: PREVIEW_PROJECT_ID
 #
 # API Gateway configuration, if enabled will deploy apis to the environment api gateway
-# configuration is done under .github/vars/apigw/
+# configuration is done under .cloudopsworks/vars/apigw/
 #apis:
 #  enabled: true
 #

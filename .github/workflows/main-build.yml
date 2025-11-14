@@ -21,8 +21,8 @@ on:
       - release/**
     paths-ignore:
       - '.github/**'
-      - '!.github/vars/**'
-      - '!.github/values/**'
+      - '!.cloudopsworks/vars/**'
+      - '!.cloudopsworks/values/**'
   workflow_dispatch:
 
 concurrency: build-${{ github.repository }}-${{ github.ref }}
