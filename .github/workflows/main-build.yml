@@ -266,3 +266,4 @@ jobs:
       aws_secret_access_key: ${{ secrets.DEPLOYMENT_AWS_SECRET_ACCESS_KEY }}
       azure_service_id: ${{ secrets.DEPLOYMENT_AZURE_SERVICE_ID }}
       azure_service_secret: ${{ secrets.DEPLOYMENT_AZURE_SERVICE_SECRET }}
+      gcp_credentials: ${{ secrets.DEPLOYMENT_GCP_CREDENTIALS }}
