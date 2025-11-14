@@ -79,6 +79,10 @@ repository_owner: "REPO_OWNER" # Required
 #  enabled: true
 #  kubernetes: true
 #  domain: example.com
+#  azure:
+#    resource_group: PREVIEW_RG
+#  gcp:
+#    project_id: PREVIEW_PROJECT_ID
 #
 # API Gateway configuration, if enabled will deploy apis to the environment api gateway
 # configuration is done under .github/vars/apigw/
