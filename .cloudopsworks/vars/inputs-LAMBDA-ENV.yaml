@@ -195,6 +195,7 @@ lambda:
   #                  - 100
   #            Location:
   #              - New York
+  #
   #  dynamodb:
   #    tableName: DYNAMODB_TABLE_NAME
   #    startingPosition: LATEST | TRIM_HORIZON # Optional: Starting position for the stream, defaults to LATEST
