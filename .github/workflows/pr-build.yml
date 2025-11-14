@@ -202,7 +202,7 @@ jobs:
           token: ${{ secrets.BOT_TOKEN }}
           azure_service_id: ${{ secrets.DEPLOYMENT_AZURE_SERVICE_ID }}
           azure_service_secret: ${{ secrets.DEPLOYMENT_AZURE_SERVICE_SECRET }}
-          azure_rg: ${{ steps.config.outputs.build_azure_rg != '' && steps.config.outputs.build_azure_rg || vars.PREVIEW_AZURE_RESOURCE_GROUP }}
+          azure_rg: ${{ steps.config.outputs.deploy_azure_rg != '' && steps.config.outputs.deploy_azure_rg || vars.PREVIEW_AZURE_RESOURCE_GROUP }}
           terraform_state_conf: ${{ inputs.terraform_state_conf }}
           release_name: ${{ steps.config.outputs.release_name }}
           release_version: ${{ needs.code-build.outputs.semver }}
