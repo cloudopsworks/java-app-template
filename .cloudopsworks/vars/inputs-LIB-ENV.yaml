@@ -21,5 +21,9 @@ runner_set: "RUNNER-ENV"
 #
 # For GCP
 #gcp:
+#  region: "GCP_REGION"
+#  project_id: "GCP_PROJECT"
+#  impersonate_sa: "GCP project Service Account e-mail" # Optional: when existing role is same for build and deploy
+#  build_impresonate_sa: "GCP project Service Account e-mail" # Optional: when existing role is different for build and deploy
 #  secrets_path_filter: /secrets
 #
