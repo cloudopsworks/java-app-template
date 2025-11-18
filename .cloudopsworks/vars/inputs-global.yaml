@@ -34,6 +34,12 @@ repository_owner: "REPO_OWNER" # Required
 #  extra_exclusions:
 #  branch_disabled: true # uncomment only if you are using Community Sonarqube
 #
+# JIRA Integration for Release Management
+#jira:
+#  enabled: true | false # Defaults to true, set to false to disable, JIRA_INTEGRATION_ENABLED at organization setting enables or disables globally
+#  project_id: "PROJECT ID NUMBER" # Optional, if not set will default to JIRA_INTEGRATION_PROJECT_ID from organization
+#  project_key: "PROJECT KEY" # Optional,  if not set will default to JIRA_INTEGRATION_PROJECT_KEY from organization
+#
 # Set DependencyTrack processing to false if want to disable, the tool is enabled by default
 # type: is one of => Library , Application , Container , Framework , Device , Firmware , File , Operating System
 #       Default type is Application
