@@ -81,7 +81,7 @@ jobs:
         id: config
         uses: ./bp/ci/config
 
-      - name: Deploy AWS
+      - name: Preview Destroy AWS
         if: ${{ steps.config.outputs.cloud == 'AWS' }}
         uses: ./bp/cd/deploy/preview/aws
         with:
@@ -102,7 +102,7 @@ jobs:
           pull_request_name: pr${{ github.event.pull_request.number }}
           cluster_name: ${{ vars.PREVIEW_AWS_EKS_CLUSTER_NAME }}
 
-      - name: Deploy Azure
+      - name: Preview Destroy Azure
         if: ${{ steps.config.outputs.cloud == 'AZURE' }}
         uses: ./bp/cd/deploy/app/azure
         with:
@@ -122,20 +122,28 @@ jobs:
           pull_request_name: pr${{ github.event.pull_request.number }}
           cluster_name: ${{ vars.PREVIEW_AZURE_AKS_CLUSTER_NAME }}
 
-#      - name: Deploy GCP
-#        if: ${{ steps.config.outputs.cloud == 'GCP' }}
-#        uses: ./bp/cd/deploy/app/azure
-#        with:
-#          destroy: true
-#          cloud_type: ${{ inputs.cloud_type }}
-#          token: ${{ secrets.token }}
-#          gcp_service_id: ${{ secrets.gcp_service_id }}
-#          terraform_state_conf: ${{ inputs.terraform_state_conf }}
-#          release_name: ${{ steps.config.outputs.release_name }}
-#          release_version: ${{ inputs.semver }}
-#          project_key: ${{ steps.config.outputs.project_key }}
-#          deployment_name: ${{ inputs.deployment_name }}
-#          environment: ${{ steps.config.outputs.environment }}
+      - name: Preview Destroy GCP
+        if: ${{ steps.config.outputs.cloud == 'GCP' }}
+        uses: ./bp/cd/deploy/app/azure
+        with:
+          destroy: true
+          cloud_type: ${{ steps.config.outputs.cloud }}
+          token: ${{ secrets.BOT_TOKEN }}
+          gcp_credentials: ${{ secrets.PREVIEW_GCP_CREDENTIALS }}
+          gcp_impersonate_sa: ${{ vars.PREVIEW_CGP_IMPERSONATE_SA }}
+          gcp_project: ${{ vars.PREVIEW_GCP_PROJECT }}
+          gcp_region: ${{ vars.PREVIEW_GCP_REGION }}
+          terraform_state_conf: ${{ inputs.terraform_state_conf }}
+          release_name: ${{ steps.config.outputs.release_name }}
+          release_version: ${{ needs.code-build.outputs.semver }}
+          project_key: ${{ steps.config.outputs.project_key }}
+          project_owner: ${{ steps.config.outputs.project_owner }}
+          deployment_name: ${{ steps.config.outputs.deployment_name }}
+          environment: ${{ steps.config.outputs.environment }}
+          container_registry: ${{ vars.PREVIEW_DOCKER_REGISTRY_ADDRESS }}
+          pull_request_name: pr${{ github.event.pull_request.number }}
+          cluster_name: ${{ vars.PREVIEW_GCP_GKE_CLUSTER_NAME }}
+          rancher_project_id: ${{ vars.PREVIEW_RANCHER_PROJECT_ID }}
 
   branch_deletion:
     if: ${{ ! cancelled() }}
