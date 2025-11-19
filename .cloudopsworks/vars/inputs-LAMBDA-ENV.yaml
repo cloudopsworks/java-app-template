@@ -1,5 +1,5 @@
 environment: "dev|uat|prod|demo"
-runner_set: "RUNNER-ENV"
+#runner_set: "RUNNER-ENV" # Optional: when using self-hosted runners
 #disable_deploy: true
 versions_bucket: "VERSIONS_BUCKET"
 #logs_bucket: "LOGS_BUCKET"
@@ -195,6 +195,7 @@ lambda:
   #                  - 100
   #            Location:
   #              - New York
+  #
   #  dynamodb:
   #    tableName: DYNAMODB_TABLE_NAME
   #    startingPosition: LATEST | TRIM_HORIZON # Optional: Starting position for the stream, defaults to LATEST
