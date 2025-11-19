@@ -219,7 +219,7 @@ jobs:
       default_gcp_impersonate_sa: ${{ vars.DEPLOYMENT_GCP_IMPERSONATE_SA }}
       default_gcp_project: ${{ vars.DEPLOYMENT_GCP_PROJECT }}
       default_gcp_region: ${{ vars.DEPLOYMENT_GCP_REGION }}
-      default_azure_rg: ${{ vars.DEPLOYMENT_AZURE_RG }}
+      default_azure_rg: ${{ vars.DEPLOYMENT_AZURE_RESOURCE_GROUP }}
       terraform_state_conf: ${{ vars.DEPLOYMENT_STATE_CONF }}
       semver: ${{ needs.code-build.outputs.semver }}
       apis_enabled: ${{ needs.code-build.outputs.apis_enabled == 'true' }}
@@ -254,7 +254,7 @@ jobs:
       default_gcp_impersonate_sa: ${{ vars.DEPLOYMENT_GCP_IMPERSONATE_SA }}
       default_gcp_project: ${{ vars.DEPLOYMENT_GCP_PROJECT }}
       default_gcp_region: ${{ vars.DEPLOYMENT_GCP_REGION }}
-      default_azure_rg: ${{ vars.DEPLOYMENT_AZURE_RG }}
+      default_azure_rg: ${{ vars.DEPLOYMENT_AZURE_RESOURCE_GROUP }}
       terraform_state_conf: ${{ vars.DEPLOYMENT_STATE_CONF }}
       semver: ${{ needs.code-build.outputs.semver }}
       apis_enabled: ${{ needs.code-build.outputs.apis_enabled == 'true' }}
