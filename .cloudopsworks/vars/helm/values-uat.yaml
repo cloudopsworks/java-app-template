@@ -51,8 +51,8 @@
 
 # define environment variables here as a map of key: value
 #env:
-# - name: ENV_VAR_NAME
-#   value: "ENV VAR VALUE"
+#  - name: ENV_VAR_NAME
+#    value: "ENV VAR VALUE"
 #  ...
 
 # define environment variables to set from ConfigMap / Secret

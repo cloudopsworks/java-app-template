@@ -67,6 +67,7 @@ jobs:
       deploy_azure_rg: ${{ steps.config.outputs.deploy_azure_rg }}
       gcp_project: ${{ steps.config.outputs.gcp_project }}
       gcp_region: ${{ steps.config.outputs.gcp_region }}
+      deploy_gcp_impersonate_sa: ${{ steps.config.outputs.deploy_gcp_impersonate_sa }}
     steps:
       - name: Checkout w/Blueprint
         uses: cloudopsworks/blueprints/cd/checkout@v5.10
@@ -91,6 +92,11 @@ jobs:
 
       - name: Install runner tools
         uses: ./bp/ci/common/install/runner-tools
+
+      - name: Move Apis
+        uses: ./bp/cd/tasks/apis/copy
+        with:
+          cloud: ${{ needs.preload.outputs.cloud }}
 
       - name: Unlock API AWS
         if: ${{ needs.preload.outputs.cloud == 'AWS' && inputs.target == 'api' }}
@@ -139,7 +145,7 @@ jobs:
           token: ${{ secrets.token }}
           azure_service_id: ${{ secrets.DEPLOYMENT_AZURE_SERVICE_ID }}
           azure_service_secret: ${{ secrets.DEPLOYMENT_AZURE_SERVICE_SECRET }}
-          azure_rg: ${{ needs.preload.outputs.deploy_azure_rg != '' && needs.preload.outputs.deploy_azure_rg || vars.DEPLOYMENT_AZURE_RG }}
+          azure_rg: ${{ needs.preload.outputs.deploy_azure_rg != '' && needs.preload.outputs.deploy_azure_rg || vars.DEPLOYMENT_AZURE_RESOURCE_GROUP }}
           terraform_state_conf: ${{ vars.DEPLOYMENT_STATE_CONF }}
           release_name: ${{ needs.preload.outputs.release_name }}
           release_version: 'v1'
@@ -158,7 +164,7 @@ jobs:
           token: ${{ secrets.BOT_TOKEN }}
           azure_service_id: ${{ secrets.DEPLOYMENT_AZURE_SERVICE_ID }}
           azure_service_secret: ${{ secrets.DEPLOYMENT_AZURE_SERVICE_SECRET }}
-          azure_rg: ${{ needs.preload.outputs.deploy_azure_rg != '' && needs.preload.outputs.deploy_azure_rg || vars.DEPLOYMENT_AZURE_RG }}
+          azure_rg: ${{ needs.preload.outputs.deploy_azure_rg != '' && needs.preload.outputs.deploy_azure_rg || vars.DEPLOYMENT_AZURE_RESOURCE_GROUP }}
           terraform_state_conf: ${{ vars.DEPLOYMENT_STATE_CONF }}
           release_name: ${{ needs.preload.outputs.release_name }}
           release_version: ${{ inputs.semver }}
@@ -166,7 +172,7 @@ jobs:
           deployment_name: ${{ inputs.unlockDeploymentName }}
           environment: ${{ inputs.environment }}
 
-      - name: Destroy API GCP
+      - name: Unlock API GCP
         if: ${{ needs.preload.outputs.cloud == 'GCP' }}
         uses: ./bp/cd/deploy/api/gcp
         with:
@@ -176,6 +182,7 @@ jobs:
           cloud_type: ${{ inputs.cloud_type }}
           token: ${{ secrets.BOT_TOKEN }}
           gcp_credentials: ${{ secrets.DEPLOYMENT_GCP_CREDENTIALS }}
+          gcp_impersonate_sa: ${{ needs.preload.outputs.deploy_gcp_impersonate_sa != '' && needs.preload.outputs.deploy_gcp_impersonate_sa || vars.DEPLOYMENT_GCP_IMPERSONATE_SA }}
           gcp_project: ${{ needs.preload.outputs.gcp_project != '' && needs.preload.outputs.gcp_project || vars.DEPLOYMENT_GCP_PROJECT }}
           gcp_region: ${{ needs.preload.outputs.gcp_region != '' && needs.preload.outputs.gcp_region || vars.DEPLOYMENT_GCP_REGION }}
           terraform_state_conf: ${{ vars.DEPLOYMENT_STATE_CONF }}
@@ -185,7 +192,7 @@ jobs:
           deployment_name: ${{ inputs.unlockDeploymentName }}
           environment: ${{ inputs.environment }}
 
-      - name: Destroy Application Deploy GCP
+      - name: Unlock Application Deploy GCP
         if: ${{ needs.preload.outputs.cloud == 'GCP' }}
         uses: ./bp/cd/deploy/app/gcp
         with:
@@ -195,6 +202,7 @@ jobs:
           cloud_type: ${{ inputs.cloud_type }}
           token: ${{ secrets.BOT_TOKEN }}
           gcp_credentials: ${{ secrets.DEPLOYMENT_GCP_CREDENTIALS }}
+          gcp_impersonate_sa: ${{ needs.preload.outputs.deploy_gcp_impersonate_sa != '' && needs.preload.outputs.deploy_gcp_impersonate_sa || vars.DEPLOYMENT_GCP_IMPERSONATE_SA }}
           gcp_project: ${{ needs.preload.outputs.gcp_project != '' && needs.preload.outputs.gcp_project || vars.DEPLOYMENT_GCP_PROJECT }}
           gcp_region: ${{ needs.preload.outputs.gcp_region != '' && needs.preload.outputs.gcp_region || vars.DEPLOYMENT_GCP_REGION }}
           terraform_state_conf: ${{ vars.DEPLOYMENT_STATE_CONF }}
