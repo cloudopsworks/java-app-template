@@ -152,5 +152,5 @@ ingress:
 #            - type: Percent
 #              value: 100
 #              periodSeconds: 15
-  triggers: {}
-  # {list of triggers to activate scaling of the target resource, see keda documentation for details}
+#  triggers: {}
+#  # {list of triggers to activate scaling of the target resource, see keda documentation for details}
