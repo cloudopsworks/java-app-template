@@ -25,7 +25,7 @@ on:
           - api
       api_lock:
         type: string
-        description: API to unlock (single/multiple apis)
+        description: 'API to unlock (Format: API_Name/version)'
         required: false
         default: ''
       lockId:
