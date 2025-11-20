@@ -15,26 +15,23 @@ on:
         type: environment
         description: Select Environment to Unlock
         required: true
-      environment:
-        type: choice
-        description: Environment to Unlock
-        required: true
-        options:
-          - dev
-          - uat
-          - prod
-      lockId:
-        type: string
-        description: Lock ID for the environment
-        required: true
       target:
         type: choice
-        description: What to Unlock?
+        description: What to Unlock? API or Application Deployment
         required: true
         default: app
         options:
           - app
           - api
+      api_lock:
+        type: string
+        description: 'API to unlock (Format: API_Name/version)'
+        required: false
+        default: ''
+      lockId:
+        type: string
+        description: Lock ID for the environment
+        required: true
       qualifier:
         type: string
         description: Qualifier for the lock (green/bluee)
@@ -66,6 +63,7 @@ jobs:
       azure_rg: ${{ steps.config.outputs.azure_rg }}
       gcp_project: ${{ steps.config.outputs.gcp_project }}
       gcp_region: ${{ steps.config.outputs.gcp_region }}
+      environment: ${{ steps.config.outputs.environment }}
     steps:
       - name: Checkout w/Blueprint
         uses: cloudopsworks/blueprints/cd/checkout@v5.9
@@ -91,6 +89,11 @@ jobs:
       - name: Install runner tools
         uses: ./bp/ci/common/install/runner-tools
 
+      - name: Move Apis
+        uses: ./bp/cd/tasks/apis/copy
+        with:
+          cloud: ${{ needs.preload.outputs.cloud }}
+
       - name: Unlock API AWS
         if: ${{ needs.preload.outputs.cloud == 'AWS' && inputs.target == 'api' }}
         uses: ./bp/cd/deploy/api/aws
@@ -107,7 +110,8 @@ jobs:
           release_version: 'v1'
           project_key: ${{ needs.preload.outputs.project_key }}
           deployment_name: ${{ inputs.unlockDeploymentName }}
-          environment: ${{ inputs.environment }}
+          environment: ${{ needs.preload.outputs.environment }}
+          api_lock: ${{ inputs.api_lock }}
 
       - name: Unlock Application Deploy AWS
         if: ${{ needs.preload.outputs.cloud == 'AWS' && inputs.target == 'app' }}
@@ -127,7 +131,7 @@ jobs:
           release_version: 'v1'
           project_key: ${{ needs.preload.outputs.project_key }}
           deployment_name: ${{ inputs.unlockDeploymentName }}
-          environment: ${{ inputs.environment }}
+          environment: ${{ needs.preload.outputs.environment }}
 
       - name: Unlock API Azure
         if: ${{ needs.preload.outputs.cloud == 'AZURE' && inputs.target == 'api' }}
@@ -144,7 +148,8 @@ jobs:
           release_version: 'v1'
           project_key: ${{ needs.preload.outputs.project_key }}
           deployment_name: ${{ inputs.unlockDeploymentName }}
-          environment: ${{ inputs.environment }}
+          environment: ${{ needs.preload.outputs.environment }}
+          api_lock: ${{ inputs.api_lock }}
 
       - name: Unlock Application Deploy Azure
         if: ${{ needs.preload.outputs.cloud == 'AZURE' && inputs.target == 'app' }}
@@ -163,9 +168,9 @@ jobs:
           release_version: ${{ inputs.semver }}
           project_key: ${{ needs.preload.outputs.project_key }}
           deployment_name: ${{ inputs.unlockDeploymentName }}
-          environment: ${{ inputs.environment }}
+          environment: ${{ needs.preload.outputs.environment }}
 
-      - name: Destroy API GCP
+      - name: Unlock API GCP
         if: ${{ needs.preload.outputs.cloud == 'GCP' }}
         uses: ./bp/cd/deploy/api/gcp
         with:
@@ -182,9 +187,10 @@ jobs:
           release_version: 'v1'
           project_key: ${{ needs.preload.outputs.project_key }}
           deployment_name: ${{ inputs.unlockDeploymentName }}
-          environment: ${{ inputs.environment }}
+          environment: ${{ needs.preload.outputs.environment }}
+          api_lock: ${{ inputs.api_lock }}
 
-      - name: Destroy Application Deploy GCP
+      - name: Unlock Application Deploy GCP
         if: ${{ needs.preload.outputs.cloud == 'GCP' }}
         uses: ./bp/cd/deploy/app/gcp
         with:
@@ -201,4 +207,4 @@ jobs:
           release_version: ${{ inputs.semver }}
           project_key: ${{ needs.preload.outputs.project_key }}
           deployment_name: ${{ inputs.unlockDeploymentName }}
-          environment: ${{ inputs.environment }}
+          environment: ${{ needs.preload.outputs.environment }}
