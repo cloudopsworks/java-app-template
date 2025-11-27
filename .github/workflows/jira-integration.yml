@@ -40,7 +40,8 @@ jobs:
         id: config
         uses: ./bp/ci/config
 
-      - uses: ./bp/cd/tasks/jira/release
+      - name: Jira Integration on Release
+        uses: ./bp/cd/tasks/jira/release
         if: ${{ steps.config.outputs.jira_integration == 'true' && vars.JIRA_INTEGRATION_ENABLED == 'true' }}
         with:
           jira_api_user: ${{ vars.JIRA_INTEGRATION_API_USER }}
