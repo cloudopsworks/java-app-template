@@ -19,6 +19,7 @@
 
 # Deployment Annotations
 #annotations: {}
+#  reloader.stakater.com/auto: "true" # Recommended if you are using external_secrets.enabled=true and have installed Stakater Reloader (https://github.com/stakater/Reloader)
 
 # Pod specific Annotations
 #podAnnotations: {}
