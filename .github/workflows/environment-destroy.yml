@@ -85,6 +85,7 @@ jobs:
 
       - name: Move Apis
         uses: ./bp/cd/tasks/apis/copy
+        if: ${{ inputs.target == 'api' || inputs.target == 'BOTH' }}
         with:
           cloud: ${{ needs.preload.outputs.cloud }}
 
