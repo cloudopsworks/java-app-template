@@ -104,7 +104,7 @@ jobs:
 
       - name: Preview Destroy Azure
         if: ${{ steps.config.outputs.cloud == 'AZURE' }}
-        uses: ./bp/cd/deploy/app/azure
+        uses: ./bp/cd/deploy/preview/azure
         with:
           destroy: true
           cloud_type: ${{ steps.config.outputs.cloud }}
@@ -124,7 +124,7 @@ jobs:
 
       - name: Preview Destroy GCP
         if: ${{ steps.config.outputs.cloud == 'GCP' }}
-        uses: ./bp/cd/deploy/app/azure
+        uses: ./bp/cd/deploy/preview/gcp
         with:
           destroy: true
           cloud_type: ${{ steps.config.outputs.cloud }}
