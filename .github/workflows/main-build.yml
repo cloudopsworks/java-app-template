@@ -21,10 +21,10 @@ on:
       - release/**
     paths:
       - '**'
-      - '!.github/**'
-      - '!.cloudopsworks/**'
       - '.cloudopsworks/vars/**'
       - '.cloudopsworks/values/**'
+      - '!.github/**'
+      - '!.cloudopsworks/*'
   workflow_dispatch:
 
 concurrency: build-${{ github.repository }}-${{ github.ref }}
