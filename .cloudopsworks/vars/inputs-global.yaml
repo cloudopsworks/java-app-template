@@ -18,6 +18,10 @@ repository_owner: "REPO_OWNER" # Required
 #semgrep:
 #  enabled: true
 #
+# Set Trivy processing to true if want to enable Docker Image scan, the tool is disabled by default
+#trivy:
+#  enabled: true
+#
 # Set Sonarqube processing to true if want to enable, the tool is disabled by default
 #sonarqube:
 #  enabled: true
