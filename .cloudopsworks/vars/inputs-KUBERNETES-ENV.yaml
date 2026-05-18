@@ -1,4 +1,8 @@
 # This file contains the environment variables for the Kubernetes deployment
+# Agents: cloud=aws|gcp|azure ; cloud_type=kubernetes
+# Agents: cloud=aws ; cloud_type=eks
+# Agents: cloud=azure ; cloud_type=aks
+# Agents: cloud=gcp ; cloud_type=gke
 environment: "dev|uat|prod|demo"
 #runner_set: "RUNNER-ENV" # Optional: when using self-hosted runners
 #disable_deploy: true

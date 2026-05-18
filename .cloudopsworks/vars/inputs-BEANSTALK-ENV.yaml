@@ -1,3 +1,5 @@
+# This file contains the input variables for Elastic Beanstalk deployment.
+# Agents: cloud=aws ; cloud_type=beanstalk
 environment: "dev|uat|prod|demo"
 #runner_set: "RUNNER-ENV" # Optional: when using self-hosted runners
 #disable_deploy: true
