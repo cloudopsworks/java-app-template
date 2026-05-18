@@ -1,3 +1,5 @@
+# This file contains the global variables that will be used across all pipelines,
+# these variables can be overwritten by the pipeline specific variables defined in .cloudopsworks/vars/inputs-<pipeline>.yaml
 organization_name: "ORG_NAME"
 organization_unit: "ORG_UNIT"
 environment_name: "ENV_NAME"

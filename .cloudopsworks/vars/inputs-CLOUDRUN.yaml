@@ -1,3 +1,5 @@
+# This file defines the input variables for the Cloud Run module.
+# Agents: cloud=gcp ; cloud_type=cloudrun
 environment: "dev|uat|prod|demo"
 #runner_set: "RUNNER-ENV" # Optional: when using self-hosted runners
 #disable_deploy: true
