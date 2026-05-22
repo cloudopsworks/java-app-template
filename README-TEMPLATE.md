@@ -331,3 +331,159 @@ If you use the CloudOps Works release workflow, keep changes grouped by release 
 
 - `.omx/`, `.omc/`, `.claude/`, `.opencode/`, and similar agent/tooling directories are intentionally ignored and are not part of the application template contract.
 - The template is designed for CloudOps Works blueprint-backed automation; if you remove that integration, also prune the related workflows and `.cloudopsworks/` configuration.
+
+---
+
+## AI-assisted upgrade of `.cloudopsworks/vars` configuration files
+
+This section is a machine-readable protocol for AI agents performing a seamless, non-destructive upgrade of all configuration files under `.cloudopsworks/vars/` when a new template version is released. Follow the steps below in order.
+
+### Upgrade overview
+
+The template version locked into this repository is recorded in `.cloudopsworks/_VERSION`. The canonical upstream source is the GitHub repository `cloudopsworks/java-app-template`, pinned to the tag that matches the content of `_VERSION`.
+
+An upgrade merges new keys, updated comments, and structural changes from the upstream template into local files **without overwriting values the operator has already set**.
+
+---
+
+### Step 1 — determine current and target versions
+
+1. Read `.cloudopsworks/_VERSION` to get the **current locked version** (e.g., `v1.4.15`).
+2. The **target version** is either supplied by the operator or is the latest release tag on `cloudopsworks/java-app-template`.
+3. Fetch any upstream file from GitHub using the pattern:
+   ```
+   https://raw.githubusercontent.com/cloudopsworks/java-app-template/<version>/<path>
+   ```
+   Example:
+   ```
+   https://raw.githubusercontent.com/cloudopsworks/java-app-template/v1.4.15/.cloudopsworks/vars/inputs-global.yaml
+   ```
+
+---
+
+### Step 2 — identify the deployment type for each environment file
+
+Each `inputs-<name>.yaml` file under `.cloudopsworks/vars/` maps to a specific upstream template. Determine the type using the following priority order:
+
+**Priority 1 — `Agents:` header comment**
+
+If the file contains an `# Agents:` line in its header block, read `cloud` and `cloud_type` directly from it:
+
+```yaml
+# Agents: cloud=aws ; cloud_type=lambda
+```
+
+Multiple valid combinations may be listed separated by `|`:
+
+```yaml
+# Agents: cloud=aws|gcp|azure ; cloud_type=kubernetes
+```
+
+**Priority 2 — fallback to `inputs-global.yaml`**
+
+If no `# Agents:` line is present, read the active `cloud` and `cloud_type` values from `.cloudopsworks/vars/inputs-global.yaml` and apply the mapping table below.
+
+**`cloud` / `cloud_type` → upstream template file:**
+
+| `cloud`                  | `cloud_type`                   | Upstream template file         |
+|--------------------------|--------------------------------|--------------------------------|
+| `aws`                    | `eks` or `kubernetes`          | `inputs-KUBERNETES-ENV.yaml`   |
+| `azure`                  | `aks` or `kubernetes`          | `inputs-KUBERNETES-ENV.yaml`   |
+| `gcp`                    | `gke` or `kubernetes`          | `inputs-KUBERNETES-ENV.yaml`   |
+| `aws`                    | `lambda`                       | `inputs-LAMBDA-ENV.yaml`       |
+| `aws`                    | `beanstalk`                    | `inputs-BEANSTALK-ENV.yaml`    |
+| `gcp`                    | `appengine`                    | `inputs-APPENGINE.yaml`        |
+| `gcp`                    | `cloudrun`                     | `inputs-CLOUDRUN.yaml`         |
+| `aws` / `gcp` / `azure`  | `none` or library mode         | `inputs-LIB-ENV.yaml`          |
+
+`inputs-global.yaml` always maps to the upstream `inputs-global.yaml` regardless of cloud type.
+
+---
+
+### Step 3 — merge environment-specific files
+
+For each `inputs-<name>.yaml`, apply all of the following rules.
+
+#### Keys and values
+
+- **Preserve operator-set values** — any key whose local value differs from the upstream template's placeholder or default must be kept exactly as-is.
+- **Add missing keys** — keys present in the upstream template but absent locally must be inserted at the correct structural position using the upstream default value and comment.
+- **Flag removed keys** — keys present locally but deleted from the upstream template must be reported to the operator before removal; do not silently delete them.
+
+#### Comments
+
+- **Template comments are authoritative for unchanged sections** — section-level and field-level comments from the upstream template replace their local equivalents when the operator has made no additions to that comment block.
+- **Preserve operator-added comments** — any comment not present in the upstream template must be retained verbatim.
+- **Update the `Agents:` header line** — if the upstream template added or changed the `# Agents:` metadata line, update it in the local file without altering the first description line (`# This file contains...`).
+
+#### Formatting
+
+- **Match upstream indentation and quoting** — indentation, block vs. flow style, and quoted vs. unquoted strings must match the upstream template for any unchanged or newly added sections.
+- **Commented-out blocks** — blocks that are commented out in the upstream template must remain commented out unless the operator has explicitly uncommented them locally.
+- **Multiline scalars** — preserve the operator's choice of `|` vs. `>` for any multiline value the operator has set.
+
+---
+
+### Step 4 — merge `inputs-global.yaml`
+
+`inputs-global.yaml` requires special handling because it contains mandatory operator identity fields alongside a large body of optional commented-out sections.
+
+Merge procedure:
+
+1. **Retain the four mandatory identity fields** verbatim at the top of the file:
+   ```yaml
+   organization_name: "..."
+   organization_unit: "..."
+   environment_name: "..."
+   repository_owner: "..."
+   ```
+2. **Retain `cloud` and `cloud_type`** exactly as the operator set them.
+3. **For every optional commented-out section** in the upstream template, check the local file:
+   - If the operator **has uncommented and configured it** — keep the operator's values; update only surrounding comment text if it changed upstream.
+   - If the section **is still fully commented out locally** — replace the entire commented block with the upstream version, capturing any new fields or updated documentation within it.
+4. **Append new optional sections** that appear in the upstream template but are entirely absent locally, in fully commented-out form, preserving their upstream position and comments.
+
+---
+
+### Step 5 — upgrade subdirectory files
+
+Apply the same merge rules (Steps 3 and 4) to every file in the following subdirectories, matching each local file to its corresponding upstream file at the same relative path:
+
+- `.cloudopsworks/vars/preview/inputs.yaml`
+- `.cloudopsworks/vars/preview/values.yaml`
+- `.cloudopsworks/vars/apigw/apis-global.yaml`
+- `.cloudopsworks/vars/apigw/apis-dev.yaml`
+- `.cloudopsworks/vars/apigw/apis-uat.yaml`
+- `.cloudopsworks/vars/apigw/apis-prod.yaml`
+- `.cloudopsworks/vars/helm/values-dev.yaml`
+- `.cloudopsworks/vars/helm/values-uat.yaml`
+- `.cloudopsworks/vars/helm/values-prod.yaml`
+
+---
+
+### Step 6 — update `_VERSION`
+
+After all merges are verified correct, write the target version string (e.g., `v1.4.16`) to `.cloudopsworks/_VERSION`. This is the final step.
+
+---
+
+### Upgrade invariants
+
+An agent performing this upgrade must **never**:
+
+- Overwrite a field the operator has explicitly set to a non-placeholder value.
+- Remove a commented-out operator value without first reporting it.
+- Change the YAML structure of any active (uncommented) operator section.
+- Alter a file's opening description comment (`# This file contains...`) unless the upstream version changed it.
+- Modify `.cloudopsworks/cloudopsworks-ci.yaml`, `gitversion_*.yaml`, or any file under `.github/workflows/` as part of a vars upgrade — those follow their own upgrade path.
+- Update `_VERSION` before all file merges are complete.
+
+---
+
+### Conflict resolution
+
+When a merge cannot be resolved automatically (for example, the upstream template restructured a section that the operator has customized):
+
+1. Emit a diff showing both the upstream template block and the local operator block side by side.
+2. Pause and present the conflict to the operator, asking which version to keep or whether a manual merge is needed.
+3. Never silently choose one side.
