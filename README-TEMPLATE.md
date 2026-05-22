@@ -400,27 +400,18 @@ If no `# Agents:` line is present, read the active `cloud` and `cloud_type` valu
 
 ---
 
-### Step 3 — merge environment-specific files
+### Step 3 — upgrade deployment target files
 
-For each `inputs-<name>.yaml`, apply all of the following rules.
+The deployment target files identified by the Step 2 mapping table — such as `inputs-KUBERNETES-ENV.yaml`, `inputs-LAMBDA-ENV.yaml`, `inputs-BEANSTALK-ENV.yaml`, `inputs-APPENGINE.yaml`, `inputs-CLOUDRUN.yaml`, `inputs-LIB-ENV.yaml`, and mobile equivalents such as `inputs-ANDROID-ENV.yaml` and `inputs-XCODE-ENV.yaml` — are **scaffolding templates**. They provide placeholder structures and documented examples, not finalized operator configuration.
 
-#### Keys and values
+**Do not merge these files. Overwrite them.**
 
-- **Preserve operator-set values** — any key whose local value differs from the upstream template's placeholder or default must be kept exactly as-is.
-- **Add missing keys** — keys present in the upstream template but absent locally must be inserted at the correct structural position using the upstream default value and comment.
-- **Flag removed keys** — keys present locally but deleted from the upstream template must be reported to the operator before removal; do not silently delete them.
+Upgrade procedure for each deployment target file:
 
-#### Comments
-
-- **Template comments are authoritative for unchanged sections** — section-level and field-level comments from the upstream template replace their local equivalents when the operator has made no additions to that comment block.
-- **Preserve operator-added comments** — any comment not present in the upstream template must be retained verbatim.
-- **Update the `Agents:` header line** — if the upstream template added or changed the `# Agents:` metadata line, update it in the local file without altering the first description line (`# This file contains...`).
-
-#### Formatting
-
-- **Match upstream indentation and quoting** — indentation, block vs. flow style, and quoted vs. unquoted strings must match the upstream template for any unchanged or newly added sections.
-- **Commented-out blocks** — blocks that are commented out in the upstream template must remain commented out unless the operator has explicitly uncommented them locally.
-- **Multiline scalars** — preserve the operator's choice of `|` vs. `>` for any multiline value the operator has set.
+1. **Before overwriting** — inspect the local file and record any operator-configured values (keys that have been uncommented and set to non-placeholder values).
+2. **Replace the file** — overwrite the local file entirely with the upstream template version.
+3. **Re-apply operator values** — after overwriting, set each previously recorded operator-configured value at its corresponding key in the new file.
+4. **Copy in absent files** — if a deployment target file is present in the upstream template but absent locally, copy it in from the upstream template as a new file.
 
 ---
 
@@ -447,7 +438,7 @@ Merge procedure:
 
 ### Step 5 — upgrade subdirectory files
 
-Apply the same merge rules (Steps 3 and 4) to every file in the following subdirectories, matching each local file to its corresponding upstream file at the same relative path:
+Apply the merge rules from Step 4 to every file in the following subdirectories, matching each local file to its corresponding upstream file at the same relative path:
 
 - `.cloudopsworks/vars/preview/inputs.yaml`
 - `.cloudopsworks/vars/preview/values.yaml`
