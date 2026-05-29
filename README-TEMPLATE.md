@@ -478,3 +478,34 @@ When a merge cannot be resolved automatically (for example, the upstream templat
 1. Emit a diff showing both the upstream template block and the local operator block side by side.
 2. Pause and present the conflict to the operator, asking which version to keep or whether a manual merge is needed.
 3. Never silently choose one side.
+
+---
+
+## Release Workflow — use `cw-release`
+
+All releases **must** be performed using the `cw-release` skill from the CloudOps Works skill set. Do **not** create release branches, hotfix branches, version tags, or release PRs manually — the skill owns the full GitFlow-aware release lifecycle for this repository.
+
+### When to invoke `cw-release`
+
+Use it whenever you are asked to:
+- Release, ship, or publish a new version (patch, minor, or major)
+- Create a hotfix or patch release
+- Create a release branch or feature-merge PR
+- Tag and publish a version
+
+### How to run it
+
+In Claude Code (CLI, IDE extension, or web):
+
+```
+/cw-release
+```
+
+### What the skill does
+
+1. Detects the GitVersion flow in use (`gitversion_gitflow.yaml` or `gitversion_githubflow.yaml`).
+2. Reads the repo-local release policy from `.cloudopsworks/cloudopsworks-ci.yaml`.
+3. Drives the shared tronador `make` / `gh` release path end-to-end.
+4. Creates the correct branch, PR, tag, and GitHub Release in the right sequence.
+
+> **Do not** run `git tag`, `gh release create`, or `make release` directly. Always let `cw-release` orchestrate these steps to keep version history and CI consistent.
