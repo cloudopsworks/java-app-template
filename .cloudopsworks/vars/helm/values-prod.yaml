@@ -155,3 +155,7 @@ ingress:
 #              periodSeconds: 15
 #  triggers: {}
 #  # {list of triggers to activate scaling of the target resource, see keda documentation for details}
+
+# Extra Objects to be added to the deployment, e.g. for custom resources or additional services, expressed as YAML lists.
+#  Each object should be a valid Kubernetes resource definition.
+#extraObjects:
