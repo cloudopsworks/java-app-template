@@ -35,6 +35,8 @@ config:
   # Configure repository to enable branch protection
   # https://docs.github.com/en/rest/reference/repos#update-branch-protection
   branchProtection: true
+  # Configure the repository to enable conventional commits Ruleset - This requires PRO/Enterprise/Teams Paid Plan to work, Free plans not-supported.
+  conventionalCommitsEnabled: false
   # Configure the repository to enforce conventional commits
   enforceConventionalCommits: false
   # Configure the repository to enforce custom commits messages pattern
