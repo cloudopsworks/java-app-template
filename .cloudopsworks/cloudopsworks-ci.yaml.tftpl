@@ -34,7 +34,13 @@ excludeGlobs:
 config:
   # Configure repository to enable branch protection
   # https://docs.github.com/en/rest/reference/repos#update-branch-protection
-  branchProtection: true
+  branchProtection: ${branch.protectionEnabled}
+  # Configure the repository to enforce conventional commits
+  enforceConventionalCommits: ${enforce.conventionalCommitsEnabled}
+  # Configure the repository to enforce custom commits messages pattern
+  enforceCustomCommitsPattern: ${enforce.customCommitsPatternEnabled}
+  #enforceCustomCommitsPatternRegex: "PROJECT-[0-9]+" #sample regex to enforce commit messages to have a JIRA ticket number in the format PROJECT-1234
+  enforceCustomCommitsPatternRegex: "${enforce.customCommitsPatternRegex}"
   # Configure the repository to use Git Flow and or support Branches enablement
   gitFlow:
     enabled: ${gitflow.enabled}
