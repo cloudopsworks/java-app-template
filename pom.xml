@@ -128,7 +128,7 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/x
         <configuration>
           <argLine>${argLine} -Dspring.profiles.active=test</argLine>
         </configuration>
-        <version>3.5.1</version>
+        <version>3.5.6</version>
       </plugin>
 
       <plugin>
