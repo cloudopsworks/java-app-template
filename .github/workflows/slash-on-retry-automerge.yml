@@ -28,7 +28,7 @@ jobs:
       - uses: cloudopsworks/automerge-action@v0.17.0
         env:
           GITHUB_TOKEN: "${{ secrets.BOT_TOKEN }}"
-          MERGE_COMMIT_MESSAGE: "pull-request-description"
+          MERGE_COMMIT_MESSAGE: "pull-request-title"
           MERGE_LABELS: "approved,!do-not-merge"
           UPDATE_LABELS: "approved"
           #LOG: "TRACE"
