@@ -18,9 +18,9 @@ assembly-versioning-scheme: MajorMinorPatch
 assembly-file-versioning-scheme: MajorMinorPatch
 tag-prefix: "[vV]?"
 version-in-branch-pattern: "(?<version>[vV]?\\d+(\\.\\d+)?(\\.\\d+)?).*"
-major-version-bump-message: "\\+semver:\\s?(major|breaking)"
+major-version-bump-message: "\\+semver:\\s?(breaking|major)"
 minor-version-bump-message: "\\+semver:\\s?(feature|minor)"
-patch-version-bump-message: "\\+semver:\\s?(fix|patch|hotfix)"
+patch-version-bump-message: "\\+semver:\\s?(fix|patch)"
 no-bump-message: "\\+semver:\\s?(none|skip)"
 tag-pre-release-weight: 60000
 commit-date-format: yyyy-MM-dd
@@ -33,18 +33,15 @@ merge-message-formats:
 update-build-number: true
 semantic-version-format: Strict
 strategies:
-  - Fallback
   - ConfiguredNextVersion
-  - MergeMessage
-  - TaggedCommit
-  - TrackReleaseBranches
-  - VersionInBranchName
+  - Mainline
 branches:
   main:
+    mode: ContinuousDeployment
     label: ''
     increment: Patch
     prevent-increment:
-      of-merged-branch: false
+      of-merged-branch: true
     track-merge-target: false
     track-merge-message: true
     regex: "^master$|^main$"
@@ -54,36 +51,30 @@ branches:
     is-release-branch: false
     is-main-branch: true
     pre-release-weight: 55000
-  release:
-    mode: ManualDeployment
-    label: beta
-    increment: Patch
-    prevent-increment:
-      of-merged-branch: true
-      when-branch-merged: false
-      when-current-commit-tagged: false
-    track-merge-target: false
-    track-merge-message: true
-    regex: "^releases?[\\/-](?<BranchName>[vV]?\\d+\\.\\d+\\.\\d+.*)"
-    source-branches:
-      - main
-    is-source-branch-for: []
-    tracks-release-branches: false
-    is-release-branch: true
-    is-main-branch: false
-    pre-release-weight: 30000
   feature:
-    mode: ManualDeployment
-    label: alpha
-    increment: Inherit
+    mode: ContinuousDelivery
+    label: "{BranchName}"
+    increment: Minor
     prevent-increment:
       when-current-commit-tagged: false
     track-merge-message: true
     regex: "^features?[\\/-](?<BranchName>.+)"
     source-branches:
       - main
-      - release
     is-source-branch-for: []
+    is-main-branch: false
+    pre-release-weight: 30000
+  hotfix:
+    mode: ContinuousDelivery
+    label: "{BranchName}"
+    increment: Patch
+    prevent-increment:
+      when-current-commit-tagged: false
+    regex: "^hotfix(es)?[\\/-](?<BranchName>.+)"
+    source-branches:
+      - main
+    is-source-branch-for: []
+    is-release-branch: true
     is-main-branch: false
     pre-release-weight: 30000
   pull-request:
@@ -97,39 +88,19 @@ branches:
     regex: "^(pull-requests|pull|pr)[\\/-](?<Number>\\d*)"
     source-branches:
       - main
-      - release
       - feature
+      - hotfix
     is-source-branch-for: []
-    pre-release-weight: 30000
-  hotfix:
-    mode: ManualDeployment
-    label: beta
-    increment: Inherit
-    prevent-increment:
-      when-current-commit-tagged: false
-    regex: "^(hotfix|fix)(es)?[\\/-](?<BranchName>[vV]?\\d+\\.\\d+\\.\\d+.*)"
-    source-branches:
-      - main
-      - support
-    is-source-branch-for: []
-    is-release-branch: true
-    is-main-branch: false
     pre-release-weight: 30000
   unknown:
-    mode: ManualDeployment
-    label: "{BranchName}"
-    increment: Inherit
+    increment: Patch
     prevent-increment:
       when-current-commit-tagged: false
-    track-merge-message: false
     regex: "(?<BranchName>.+)"
     source-branches:
       - main
-      - release
-      - feature
-      - pull-request
     is-source-branch-for: []
-    is-main-branch: false
+    pre-release-weight: 30000
 ignore:
   sha: []
   paths: []
