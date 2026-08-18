@@ -60,7 +60,7 @@ branches:
     label: ''
     increment: Patch
     prevent-increment:
-      of-merged-branch: false
+      of-merged-branch: true
     track-merge-target: false
     track-merge-message: true
     regex: "^master$|^main$"
