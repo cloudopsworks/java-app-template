@@ -81,6 +81,7 @@ jobs:
         id: build
         uses: ./bp/ci/java/build
         with:
+          environment: ${{ steps.config.outputs.environment }}
           bot_user: ${{ vars.BOT_USER }}
           token: ${{ secrets.BOT_TOKEN }}
 
