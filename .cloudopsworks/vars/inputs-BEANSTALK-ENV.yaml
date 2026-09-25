@@ -6,7 +6,7 @@ environment: "dev|uat|prod|demo"
 versions_bucket: "VERSIONS_BUCKET"
 #logs_bucket: "LOGS_BUCKET"
 #blue_green: true # uncomment for Prod environment to support blue/green deploy
-container_registry: REGISTRY # optional if Preview = false, can comment out
+#container_registry: REGISTRY # optional if Preview = false, can comment out
 
 aws:
   region: "AWS_REGION"

@@ -5,7 +5,7 @@ environment: "dev|uat|prod|demo"
 #disable_deploy: true
 versions_bucket: "VERSIONS_BUCKET"
 #blue_green: true # uncomment for Prod environment to support blue/green deploy
-container_registry: REGISTRY # optional if Preview = false, can comment out
+#container_registry: REGISTRY # optional if Preview = false, can comment out
 
 gcp:
   region: "GCP_REGION"
