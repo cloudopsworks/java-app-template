@@ -1,5 +1,34 @@
 # Java Application Template
 
+## Agent command policy
+
+The `Makefile` remains for compatibility, but direct Make invocation is deprecated
+for README and Git-flow/version operations. Agents must use the Tronador CLI:
+
+- Run `tronador readme build` to render README output. If committed target/dependency
+  documentation also needs refresh, run `tronador docs targets` first.
+- Use `tronador versions` for branch and version workflows. Before starting a
+  feature, verify that the active GitVersion configuration declares the intended
+  `# Agents: WayOfWork=...` policy; missing or contradictory metadata is a blocker.
+  `tronador versions feature start "<slug>"` starts from `develop` for GitFlow and
+  from the configured primary branch for GitHub Flow or trunk-based development.
+  Use the matching `publish` and `finish` subcommands, and use
+  `tronador versions tag --publish` when creating and publishing a version tag.
+- For destructive cleanup after a verified merge, use
+  `tronador versions feature purge ... --allow-network`,
+  `tronador versions hotfix purge ... --allow-network`, or
+  `tronador versions release purge ... --allow-network`. Fail closed if the
+  WayOfWork policy, merge evidence, authentication, or remote state is missing or
+  contradictory; do not fall back to Make. For a GitFlow release merged into
+  `support/*`, the release must also be back-integrated into `develop` before purge;
+  otherwise Tronador intentionally refuses deletion. CI jobs must install the CLI first with
+  `uses: cloudopsworks/install-tronador-cli@v1`.
+- Run `tronador project version --generate --yes` only after verified GitHub-template
+  or source-owner policy explicitly makes `_VERSION` writable. When authorized, the
+  command only writes the guarded file; review, stage, and commit it through the normal
+  feature-branch and pull-request flow. In downstream implementations `_VERSION` remains
+  a protected template marker; marker presence or inherited prose never grants authority.
+
 This repository is the **CloudOps Works Java application template** for bootstrapping a new Java service or library with Maven, GitHub Actions, and CloudOps Works delivery wiring already in place.
 
 Use this template when you want a repository that already includes:
@@ -18,7 +47,7 @@ Use this template when you want a repository that already includes:
 - `src/main/java/.placeholder` — placeholder for application sources
 - `src/test/.placeholder` — placeholder for tests
 - `apifiles/` — API definition placeholders
-- `Makefile` — bootstrap and GitVersion-backed version helper targets
+- `Makefile` — deprecated compatibility wrappers for bootstrap and version operations
 
 ### Delivery scaffold
 - `.cloudopsworks/cloudopsworks-ci.yaml` — repository governance and deployment routing
@@ -41,16 +70,20 @@ Create a new repository from `cloudopsworks/java-app-template`, then clone it lo
 ### 2. Initialize the Maven metadata
 From the root of the generated repository, run:
 
+Install Tronador CLI v0.5.0 or newer and GitHub CLI, then authenticate `gh`
+(`gh auth status` must succeed). Project initialization resolves the repository
+owner through GitHub, so network access must be explicit:
+
 ```bash
-make code/init
+tronador project init --allow-network
 ```
 
-This target updates `pom.xml` to:
+This command updates `pom.xml` to:
 - set `artifactId` to the current directory name
 - set the project version to `MajorMinorPatch-SNAPSHOT` derived from GitVersion
 
 ### 3. Replace the placeholder metadata in `pom.xml`
-`make code/init` does not finish the Java project definition for you. Review and replace at least:
+`tronador project init --allow-network` does not finish the Java project definition for you. Review and replace at least:
 
 - `GROUP_ID`
 - `ARTIFACT_ID`
@@ -71,10 +104,10 @@ Replace the placeholder files with real code and tests:
 ### 5. Verify the repository locally
 ```bash
 mvn test
-make version
+tronador project version
 ```
 
-`make version` writes a `VERSION` file and updates the Maven project version using GitVersion semantics.
+`tronador project version` writes a `VERSION` file and updates the Maven project version using GitVersion semantics.
 
 ---
 
@@ -309,7 +342,7 @@ If you use the CloudOps Works release workflow, keep changes grouped by release 
 ## Recommended first-pass checklist for generated repositories
 
 - [ ] Create the repo from this template
-- [ ] Run `make code/init`
+- [ ] Run `tronador project init --allow-network`
 - [ ] Replace the `pom.xml` placeholders and choose the final parent/dependencies
 - [ ] Replace `README.md` with project-specific documentation
 - [ ] Add real application sources under `src/main/java`
@@ -321,7 +354,7 @@ If you use the CloudOps Works release workflow, keep changes grouped by release 
 - [ ] Configure API Gateway files if needed
 - [ ] Add the required GitHub secrets and variables
 - [ ] Run `mvn test`
-- [ ] Run `make version`
+- [ ] Run `tronador project version`
 - [ ] Open a PR and verify `pr-build.yml`
 - [ ] Merge and verify the first environment deployment or artifact publication
 
@@ -337,24 +370,24 @@ If you use the CloudOps Works release workflow, keep changes grouped by release 
 ## Upgrading from the Template
 
 Repositories derived from this template stay in sync with upstream releases using the
-`make repos/upgrade*` targets. An agent asked to "upgrade", "update from template",
+`tronador repos` command set. An agent asked to "upgrade", "update from template",
 "sync with template", "apply template changes", or "bump template version" should use
-these targets — never fetch or apply template changes manually.
+these commands — never fetch or apply template changes manually.
 
-### Available upgrade targets
+### Available upgrade commands
 
-| Target | When to use |
+| Command | When to use |
 |---|---|
-| `make repos/upgrade` | **Default — patch upgrade.** Pulls the latest patch within the **same minor version**. No breaking changes. Use for routine maintenance. |
-| `make repos/upgrade/major` | Pulls the latest release within the **same major version**. May include workflow-level changes. |
-| `make repos/upgrade/master` | Pulls from the template's `master` branch tip. Use only when explicitly asked to track the latest unreleased template state. |
-| `make repos/upgrade/dev` | Pulls from the template's `develop` branch. Use only for pre-release or preview upgrades. |
-| `make repos/available` | Lists the latest available patch and major versions without modifying anything. Run this first to see what is available. |
+| `tronador repos upgrade` | **Default — patch upgrade.** Pulls the latest patch within the **same minor version**. No breaking changes. Use for routine maintenance. |
+| `tronador repos upgrade major` | Pulls the latest release within the **same major version**. May include workflow-level changes. |
+| `tronador repos upgrade master` | Pulls from the template's `master` branch tip. Use only when explicitly asked to track the latest unreleased template state. |
+| `tronador repos upgrade develop` | Pulls from the template's `develop` branch. Use only for pre-release or preview upgrades. |
+| `tronador repos available` | Lists the latest available patch and major versions without modifying anything. Run this first to see what is available. |
 
 ### Upgrade workflow for agents
 
-1. Run `make repos/available` to see the current and latest available versions.
-2. Choose the appropriate target (default: `make repos/upgrade` for a routine patch upgrade).
+1. Run `tronador repos available` to see the current and latest available versions.
+2. Choose the appropriate command (default: `tronador repos upgrade` for a routine patch upgrade).
 3. Review the diff — the upgrade overwrites `.github/workflows/` and selected `.cloudopsworks/` metadata; application source files are never touched.
 4. Commit the result with: `chore: upgrade from <template-name> <old-version> → <new-version> +semver: patch`
 5. Use `/cw-release` to create and merge the hotfix PR (see [Release Workflow — use `cw-release`](#release-workflow--use-cw-release)).
@@ -483,9 +516,9 @@ Apply the merge rules from Step 4 to every file in the following subdirectories,
 
 ---
 
-### Step 6 — update `_VERSION`
+### Step 6 — verify the protected `_VERSION` marker
 
-After all merges are verified correct, write the target version string (e.g., `v1.4.16`) to `.cloudopsworks/_VERSION`. This is the final step.
+Do not write `.cloudopsworks/_VERSION` during a manual downstream merge. It is a protected template-generation marker and may change only through the repository's verified, authorized template-upgrade owner (for example `tronador repos upgrade`). After all merges are verified, confirm the authorized upgrade recorded the expected template version; otherwise leave the marker unchanged and report the mismatch.
 
 ---
 
@@ -498,7 +531,7 @@ An agent performing this upgrade must **never**:
 - Change the YAML structure of any active (uncommented) operator section.
 - Alter a file's opening description comment (`# This file contains...`) unless the upstream version changed it.
 - Modify `.cloudopsworks/cloudopsworks-ci.yaml`, `gitversion_*.yaml`, or any file under `.github/workflows/` as part of a vars upgrade — those follow their own upgrade path.
-- Update `_VERSION` before all file merges are complete.
+- Hand-edit or stage `_VERSION`; only the verified, authorized template-upgrade owner may change it after the file merges are complete.
 
 ---
 
@@ -536,7 +569,7 @@ In Claude Code (CLI, IDE extension, or web):
 
 1. Detects the GitVersion flow in use (`gitversion_gitflow.yaml` or `gitversion_githubflow.yaml`).
 2. Reads the repo-local release policy from `.cloudopsworks/cloudopsworks-ci.yaml`.
-3. Drives the shared tronador `make` / `gh` release path end-to-end.
+3. Drives the shared `tronador` CLI / `gh` release path end-to-end.
 4. Creates the correct branch, PR, tag, and GitHub Release in the right sequence.
 
-> **Do not** run `git tag`, `gh release create`, or `make release` directly. Always let `cw-release` orchestrate these steps to keep version history and CI consistent.
+> **Do not** run `git tag`, `gh release create`, or the legacy Make release target directly. Always let `cw-release` orchestrate these steps to keep version history and CI consistent.
