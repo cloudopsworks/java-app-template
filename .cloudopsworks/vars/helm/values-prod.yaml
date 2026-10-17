@@ -117,12 +117,12 @@ ingress:
 
 # Service Account
 #serviceAccount:
-  # Specifies whether a service account should be used, if set true, the service account name should be set
-  #enabled: false
-  # Specifies whether a service account should be created
-  #create: false
-  #annotations: {}
-  #name: (optional)
+#  # Specifies whether a service account should be used, if set true, the service account name should be set
+#  enabled: false
+#  # Specifies whether a service account should be created
+#  create: false
+#  annotations: {}
+#  name: (optional)
 
 # KEDA ScaledObject / Job Configuration
 #keda:
