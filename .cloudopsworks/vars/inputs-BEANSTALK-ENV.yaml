@@ -14,7 +14,7 @@ aws:
 #  build_sts_role_arn: "BUILD_AWS_STS_ROLE_ARN" # Optional: when existing role is different for build and deploy
 #  deploy_sts_role_arn: "DEPLOYMENT_AWS_STS_ROLE_ARN" # Optional: when existing role is different for build and deploy
 dns:
-  enabled: true
+  enabled: false
   private_zone: false
   domain_name: DOMAIN_NAME
   alias_prefix: ALIAS_PREFIX
@@ -162,43 +162,43 @@ beanstalk:
     #  max: 1
   networking:
     private_subnets: []
-    #      - SUBNET_ID
-    #      - SUBNET_ID2
+    #  - SUBNET_ID
+    #  - SUBNET_ID2
     public_subnets: []
-    #      - SUBNET_ID3
-    #      - SUBNET_ID4
+    #  - SUBNET_ID3
+    #  - SUBNET_ID4
     vpc_id: VPC_ID
   ##
   # Optional variable for mapping ports to backend ports:
   port_mappings: []
-#    - name: default
-#      from_port: 80
-#      to_port: 8081
-#      protocol: HTTP
-#    - name: port443
-#      from_port: 443
-#      to_port: 8443
-#      protocol: HTTPS
-#      backend_protocol: HTTPS
-#      health_check: # for custom target group
-#        enabled: true
-#        protocol: HTTPS
-#        port: 8443 | traffic-port
-#        matcher: "200-302"
-#        path: "/"
-#        unhealthy_threshold: 2
-#        healthy_threshold: 2
-#        timeout: 5
-#        interval: 30
-#      # Rules are required if custom_shared_rules=false or not set
-#      rules:
-#        - RULENAME
+  #  - name: default
+  #    from_port: 80
+  #    to_port: 8081
+  #    protocol: HTTP
+  #  - name: port443
+  #    from_port: 443
+  #    to_port: 8443
+  #    protocol: HTTPS
+  #    backend_protocol: HTTPS
+  #    health_check: # for custom target group
+  #      enabled: true
+  #      protocol: HTTPS
+  #      port: 8443 | traffic-port
+  #      matcher: "200-302"
+  #      path: "/"
+  #      unhealthy_threshold: 2
+  #      healthy_threshold: 2
+  #      timeout: 5
+  #      interval: 30
+  #    # Rules are required if custom_shared_rules=false or not set
+  #    rules:
+  #      - RULENAME
 
   ##
   # Optional variable for adding extra tags to the environment
   extra_tags: {}
-  #    key: value
-  #    key2: value2
+  #  key: value
+  #  key2: value2
   extra_settings: []
   #  - name: "PORT"
   #    namespace: "aws:elasticbeanstalk:application:environment"
@@ -215,25 +215,25 @@ beanstalk:
   ##
   # Enable custom shared Rules where below rule mappings mandate over elastic beanstalk configuration.
   #custom_shared_rules: true
-  ##
+  #
   # Optional Variable for mapping rules for shared Load Balancer
   rule_mappings: []
-#    - name: RULENAME
-#      process: port_mapping_process
-#      host: host.address.com,host.address2.com
-#      path: /path
-#      priority: 100
-#      path_patterns:
-#        - /path
-#      query_strings:
-#        - query1=value1
-#        - query2=value2
-#      http_headers:
-#        - name: HEADERNAME
-#          values: ["value1", "valuepattern*"]
-#      source_ips:
-#        - IP1
-#        - IP2
+  #  - name: RULENAME
+  #    process: port_mapping_process
+  #    host: host.address.com,host.address2.com
+  #    path: /path
+  #    priority: 100
+  #    path_patterns:
+  #      - /path
+  #    query_strings:
+  #      - query1=value1
+  #      - query2=value2
+  #    http_headers:
+  #      - name: HEADERNAME
+  #        values: ["value1", "valuepattern*"]
+  #    source_ips:
+  #      - IP1
+  #      - IP2
 tags: {}
-# TAG1: value1
-# TAG2: value2
+  #TAG1: value1
+  #TAG2: value2
