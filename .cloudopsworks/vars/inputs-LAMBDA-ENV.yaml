@@ -120,6 +120,7 @@ lambda:
   #      maxAge: 86400
   #  - id: "dev"
   #    authorizationType: "NONE"
+  
   ##
   # Optional: EventBridge Scheduler invokes Lambda on a timer; it is not an EventBridge event rule.
   # An invocation role is created automatically when schedules are configured. Scheduler trust is restricted

@@ -216,6 +216,7 @@ beanstalk:
   # Enable custom shared Rules where below rule mappings mandate over elastic beanstalk configuration.
   #custom_shared_rules: true
   #
+  ##
   # Optional Variable for mapping rules for shared Load Balancer
   rule_mappings: []
   #  - name: RULENAME
